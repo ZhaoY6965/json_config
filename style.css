@@ -104,50 +104,6 @@ h1 {
     letter-spacing: 0.5px;
 }
 
-/* ===== 主题选择器 ===== */
-.theme-selector {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 12px;
-    padding: 8px 14px;
-    background: var(--bg-selector);
-    border-radius: 10px;
-    border: 1px solid var(--border-color);
-}
-.theme-selector label {
-    font-weight: 600;
-    font-size: 14px;
-    color: var(--text-primary);
-}
-.theme-selector select {
-    padding: 5px 12px;
-    border-radius: 6px;
-    border: 1px solid var(--border-color);
-    background: var(--bg-input);
-    color: var(--text-primary);
-    font-size: 13px;
-    cursor: pointer;
-    outline: none;
-}
-.theme-selector select:focus {
-    border-color: var(--accent-color);
-}
-#customColorPicker {
-    width: 34px;
-    height: 30px;
-    border-radius: 6px;
-    border: 2px solid var(--border-color);
-    cursor: pointer;
-    padding: 2px;
-    background: transparent;
-}
-#customColorLabel {
-    font-size: 12px;
-    color: var(--text-secondary);
-}
-
 /* ===== 工作台标签 ===== */
 .workbench-tabs {
     display: flex;
@@ -709,4 +665,309 @@ h1 {
 }
 .lib-table tr:hover {
     background: var(--bg-hover);
+}
+
+/* ===== 配置项目面板 ===== */
+.project-status {
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+.project-status.empty {
+    background: var(--msg-error-bg, #fde8e8);
+    color: var(--msg-error-text, #e53e3e);
+}
+.project-status.loaded {
+    background: var(--msg-success-bg, #c6f6d5);
+    color: var(--msg-success-text, #276749);
+}
+
+.config-file-list {
+    background: var(--bg-input);
+}
+
+.config-item {
+    display: flex;
+    align-items: center;
+    padding: 6px 12px 6px 20px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.15s;
+    gap: 8px;
+}
+.config-item:hover {
+    background: var(--bg-hover);
+}
+.config-item.active {
+    background: var(--accent-color, #0078D4);
+    color: white;
+}
+.config-item.active .config-count {
+    color: rgba(255,255,255,0.8);
+}
+.config-item.active .mod-dot {
+    background: #ffd700;
+}
+
+.config-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.config-count {
+    font-size: 11px;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+}
+
+.mod-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--msg-error-text, #e53e3e);
+    flex-shrink: 0;
+    margin-left: 4px;
+}
+
+.config-remove {
+    display: none;
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+    text-align: center;
+    border-radius: 50%;
+    font-size: 14px;
+    cursor: pointer;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    margin-left: 2px;
+    user-select: none;
+}
+.config-item:hover .config-remove {
+    display: inline-block;
+}
+.config-remove:hover {
+    background: var(--bg-hover);
+    color: var(--msg-error-text, #e53e3e);
+}
+.config-item.active .config-remove {
+    color: rgba(255,255,255,0.7);
+}
+.config-item.active .config-remove:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.15);
+}
+
+.config-empty {
+    padding: 16px;
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+.info-row {
+    margin-bottom: 2px;
+}
+
+/* Config edit table */
+.config-edit-table {
+    font-size: 12px;
+}
+.config-edit-table th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    white-space: nowrap;
+    font-size: 11px;
+}
+.config-edit-table td {
+    padding: 3px 4px;
+}
+.config-edit-table input,
+.config-edit-table select {
+    width: 100%;
+    padding: 3px 6px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    font-size: 12px;
+    box-sizing: border-box;
+}
+.config-edit-table input:focus,
+.config-edit-table select:focus {
+    outline: none;
+    border-color: var(--accent-color, #0078D4);
+    box-shadow: 0 0 0 2px rgba(0,120,212,0.2);
+}
+.config-edit-table input[readonly] {
+    background: var(--bg-selector);
+    color: var(--text-secondary);
+    cursor: default;
+}
+.config-edit-table .fk-select {
+    background: var(--bg-selector);
+    font-size: 11px;
+}
+.config-edit-table .row-check {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+.config-edit-table .row-num {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 11px;
+    width: 30px;
+}
+
+/* Hex color preview swatch */
+.hex-swatch {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    border: 1px solid var(--border-color);
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+/* Virtual scroll spacer rows */
+.config-edit-table tr.v-spacer td {
+    padding: 0 !important;
+    border: none !important;
+    line-height: 0;
+}
+.config-edit-table tr {
+    height: 30px;
+}
+.config-edit-table td {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 350px;
+}
+.config-edit-table td.td-narrow {
+    max-width: 80px;
+}
+
+/* ========== 卡片页面设计器 ========== */
+#cardDesignerModal .modal-content {
+    width: 90vw;
+    max-width: 1200px;
+    min-height: 600px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+}
+#cardDesignerModal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+#cardDesignerModal .modal-header h3 {
+    margin: 0;
+    font-size: 16px;
+}
+#cardDesignerModal .modal-body {
+    flex: 1;
+    display: flex;
+    gap: 12px;
+    padding: 12px;
+    overflow: hidden;
+    min-height: 0;
+}
+#cardDesignerModal .modal-footer {
+    display: flex;
+    gap: 8px;
+    padding: 10px 16px;
+    border-top: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.cd-left-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+}
+.cd-right-panel {
+    width: 280px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid var(--border-color);
+    padding-left: 12px;
+}
+.cd-grid-wrapper {
+    flex: 1;
+    overflow: auto;
+    min-height: 0;
+}
+.cd-grid-table td:hover {
+    background: var(--bg-hover) !important;
+}
+.cd-grid-table td {
+    user-select: none;
+}
+.cd-grid-table td[style*="background: var(--accent-color"]:hover {
+    opacity: 0.85;
+}
+
+.cd-ccr-item:hover {
+    background: var(--bg-hover);
+}
+.cd-ccr-item:active {
+    cursor: grabbing;
+}
+
+#cdOutputArea {
+    display: none;
+    margin-top: 8px;
+    padding: 10px;
+    background: var(--bg-selector);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 11px;
+    max-height: 200px;
+    overflow: auto;
+    white-space: pre;
+    color: var(--text-primary);
+}
+
+#cdCcrFilter {
+    width: 100%;
+    padding: 4px 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    font-size: 12px;
+    box-sizing: border-box;
+    margin-bottom: 6px;
+}
+#cdCcrList {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+#cdCardSelector {
+    width: 100%;
+    padding: 4px 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    font-size: 13px;
+    box-sizing: border-box;
 }

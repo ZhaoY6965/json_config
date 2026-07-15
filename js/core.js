@@ -7,6 +7,7 @@ export const dom = {
     status: document.getElementById('statusMessageLeft'),
     downloadBtn: document.getElementById('downloadBtn'),
     copyBtn: document.getElementById('copyBtn'),
+    clearPreviewBtn: document.getElementById('clearPreviewBtn'),
     editPreviewBtn: document.getElementById('editPreviewBtn'),
     applyPreviewBtn: document.getElementById('applyPreviewBtn'),
 };
@@ -20,14 +21,6 @@ export const batch = {
     updateBatchBtn: document.getElementById('updateBatchBtn'),
     cancelEditBtn: document.getElementById('cancelEditBtn'),
     tableBody: document.getElementById('batchTableBody'),
-    batchList: document.getElementById('batchList'),
-    addTemplateBtn: document.getElementById('addTemplateBtn'),
-    exportTemplateBtn: document.getElementById('exportTemplateBtn'),
-    importTemplateBtn: document.getElementById('importTemplateBtn'),
-    templateFileInput: document.getElementById('templateFileInput'),
-    templateSearchInput: document.getElementById('templateSearchInput'),
-    templateTableBody: document.getElementById('templateTableBody'),
-    templateEmpty: document.getElementById('templateEmpty'),
 };
 
 // 字段提取页 DOM 引用
@@ -72,14 +65,6 @@ export const modals = {
     countModalInput: document.getElementById('countModalInput'),
     countModalConfirm: document.getElementById('countModalConfirmBtn'),
     countModalCancel: document.getElementById('countModalCancelBtn'),
-    confirmModal: document.getElementById('confirmModal'),
-    confirmOkBtn: document.getElementById('confirmOkBtn'),
-    confirmCancelBtn: document.getElementById('confirmCancelBtn'),
-    newTemplateModal: document.getElementById('newTemplateModal'),
-    newTemplateName: document.getElementById('newTemplateName'),
-    newTemplateCreator: document.getElementById('newTemplateCreator'),
-    newTemplateConfirm: document.getElementById('newTemplateConfirmBtn'),
-    newTemplateCancel: document.getElementById('newTemplateCancelBtn'),
     fileNameModal: document.getElementById('fileNameModal'),
     modalInput: document.getElementById('modalFileNameInput'),
     modalConfirm: document.getElementById('modalConfirmBtn'),
@@ -96,9 +81,6 @@ export let nextBatchId = 1;
 export function getNextBatchId() { return nextBatchId; }
 export function allocBatchId() { return nextBatchId++; }
 export function resetBatchId() { nextBatchId = 1; }
-
-export let editingBatchId = null;
-export let stagedData = [];
 
 export function showStatus(msg, type = 'info') {
     const el = dom.status;

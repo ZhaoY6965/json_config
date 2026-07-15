@@ -1,5 +1,6 @@
 // extractor.js — 字段提取 (Field Extraction) tab functionality
-import { batches, allocBatchId, dom, showStatus } from './core.js';
+import { showStatus } from './core.js';
+import { setPreview } from './preview.js';
 
 // ── Private module state ──
 var extractData = null;
@@ -10,7 +11,18 @@ var selectedFields = new Set();
 
 function getFieldType(value) {
     if (value === null || value === undefined) return 'null';
-    if (Array.isArray(value)) return 'array';
+    if (Array.isArray(value)) {
+        if (value.length > 0) {
+            var elemType = Array.isArray(value[0]) ? 'array' :
+                (value[0] === null ? 'null' :
+                (typeof value[0] === 'number' ? (Number.isInteger(value[0]) ? 'int' : 'float') : typeof value[0]));
+            return 'array<' + elemType + '>[' + value.length + ']';
+        }
+        return 'array[0]';
+    }
+    if (typeof value === 'number') {
+        return Number.isInteger(value) ? 'number(int)' : 'number(float)';
+    }
     return typeof value;
 }
 
@@ -58,7 +70,8 @@ function loadExtractFile(file) {
     reader.onload = function (e) {
         try {
             var parsed = JSON.parse(e.target.result);
-            extractData = Array.isArray(parsed) ? parsed : (parsed.data || [parsed]);
+            extractData = Array.isArray(parsed) ? parsed :
+                (parsed.data && Array.isArray(parsed.data) ? parsed.data : [parsed]);
             extractFields = extractFieldDetails(extractData);
             selectedFields = new Set(extractFields.map(function (f) { return f.name; }));
 
@@ -66,16 +79,18 @@ function loadExtractFile(file) {
             var fileInfoEl = document.getElementById('extractFileInfo');
             if (fileInfoEl) fileInfoEl.textContent = file.name;
 
-            // Show metadata
+            // Show metadata using proper elements
             var metaEl = document.getElementById('extractMeta');
-            if (metaEl) {
-                metaEl.textContent = '数据条数: ' + extractData.length + ' | 字段数: ' + extractFields.length;
-            }
+            if (metaEl) metaEl.style.display = 'block';
+            var countEl = document.getElementById('extractCountDisplay');
+            if (countEl) countEl.textContent = extractData.length;
+            var fieldCountEl = document.getElementById('extractFieldCountDisplay');
+            if (fieldCountEl) fieldCountEl.textContent = extractFields.length;
 
             renderExtractFieldsTable();
             showStatus('文件加载成功，共 ' + extractData.length + ' 条数据，' + extractFields.length + ' 个字段');
         } catch (err) {
-            showStatus('JSON 解析失败: ' + err.message);
+            showStatus('JSON 解析失败: ' + err.message, 'error');
         }
     };
     reader.readAsText(file);
@@ -85,6 +100,9 @@ function renderExtractFieldsTable() {
     var tbody = document.getElementById('extractFieldsBody');
     if (!tbody) return;
     tbody.innerHTML = '';
+    var container = document.getElementById('extractFieldsContainer');
+    if (container) container.style.display = 'block';
+
     for (var i = 0; i < extractFields.length; i++) {
         var f = extractFields[i];
         var tr = document.createElement('tr');
@@ -100,10 +118,13 @@ function renderExtractFieldsTable() {
 
         var tdName = document.createElement('td');
         tdName.textContent = f.name;
+        tdName.style.fontWeight = '500';
         tr.appendChild(tdName);
 
         var tdType = document.createElement('td');
         tdType.textContent = f.type;
+        tdType.style.fontSize = '11px';
+        tdType.style.color = 'var(--text-secondary)';
         tr.appendChild(tdType);
 
         var tdCount = document.createElement('td');
@@ -112,23 +133,34 @@ function renderExtractFieldsTable() {
         tr.appendChild(tdCount);
 
         var tdSample = document.createElement('td');
+        tdSample.className = 'sample-cell';
         tdSample.textContent = formatSample(f.sample);
+        tdSample.title = formatSample(f.sample, 200);
         tr.appendChild(tdSample);
 
         tbody.appendChild(tr);
     }
+
+    updateSelectionCount();
+}
+
+function updateSelectionCount() {
+    var countEl = document.getElementById('extractSelectionCount');
+    if (countEl) countEl.textContent = '已选 ' + selectedFields.size + ' / ' + extractFields.length + ' 个字段';
 }
 
 function selectAllFields() {
     selectedFields = new Set(extractFields.map(function (f) { return f.name; }));
     var checkboxes = document.querySelectorAll('#extractFieldsBody .field-checkbox');
     for (var i = 0; i < checkboxes.length; i++) checkboxes[i].checked = true;
+    updateSelectionCount();
 }
 
 function deselectAllFields() {
     selectedFields.clear();
     var checkboxes = document.querySelectorAll('#extractFieldsBody .field-checkbox');
     for (var i = 0; i < checkboxes.length; i++) checkboxes[i].checked = false;
+    updateSelectionCount();
 }
 
 function invertFieldSelection() {
@@ -142,6 +174,7 @@ function invertFieldSelection() {
             selectedFields.delete(fieldName);
         }
     }
+    updateSelectionCount();
 }
 
 function generateExtraction() {
@@ -177,12 +210,8 @@ function previewExtraction() {
     var result = generateExtraction();
     if (!result) return;
 
-    if (dom.previewDisplay) dom.previewDisplay.textContent = JSON.stringify(result, null, 2);
-    if (dom.previewCount) dom.previewCount.textContent = '提取条数: ' + result.length;
-
-    var batchId = allocBatchId();
-    batches.push({ id: batchId, data: result, source: '字段提取' });
-    showStatus('预览已生成，共 ' + result.length + ' 条数据（批次 #' + batchId + '）');
+    setPreview(result, '提取条数: ' + result.length);
+    showStatus('提取完成，共 ' + result.length + ' 条数据已显示在右侧预览');
 }
 
 function saveAsConfigTemplate() {
@@ -283,6 +312,7 @@ export function initExtractorPanel() {
                 } else {
                     selectedFields.delete(fieldName);
                 }
+                updateSelectionCount();
             }
         });
         tbody.addEventListener('click', function (e) {
@@ -297,6 +327,7 @@ export function initExtractorPanel() {
                     } else {
                         selectedFields.delete(fieldName);
                     }
+                    updateSelectionCount();
                 }
             }
         });

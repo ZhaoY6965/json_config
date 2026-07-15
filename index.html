@@ -15,21 +15,10 @@
                     <h1>ALCMS_5.0 设备配置</h1>
                 </header>
 
-                <!-- 主题切换 -->
-                <div class="theme-selector">
-                    <label for="themeSelect">主题：</label>
-                    <select id="themeSelect">
-                        <option value="light">白色</option>
-                        <option value="dark">深色</option>
-                        <option value="custom">自定义</option>
-                    </select>
-                    <input type="color" id="customColorPicker" value="#2b7be4" style="display:none; width:34px; height:30px; border-radius:6px; border:2px solid var(--border-color); cursor:pointer; padding:2px;">
-                    <span id="customColorLabel" style="display:none; font-size:12px; color:var(--text-secondary);">点击选色</span>
-                </div>
-
                 <!-- 工作台标签栏 -->
                 <div class="workbench-tabs">
-                    <button class="workbench-tab active" data-target="tab-generate">生成模板</button>
+                    <button class="workbench-tab active" data-target="tab-config-project">配置项目</button>
+                    <button class="workbench-tab" data-target="tab-generate">生成模板</button>
                     <button class="workbench-tab" data-target="tab-extract">字段提取</button>
                     <button class="workbench-tab" data-target="tab-import-data">导入文件</button>
                     <button class="workbench-tab" data-target="tab-template-lib">模板库</button>
@@ -37,8 +26,81 @@
 
                 <!-- 工作台面板 -->
                 <div class="workbench-panels">
+                    <!-- ===== 配置项目面板 ===== -->
+                    <div id="tab-config-project" class="workbench-panel active">
+                        <div id="configProjectPanel" style="padding:8px 0;">
+                            <!-- 项目操作栏 -->
+                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+                                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                                    <div style="font-weight:600; font-size:16px; color:var(--text-primary);">📁 配置</div>
+                                    <select id="projectSelector" style="display:none; font-size:13px; padding:3px 8px; border:1px solid var(--border-color); border-radius:4px; background:var(--bg-input); color:var(--text-primary);"></select>
+                                </div>
+                                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                                    <button class="btn btn-primary btn-sm" id="selectConfigFolderBtn">选择Config目录</button>
+                                    <input type="file" id="configDirFileInput" webkitdirectory directory multiple accept=".json" style="display:none;">
+                                    <button class="btn btn-outline btn-sm" id="importConfigBtn">导入JSON</button>
+                                    <input type="file" id="configFileInput" accept=".json" style="display:none;">
+                                    <button class="btn btn-outline btn-sm" id="refreshConfigBtn" style="display:none;">刷新</button>
+                                    <button class="btn btn-success btn-sm" id="saveConfigBtn" style="display:none;">保存当前</button>
+                                    <button class="btn btn-outline btn-sm" id="saveAllConfigBtn" style="display:none;">全部保存</button>
+                                </div>
+                            </div>
+                            <div style="font-size:12px; color:var(--text-secondary); margin-bottom:8px;">
+                                选择Config目录可批量加载配置，也可拖入单个JSON文件
+                            </div>
+
+                            <!-- 目录状态 -->
+                            <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px; padding:8px 12px; background:var(--bg-selector); border-radius:8px; border:1px solid var(--border-color);">
+                                <span id="projectStatus" class="project-status empty">未加载项目</span>
+                                <span style="color:var(--text-secondary); font-size:13px;">|</span>
+                                <span id="configFolderName" style="font-size:13px; color:var(--text-primary);">选择目录或导入文件</span>
+                                <span id="schemaBadge" style="display:none; font-size:11px; padding:2px 8px; background:var(--accent-color); color:white; border-radius:10px; margin-left:auto;"></span>
+                            </div>
+
+                            <!-- 配置信息（固定高度防止布局跳动） -->
+                            <div id="configInfo" style="display:none; margin-bottom:10px; padding:8px 12px; background:var(--bg-selector); border-radius:8px; border:1px solid var(--border-color); font-size:12px; line-height:1.6; height:72px; overflow:hidden;">
+                            </div>
+
+                            <!-- 配置文件列表 -->
+                            <div style="margin-bottom:12px;">
+                                <div style="font-weight:600; font-size:13px; color:var(--text-secondary); margin-bottom:6px;">配置文件</div>
+                                <div id="configFileList" class="config-file-list" style="max-height:260px; overflow-y:auto; border:1px solid var(--border-color); border-radius:8px;">
+                                    <div class="config-empty">点击"选择目录"加载ALCMS5配置</div>
+                                </div>
+                            </div>
+
+                            <!-- 拖拽导入区 -->
+                            <div id="configDropZone" style="margin-bottom:10px; padding:12px; border:2px dashed var(--border-color); border-radius:8px; text-align:center; color:var(--text-secondary); font-size:12px; transition:all 0.2s;">
+                                📥 拖入JSON文件或目录到此处快速加载
+                            </div>
+
+                            <!-- Schema感知编辑器 -->
+                            <div id="configEditorSection" style="display:none; border:1px solid var(--border-color); border-radius:8px; padding:12px;">
+                                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                                    <div style="font-weight:600; font-size:14px; color:var(--text-primary);">
+                                        ✏️ <span id="configEditorTitle">编辑配置</span>
+                                    </div>
+                                    <div style="display:flex; gap:6px;">
+                                        <button class="btn btn-outline btn-sm" id="configAddRowBtn">添加行</button>
+                                        <button class="btn btn-outline btn-sm" id="configDeleteRowBtn">删除选中</button>
+                                        <button class="btn btn-outline btn-sm" id="configRemoveBtn" style="color:var(--msg-error-text,#e53e3e);">移除配置</button>
+                                        <button class="btn btn-primary btn-sm" id="cardDesignerBtn" style="display:none;">页面设计</button>
+                                        <button class="btn btn-primary btn-sm" id="configPreviewBtn">预览JSON</button>
+                                    </div>
+                                </div>
+                                <div id="configTableWrapper" style="max-height:480px; overflow:auto; border:1px solid var(--border-color); border-radius:6px;">
+                                    <table class="batch-table config-edit-table" id="configEditTable">
+                                        <thead id="configEditTableHead"></thead>
+                                        <tbody id="configEditTableBody"></tbody>
+                                    </table>
+                                </div>
+                                <div id="configEditorHint" style="margin-top:6px; font-size:11px; color:var(--text-secondary);"></div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- ===== 生成模板面板（完整） ===== -->
-                    <div id="tab-generate" class="workbench-panel active">
+                    <div id="tab-generate" class="workbench-panel">
                         <div style="margin:8px 0; font-size:13px; color:var(--text-secondary);">
                             点击“生成预览”查看JSON，点击“编辑”修改批次
                         </div>
@@ -83,44 +145,6 @@
                             <button class="btn btn-outline btn-lg" id="cancelEditBtn" style="display:none;">取消编辑</button>
                         </div>
 
-                        <!-- 历史批次 -->
-                        <div style="margin-top:16px; border-top:1px solid var(--border-color); padding-top:12px;">
-                            <div style="font-weight:600; font-size:14px; color:var(--text-primary);">历史批次</div>
-                            <div id="batchList" style="max-height:150px; overflow-y:auto; margin-top:4px;"></div>
-                        </div>
-
-                        <!-- 模板管理 -->
-                        <div style="margin-top:16px; border-top:1px solid var(--border-color); padding-top:12px;">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
-                                <span style="font-weight:600; font-size:14px; color:var(--text-primary);">📂 模板管理</span>
-                                <span style="display:flex; gap:8px; flex-wrap:wrap;">
-                                    <button class="btn btn-primary btn-sm" id="addTemplateBtn" style="padding:4px 14px; font-size:12px;">+ 新建模板</button>
-                                    <button class="btn btn-outline btn-sm" id="exportTemplateBtn" style="padding:4px 14px; font-size:12px;">导出</button>
-                                    <button class="btn btn-outline btn-sm" id="importTemplateBtn" style="padding:4px 14px; font-size:12px;">导入</button>
-                                    <input type="file" id="templateFileInput" accept=".json" style="display:none;">
-                                </span>
-                            </div>
-                            <div style="margin-bottom:8px;">
-                                <input type="text" id="templateSearchInput" placeholder="🔍 搜索模板（用途/创建人）..." style="width:100%; padding:6px 12px; border:1px solid var(--border-color); border-radius:6px; font-size:13px; background:var(--bg-input); color:var(--text-primary); box-sizing:border-box;">
-                            </div>
-                            <div style="border:1px solid var(--border-color); border-radius:8px; overflow:hidden; max-height:200px; overflow-y:auto;">
-                                <table class="template-table" style="width:100%; border-collapse:collapse; font-size:13px;">
-                                    <thead style="position:sticky; top:0; z-index:2;">
-                                        <tr>
-                                            <th style="width:8%; padding:6px 8px; background:var(--bg-selector); border-bottom:2px solid var(--border-color); text-align:center;">序号</th>
-                                            <th style="width:32%; padding:6px 8px; background:var(--bg-selector); border-bottom:2px solid var(--border-color); text-align:left;">用途</th>
-                                            <th style="width:20%; padding:6px 8px; background:var(--bg-selector); border-bottom:2px solid var(--border-color); text-align:left;">创建人</th>
-                                            <th style="width:25%; padding:6px 8px; background:var(--bg-selector); border-bottom:2px solid var(--border-color); text-align:left;">创建时间</th>
-                                            <th style="width:15%; padding:6px 8px; background:var(--bg-selector); border-bottom:2px solid var(--border-color); text-align:center;">操作</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="templateTableBody">
-                                        <!-- 由 JS 动态渲染 -->
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div id="templateEmpty" style="text-align:center; padding:12px; color:var(--text-secondary); font-size:13px; display:none;">暂无模板，点击“新建模板”创建</div>
-                        </div>
                     </div>
 
                     <!-- ===== 导入文件面板（重新设计：双JSON字段替换） ===== -->
@@ -396,30 +420,11 @@
             <div class="action-bar">
                 <button class="btn btn-primary btn-lg" id="downloadBtn">下载 JSON 文件</button>
                 <button class="btn btn-outline btn-lg" id="copyBtn">复制到剪贴板</button>
+                <button class="btn btn-outline btn-lg" id="clearPreviewBtn" style="color:var(--msg-error-text); border-color:var(--msg-error-border);">清空显示</button>
             </div>
         </div>
     </div>
 
-    <!-- ===== 新建模板模态框 ===== -->
-    <div id="newTemplateModal" class="modal" style="display:none;">
-        <div class="modal-content" style="min-width:400px;">
-            <h3>📝 新建模板</h3>
-            <div style="margin-top:16px;">
-                <div style="margin-bottom:12px;">
-                    <label style="display:block; font-weight:600; font-size:13px; color:var(--text-primary); margin-bottom:4px;">用途（模板名称）</label>
-                    <input type="text" id="newTemplateName" placeholder="例如：进近灯配置" style="width:100%; padding:8px 12px; border:2px solid var(--border-color); border-radius:8px; background:var(--bg-input); color:var(--text-primary); font-size:14px; box-sizing:border-box;">
-                </div>
-                <div style="margin-bottom:12px;">
-                    <label style="display:block; font-weight:600; font-size:13px; color:var(--text-primary); margin-bottom:4px;">创建人</label>
-                    <input type="text" id="newTemplateCreator" placeholder="您的姓名" style="width:100%; padding:8px 12px; border:2px solid var(--border-color); border-radius:8px; background:var(--bg-input); color:var(--text-primary); font-size:14px; box-sizing:border-box;">
-                </div>
-                <div style="margin-top:16px; display:flex; gap:12px; justify-content:flex-end;">
-                    <button id="newTemplateCancelBtn" class="btn btn-outline btn-lg">取消</button>
-                    <button id="newTemplateConfirmBtn" class="btn btn-primary btn-lg">保存模板</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- 文件名模态框 -->
     <div id="fileNameModal" class="modal" style="display:none;">
@@ -451,7 +456,7 @@
     <div id="confirmModal" class="modal" style="display:none;">
         <div class="modal-content">
             <h3>⚠️ 确认清空</h3>
-            <p style="font-size:14px; color:var(--text-secondary);">确定要清空表格吗？这将删除所有行并清除历史批次。</p>
+            <p style="font-size:14px; color:var(--text-secondary);">确定要清空表格吗？这将删除所有行。</p>
             <div class="modal-actions">
                 <button id="confirmCancelBtn" class="btn btn-outline btn-lg">取消</button>
                 <button id="confirmOkBtn" class="btn btn-danger btn-lg" style="background:#e53e3e; color:white;">确定</button>
@@ -470,16 +475,40 @@
         </div>
     </div>
 
+    <!-- 卡片页面设计器模态框 -->
+    <div id="cardDesignerModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="cdDesignTitle">卡片页面设计</h3>
+                <button class="btn btn-outline btn-sm" id="cardDesignerClose" style="font-size:18px;line-height:1;padding:2px 10px;">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="cd-left-panel">
+                    <div style="margin-bottom:8px;">
+                        <select id="cdCardSelector" style="display:none;"></select>
+                    </div>
+                    <div class="cd-grid-wrapper" id="cdGridContainer">
+                        <div style="padding:20px;text-align:center;color:var(--text-secondary);">加载中...</div>
+                    </div>
+                    <div id="cdOutputArea"></div>
+                </div>
+                <div class="cd-right-panel" id="cdCcrPanel">
+                    <div style="font-weight:600;font-size:13px;margin-bottom:6px;color:var(--text-primary);">调光器列表</div>
+                    <input type="text" id="cdCcrFilter" placeholder="搜索调光器...">
+                    <div id="cdCcrList">
+                        <div style="padding:8px;text-align:center;color:var(--text-secondary);font-size:12px;">选择卡片后显示</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span id="cdPlacementInfo" style="font-size:12px;color:var(--text-secondary);flex:1;">当前共 0 个放置位置</span>
+                <button class="btn btn-outline btn-sm" id="cdClearBtn">清空</button>
+                <button class="btn btn-success btn-sm" id="cdApplyBtn">应用到ccr_config</button>
+                <button class="btn btn-primary btn-sm" id="cdGenerateBtn">生成映射JSON</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module" src="js/main.js"></script>
-    <script>
-        document.querySelectorAll('.workbench-tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                document.querySelectorAll('.workbench-tab').forEach(t => t.classList.remove('active'));
-                document.querySelectorAll('.workbench-panel').forEach(p => p.classList.remove('active'));
-                this.classList.add('active');
-                document.getElementById(this.dataset.target).classList.add('active');
-            });
-        });
-    </script>
 </body>
 </html>

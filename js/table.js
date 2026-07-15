@@ -1,5 +1,5 @@
-import { batch, modals, showStatus } from './core.js';
-import { updatePreview, renderBatchList } from './batch.js';
+import { batch, showStatus } from './core.js';
+import { updatePreview } from './batch.js';
 
 const STEP_OPTIONS = [-3, -2, -1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
@@ -56,6 +56,10 @@ export function buildTable(fields) {
     if (fields && fields.length > 0) {
         fields.forEach(f => addRow(f, '', '', 1));
     }
+    // 如果没有字段传入，添加一个空行
+    if (!fields || fields.length === 0) {
+        addRow();
+    }
 }
 
 export function clearTable() {
@@ -63,18 +67,32 @@ export function clearTable() {
         showStatus('表格已为空', 'info');
         return;
     }
-    modals.confirmModal.style.display = 'flex';
+    const confirmModal = document.getElementById('confirmModal');
+    if (confirmModal) confirmModal.style.display = 'flex';
 }
 
 export function confirmClear() {
     batch.tableBody.innerHTML = '';
-    // 只清空表格，批次数据由外部管理
-    modals.confirmModal.style.display = 'none';
+    const confirmModal = document.getElementById('confirmModal');
+    if (confirmModal) confirmModal.style.display = 'none';
     showStatus('表格已清空', 'info');
-    updatePreview(); // 刷新预览（可能没有批次数据了）
+    updatePreview();
 }
 
 export function cancelClear() {
-    modals.confirmModal.style.display = 'none';
+    const confirmModal = document.getElementById('confirmModal');
+    if (confirmModal) confirmModal.style.display = 'none';
     showStatus('已取消清空', 'info');
 }
+
+// 绑定确认模态框事件（自包含，不依赖外部 main.js）
+(function bindConfirmModal() {
+    const modal = document.getElementById('confirmModal');
+    const okBtn = document.getElementById('confirmOkBtn');
+    const cancelBtn = document.getElementById('confirmCancelBtn');
+    if (okBtn) okBtn.addEventListener('click', confirmClear);
+    if (cancelBtn) cancelBtn.addEventListener('click', cancelClear);
+    if (modal) modal.addEventListener('click', (e) => {
+        if (e.target === modal) cancelClear();
+    });
+})();

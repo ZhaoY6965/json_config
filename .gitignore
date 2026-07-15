@@ -13,3 +13,6 @@ desktop.ini
 # Node (if ever added)
 node_modules/
 package-lock.json
+
+# Backup files
+*.bak

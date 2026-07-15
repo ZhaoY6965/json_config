@@ -2,7 +2,8 @@
 // 模板库（Template Library）— 合并浏览器 localStorage 与本地文件夹
 // ============================================================
 
-import { dom, showStatus } from './core.js';
+import { showStatus } from './core.js';
+import { setPreview } from './preview.js';
 import {
     isFileSystemAccessSupported,
     selectFolder,
@@ -212,7 +213,10 @@ function loadTemplateFromLib(index) {
             showStatus('已加载提取配置模板"' + tpl.name + '"', 'success');
 
         } else if (tpl.type === 'data') {
-            // 提取数据 — 直接作为批次推送到预览，并派发事件
+            // 提取数据 — 直接显示到右侧预览
+            if (tpl.data && Array.isArray(tpl.data)) {
+                setPreview(tpl.data, '模板"' + tpl.name + '"（共 ' + tpl.data.length + ' 条）');
+            }
             var dataEvent = new CustomEvent('template-lib-load-data', {
                 detail: { data: tpl.data, name: tpl.name }
             });

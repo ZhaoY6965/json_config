@@ -5,6 +5,16 @@ import { showStatus } from './core.js';
 
 const STORAGE_KEY = 'quick_edit_texts';
 
+// 追踪最后聚焦的输入框（解决点击按钮时焦点丢失问题）
+let lastFocusedInput = null;
+document.addEventListener('mousedown', (e) => {
+    const el = e.target;
+    if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') &&
+        !el.closest('#quickEditInput') && !el.closest('.right-panel')) {
+        lastFocusedInput = el;
+    }
+}, true); // 捕获阶段，在 blur 之前执行
+
 // 获取所有快捷文本
 export function getQuickEditTexts() {
     try {
@@ -22,15 +32,22 @@ export function saveQuickEditTexts(texts) {
 // 在光标位置插入文本
 export function insertTextAtCursor(text) {
     const active = document.activeElement;
+    let target = null;
+    // 优先使用当前聚焦的输入框，其次使用最后记录的输入框
     if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) {
-        const start = active.selectionStart;
-        const end = active.selectionEnd;
-        const val = active.value;
-        active.value = val.substring(0, start) + text + val.substring(end);
+        target = active;
+    } else if (lastFocusedInput && document.body.contains(lastFocusedInput)) {
+        target = lastFocusedInput;
+    }
+    if (target) {
+        target.focus();
+        const start = target.selectionStart;
+        const end = target.selectionEnd;
+        const val = target.value;
+        target.value = val.substring(0, start) + text + val.substring(end);
         const newPos = start + text.length;
-        active.selectionStart = active.selectionEnd = newPos;
-        active.focus();
-        showStatus(`已插入“${text}”`, 'success');
+        target.selectionStart = target.selectionEnd = newPos;
+        showStatus(`已插入”${text}”`, 'success');
     } else {
         showStatus('请先点击表格中的输入框', 'error');
     }

@@ -1,6 +1,26 @@
-import { dom, modals, batches, allocBatchId, resetBatchId, showStatus } from './core.js';
+import { dom, showStatus } from './core.js';
 
 export let isEditingPreview = false;
+
+/**
+ * 集中式预览更新 — 所有模块统一调用此函数刷新右侧预览
+ * @param {Array|Object} data  JSON 数据
+ * @param {string} [label]     可选标签，如 “（共 N 条）”
+ */
+export function setPreview(data, label) {
+    if (dom.previewEditor.style.display !== 'none') return; // 编辑模式下不覆盖
+    var arr = Array.isArray(data) ? data : [data];
+    dom.previewDisplay.textContent = JSON.stringify(arr, null, 2);
+    dom.previewCount.textContent = label || ('（共 ' + arr.length + ' 条）');
+}
+
+/** 清空预览显示 */
+export function clearPreview() {
+    if (isEditingPreview) exitPreviewEdit();
+    dom.previewDisplay.textContent = '// 等待生成配置...';
+    dom.previewCount.textContent = '';
+    showStatus('预览已清空', 'info');
+}
 
 export function enablePreviewEdit() {
     if (isEditingPreview) return;
@@ -13,7 +33,7 @@ export function enablePreviewEdit() {
     dom.editPreviewBtn.style.display = 'none';
     dom.applyPreviewBtn.style.display = 'inline-block';
     dom.previewEditor.focus();
-    showStatus('预览可编辑，修改后点击“应用修改”', 'info');
+    showStatus('预览可编辑，修改后点击”应用修改”', 'info');
 }
 
 export function applyPreviewEdit() {
@@ -25,39 +45,15 @@ export function applyPreviewEdit() {
                 showStatus('编辑后的JSON数组为空', 'error');
                 return;
             }
-            const fields = Object.keys(parsed[0]);
-            const config = fields.map(f => ({
-                field: f,
-                prefix: '',
-                start: null,
-                step: 1,
-                count: parsed.length
-            }));
-            batches.length = 0;
-            resetBatchId();
-            const newBatch = { id: allocBatchId(), config, data: parsed };
-            batches.push(newBatch);
             exitPreviewEdit();
             dom.previewDisplay.textContent = JSON.stringify(parsed, null, 2);
-            dom.previewCount.textContent = `（共 ${parsed.length} 条）`;
-            showStatus(`应用修改成功，共 ${parsed.length} 条数据`, 'success');
+            dom.previewCount.textContent = '（共 ' + parsed.length + ' 条）';
+            showStatus('应用修改成功，共 ' + parsed.length + ' 条数据', 'success');
         } else if (typeof parsed === 'object' && parsed !== null) {
             const dataArray = [parsed];
-            const fields = Object.keys(parsed);
-            const config = fields.map(f => ({
-                field: f,
-                prefix: '',
-                start: null,
-                step: 1,
-                count: 1
-            }));
-            batches.length = 0;
-            resetBatchId();
-            const newBatch = { id: allocBatchId(), config, data: dataArray };
-            batches.push(newBatch);
             exitPreviewEdit();
             dom.previewDisplay.textContent = JSON.stringify(dataArray, null, 2);
-            dom.previewCount.textContent = `（共 1 条）`;
+            dom.previewCount.textContent = '（共 1 条）';
             showStatus('应用修改成功，已转为单条数据', 'success');
         } else {
             showStatus('编辑内容必须是JSON对象或数组', 'error');
@@ -87,18 +83,22 @@ export function getCurrentContent() {
 export function showFileNameModal(defaultName = 'config.json') {
     return new Promise((resolve) => {
         const base = defaultName.replace(/\.json$/, '');
-        modals.modalInput.value = base;
-        modals.fileNameModal.style.display = 'flex';
-        modals.modalInput.focus();
+        var modal = document.getElementById('fileNameModal');
+        var input = document.getElementById('modalFileNameInput');
+        var confirmBtn = document.getElementById('modalConfirmBtn');
+        var cancelBtn = document.getElementById('modalCancelBtn');
+        input.value = base;
+        modal.style.display = 'flex';
+        input.focus();
         const onConfirm = () => {
-            let fn = modals.modalInput.value.trim() || 'config';
+            let fn = input.value.trim() || 'config';
             if (!fn.endsWith('.json')) fn += '.json';
-            modals.fileNameModal.style.display = 'none';
+            modal.style.display = 'none';
             cleanup();
             resolve(fn);
         };
         const onCancel = () => {
-            modals.fileNameModal.style.display = 'none';
+            modal.style.display = 'none';
             cleanup();
             resolve(null);
         };
@@ -107,13 +107,13 @@ export function showFileNameModal(defaultName = 'config.json') {
             if (e.key === 'Escape') onCancel();
         };
         const cleanup = () => {
-            modals.modalConfirm.removeEventListener('click', onConfirm);
-            modals.modalCancel.removeEventListener('click', onCancel);
-            modals.modalInput.removeEventListener('keydown', onKeydown);
+            confirmBtn.removeEventListener('click', onConfirm);
+            cancelBtn.removeEventListener('click', onCancel);
+            input.removeEventListener('keydown', onKeydown);
         };
-        modals.modalConfirm.addEventListener('click', onConfirm);
-        modals.modalCancel.addEventListener('click', onCancel);
-        modals.modalInput.addEventListener('keydown', onKeydown);
+        confirmBtn.addEventListener('click', onConfirm);
+        cancelBtn.addEventListener('click', onCancel);
+        input.addEventListener('keydown', onKeydown);
     });
 }
 

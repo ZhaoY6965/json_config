@@ -1,7 +1,8 @@
 // ============================================================
 // 导入功能 — 双JSON文件加载 + 字段级替换
 // ============================================================
-import { batches, allocBatchId, dom, showStatus } from './core.js';
+import { showStatus } from './core.js';
+import { setPreview } from './preview.js';
 
 // ---- 模块状态 ----
 var json1Data = null;   // JSON 1 原始解析结果
@@ -438,33 +439,7 @@ function generateReplacement() {
 // ============================================================
 
 function updatePreviewManually(dataArray) {
-    if (dom.previewDisplay) {
-        dom.previewDisplay.textContent = JSON.stringify(dataArray, null, 2);
-    }
-    if (dom.previewCount) {
-        dom.previewCount.textContent = '（共 ' + dataArray.length + ' 条）';
-    }
-    var container = document.getElementById('batchList');
-    if (container) {
-        container.innerHTML = '';
-        if (batches.length === 0) {
-            container.innerHTML = '<div style="color:var(--text-secondary); font-size:13px; padding:4px 0;">暂无批次</div>';
-        } else {
-            var html = '<ul style="list-style:none; padding:0; margin:0;">';
-            for (var i = 0; i < batches.length; i++) {
-                var b = batches[i];
-                html += '<li style="display:flex; justify-content:space-between; align-items:center; padding:4px 0; border-bottom:1px solid var(--border-color);">' +
-                    '<span style="font-size:13px;">批次 ' + (i + 1) + '（' + b.data.length + ' 条）</span>' +
-                    '<span>' +
-                    '<button class="btn-sm detail-batch-btn" data-id="' + b.id + '">详情</button>' +
-                    '<button class="btn-sm edit-batch-btn" data-id="' + b.id + '">编辑</button>' +
-                    '<button class="btn-sm delete-batch-btn" data-id="' + b.id + '" style="margin-left:4px;">删除</button>' +
-                    '</span></li>';
-            }
-            html += '</ul>';
-            container.innerHTML = html;
-        }
-    }
+    setPreview(dataArray, '（共 ' + dataArray.length + ' 条）');
 }
 
 // ============================================================
@@ -479,8 +454,13 @@ export function handleImport(file) {
             var dataArray = [];
             if (Array.isArray(json)) {
                 dataArray = json;
-            } else if (typeof json === 'object' && json !== null) {
-                dataArray = [json];
+            } else if (json && typeof json === 'object') {
+                // 支持 {data: [...]} 等嵌套结构
+                if (Array.isArray(json.data)) {
+                    dataArray = json.data;
+                } else {
+                    dataArray = [json];
+                }
             } else {
                 showStatus('无效的JSON格式，请上传对象或对象数组', 'error');
                 return;
@@ -489,23 +469,26 @@ export function handleImport(file) {
                 showStatus('数据为空', 'error');
                 return;
             }
-            var fields = Object.keys(dataArray[0]);
-            if (fields.length === 0) {
+            // 扫描所有数据项收集字段名（修复只有部分项包含某些字段的问题）
+            var fieldSet = {};
+            var fieldOrder = [];
+            for (var i = 0; i < dataArray.length; i++) {
+                if (dataArray[i] && typeof dataArray[i] === 'object') {
+                    var keys = Object.keys(dataArray[i]);
+                    for (var k = 0; k < keys.length; k++) {
+                        if (!fieldSet[keys[k]]) {
+                            fieldSet[keys[k]] = true;
+                            fieldOrder.push(keys[k]);
+                        }
+                    }
+                }
+            }
+            if (fieldOrder.length === 0) {
                 showStatus('数据对象没有字段', 'error');
                 return;
             }
-            var config = [];
-            for (var i = 0; i < fields.length; i++) {
-                config.push({ field: fields[i], prefix: '', start: null, step: 1, count: dataArray.length });
-            }
-            var newBatch = {
-                id: allocBatchId(),
-                config: config,
-                data: dataArray
-            };
-            batches.push(newBatch);
             updatePreviewManually(dataArray);
-            showStatus('成功导入 ' + dataArray.length + ' 条数据作为批次', 'success');
+            showStatus('成功导入 ' + dataArray.length + ' 条数据（' + fieldOrder.length + ' 个字段）', 'success');
         } catch (err) {
             showStatus('解析JSON失败: ' + err.message, 'error');
         }
@@ -584,19 +567,8 @@ export function initImportPanel() {
                     return;
                 }
 
-                var fields = Object.keys(dataArray[0]);
-                var config = [];
-                for (var i = 0; i < fields.length; i++) {
-                    config.push({ field: fields[i], prefix: '', start: null, step: 1, count: dataArray.length });
-                }
-                var newBatch = {
-                    id: allocBatchId(),
-                    config: config,
-                    data: dataArray
-                };
-                batches.push(newBatch);
-
                 updatePreviewManually(dataArray);
+                showStatus('替换完成，共 ' + dataArray.length + ' 条数据已显示在右侧预览', 'success');
             } catch (err) {
                 console.error('替换生成错误:', err);
                 showStatus('替换生成失败: ' + err.message, 'error');
