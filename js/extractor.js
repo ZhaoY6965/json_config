@@ -1,6 +1,7 @@
 // extractor.js — 字段提取 (Field Extraction) tab functionality
 import { showStatus } from './core.js';
 import { setPreview } from './preview.js';
+import { setSourceData, setTargetData, getSourceInfo, getTargetInfo } from './import.js';
 
 // ── Private module state ──
 var extractData = null;
@@ -271,6 +272,182 @@ function saveAsDataTemplate() {
     showStatus('数据模板 "' + name + '" 已保存，共 ' + result.length + ' 条数据');
 }
 
+// ============================================================
+// 提取结果 → 三选一保存（本地 / 源数据 / 目标数据）
+// ============================================================
+
+/** 保存提取结果到本地（下载 JSON 文件） */
+function saveExtractionLocal() {
+    var result = generateExtraction();
+    if (!result) return;
+    var blob = new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'extracted_data.json';
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1500);
+    showStatus('提取结果已下载，共 ' + result.length + ' 条数据', 'success');
+}
+
+/** 保存提取结果到源数据槽（JSON 1），供字段替换使用 */
+function saveExtractionAsSource() {
+    var result = generateExtraction();
+    if (!result) return;
+    var srcInfo = getSourceInfo();
+    if (srcInfo && !confirm('源数据已有 ' + srcInfo.count + ' 条数据，确定要覆盖吗？')) return;
+    setSourceData(result);
+    updateSlotStatus();
+    showStatus('提取结果已设为源数据，共 ' + result.length + ' 条数据', 'success');
+}
+
+/** 保存提取结果到目标数据槽（JSON 2），供字段替换使用 */
+function saveExtractionAsTarget() {
+    var result = generateExtraction();
+    if (!result) return;
+    var tgtInfo = getTargetInfo();
+    if (tgtInfo && !confirm('目标数据已有 ' + tgtInfo.count + ' 条数据，确定要覆盖吗？')) return;
+    setTargetData(result);
+    updateSlotStatus();
+    showStatus('提取结果已设为目标数据，共 ' + result.length + ' 条数据', 'success');
+}
+
+/** 更新界面上的源/目标数据状态显示 */
+function updateSlotStatus() {
+    var srcEl = document.getElementById('extractSrcStatus');
+    var tgtEl = document.getElementById('extractTgtStatus');
+    if (srcEl) {
+        var src = getSourceInfo();
+        srcEl.textContent = src ? '源数据: ' + src.count + ' 条, ' + src.fields + ' 个字段' : '源数据: 空';
+        srcEl.style.color = src ? 'var(--text-primary)' : 'var(--text-secondary)';
+    }
+    if (tgtEl) {
+        var tgt = getTargetInfo();
+        tgtEl.textContent = tgt ? '目标数据: ' + tgt.count + ' 条, ' + tgt.fields + ' 个字段' : '目标数据: 空';
+        tgtEl.style.color = tgt ? 'var(--text-primary)' : 'var(--text-secondary)';
+    }
+}
+
+/** 绑定提取结果保存按钮 */
+function bindDestButtons() {
+    var localBtn = document.getElementById('saveExtractLocal');
+    if (localBtn) localBtn.addEventListener('click', saveExtractionLocal);
+
+    var srcBtn = document.getElementById('saveExtractAsSource');
+    if (srcBtn) srcBtn.addEventListener('click', saveExtractionAsSource);
+
+    var tgtBtn = document.getElementById('saveExtractAsTarget');
+    if (tgtBtn) tgtBtn.addEventListener('click', saveExtractionAsTarget);
+}
+
+// ── 拖拽导入支持（分区域）──
+
+function initDragDrop() {
+    // Zone 1: 加载 JSON（提取源）
+    var extractZone = document.getElementById('extractDropZone');
+    if (extractZone) {
+        ['dragenter','dragover'].forEach(function(ev) {
+            extractZone.addEventListener(ev, function(e) { e.preventDefault(); e.stopPropagation(); });
+        });
+        extractZone.addEventListener('dragover', function(e) {
+            extractZone.style.borderColor = 'var(--accent-color)';
+            extractZone.style.background = 'var(--bg-hover)';
+        });
+        extractZone.addEventListener('dragleave', function(e) {
+            if (e.target === extractZone || !extractZone.contains(e.relatedTarget)) {
+                extractZone.style.borderColor = '';
+                extractZone.style.background = '';
+            }
+        });
+        extractZone.addEventListener('drop', function(e) {
+            e.preventDefault(); e.stopPropagation();
+            extractZone.style.borderColor = '';
+            extractZone.style.background = '';
+            var file = e.dataTransfer.files[0];
+            if (file && file.name.endsWith('.json')) {
+                loadExtractFile(file);
+            } else {
+                showStatus('请拖入JSON文件', 'error');
+            }
+        });
+    }
+
+    // Zone 2: JSON 1（源数据）
+    var sourceZone = document.getElementById('sourceDropZone');
+    if (sourceZone) {
+        ['dragenter','dragover'].forEach(function(ev) {
+            sourceZone.addEventListener(ev, function(e) { e.preventDefault(); e.stopPropagation(); });
+        });
+        sourceZone.addEventListener('dragover', function(e) {
+            sourceZone.style.borderColor = 'var(--accent-color)';
+            sourceZone.style.background = 'var(--bg-hover)';
+        });
+        sourceZone.addEventListener('dragleave', function(e) {
+            if (e.target === sourceZone || !sourceZone.contains(e.relatedTarget)) {
+                sourceZone.style.borderColor = '';
+                sourceZone.style.background = '';
+            }
+        });
+        sourceZone.addEventListener('drop', function(e) {
+            e.preventDefault(); e.stopPropagation();
+            sourceZone.style.borderColor = '';
+            sourceZone.style.background = '';
+            var file = e.dataTransfer.files[0];
+            if (file && file.name.endsWith('.json')) {
+                var reader = new FileReader();
+                reader.onload = function(ev) {
+                    try {
+                        var data = JSON.parse(ev.target.result);
+                        setSourceData(data, file.name);
+                    } catch(err) {
+                        showStatus('JSON解析失败: ' + err.message, 'error');
+                    }
+                };
+                reader.readAsText(file);
+            } else {
+                showStatus('请拖入JSON文件', 'error');
+            }
+        });
+    }
+
+    // Zone 3: JSON 2（目标数据）
+    var targetZone = document.getElementById('targetDropZone');
+    if (targetZone) {
+        ['dragenter','dragover'].forEach(function(ev) {
+            targetZone.addEventListener(ev, function(e) { e.preventDefault(); e.stopPropagation(); });
+        });
+        targetZone.addEventListener('dragover', function(e) {
+            targetZone.style.borderColor = 'var(--accent-color)';
+            targetZone.style.background = 'var(--bg-hover)';
+        });
+        targetZone.addEventListener('dragleave', function(e) {
+            if (e.target === targetZone || !targetZone.contains(e.relatedTarget)) {
+                targetZone.style.borderColor = '';
+                targetZone.style.background = '';
+            }
+        });
+        targetZone.addEventListener('drop', function(e) {
+            e.preventDefault(); e.stopPropagation();
+            targetZone.style.borderColor = '';
+            targetZone.style.background = '';
+            var file = e.dataTransfer.files[0];
+            if (file && file.name.endsWith('.json')) {
+                var reader = new FileReader();
+                reader.onload = function(ev) {
+                    try {
+                        var data = JSON.parse(ev.target.result);
+                        setTargetData(data, file.name);
+                    } catch(err) {
+                        showStatus('JSON解析失败: ' + err.message, 'error');
+                    }
+                };
+                reader.readAsText(file);
+            } else {
+                showStatus('请拖入JSON文件', 'error');
+            }
+        });
+    }
+}
+
 // ── Exported initializer ──
 
 export function initExtractorPanel() {
@@ -332,4 +509,8 @@ export function initExtractorPanel() {
             }
         });
     }
+
+    bindDestButtons();
+    updateSlotStatus();
+    initDragDrop();
 }

@@ -94,6 +94,8 @@ const schemas = {
             { key: 'lampalarmnum', label: 'lampalarmnum', type: FieldType.INT,    required: true, default: 2 },
             { key: 'group_id',     label: 'group_id',     type: FieldType.STRING, required: true,
               fk: { target: 'circuit_group_config', field: 'id', display: 'name' } },
+            { key: 'row',       label: 'row',       type: FieldType.INT,    required: false },
+            { key: 'colum',     label: 'colum',     type: FieldType.INT,    required: false },
         ],
     },
     circuit_group_config: {

@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>灯光图例配置工具</title>
+<style>
+  :root{
+    --bg:#F5F7FA; --panel:#FFFFFF; --line:#E3E8EF; --ink:#1F2D3D;
+    --muted:#7A8699; --accent:#2A7AD8; --accent2:#E6B800; --danger:#EF4444;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+       background:var(--bg);color:var(--ink);font-size:13px}
+  header{padding:16px 22px;background:var(--panel);border-bottom:1px solid var(--line)}
+  header h1{margin:0;font-size:18px}
+  header p{margin:4px 0 0;color:var(--muted);font-size:12px}
+  .layout{display:grid;grid-template-columns:260px 1fr 320px;gap:14px;padding:14px;align-items:start}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
+  .panel h2{font-size:13px;margin:2px 0 10px;color:var(--muted);font-weight:600;
+            text-transform:uppercase;letter-spacing:.04em}
+
+  /* ---- gallery (compact, full visibility) ---- */
+  .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .gcard{border:1px solid var(--line);border-radius:8px;padding:5px 4px;text-align:center;
+         cursor:pointer;background:#FBFCFE;transition:.15s;overflow:hidden}
+  .gcard:hover{border-color:var(--accent)}
+  .gcard.active{border-color:var(--accent);box-shadow:0 0 0 2px rgba(42,122,216,.18)}
+  .gcard svg{display:block;margin:0 auto 2px;max-height:52px}
+  .gcard .gname{font-size:11px;font-weight:600;color:var(--ink);margin-bottom:0;line-height:1.2}
+  .gcard .gtype{font-size:9px;color:var(--muted);margin-bottom:2px}
+  .gcard .ghint{font-size:8.5px;color:var(--muted);line-height:1.3;text-align:left;
+                border-top:1px solid rgba(0,0,0,.05);padding-top:2px;margin-top:1px;
+                max-height:42px;overflow:hidden}
+
+  /* ---- swatches (editable) ---- */
+  .swatches{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .sw{border:1px solid var(--line);border-radius:8px;padding:5px 4px;text-align:center;cursor:pointer;
+      font-size:10px;background:#FBFCFE;transition:.12s;position:relative}
+  .sw:hover{border-color:var(--accent)}
+  .sw.active{border-color:var(--accent);box-shadow:0 0 0 2px rgba(42,122,216,.18)}
+  .sw .chip{width:100%;height:18px;border-radius:4px;margin-bottom:3px;border:1px solid rgba(0,0,0,.08);
+            position:relative;cursor:pointer}
+  .sw .sname{font-size:10px;color:var(--ink);font-weight:500}
+  .sw .del-btn{position:absolute;top:-4px;right:-4px;width:16px;height:16px;border-radius:50%;
+               background:var(--danger);color:#fff;font-size:10px;line-height:16px;
+               cursor:pointer;display:none;z-index:2}
+  .sw:hover .del-btn{display:block}
+
+  /* ---- brush editor panel ---- */
+  .brush-editor{border:1px solid var(--line);border-radius:10px;padding:10px;margin-top:10px;
+                 background:#FAFBFC;display:none}
+  .brush-editor.open{display:block}
+  .brush-editor h3{font-size:12px;margin:0 0 8px;color:var(--ink)}
+  .brow{display:flex;gap:6px;align-items:center;margin-bottom:6px}
+  .brow label{font-size:10px;color:var(--muted);min-width:52px}
+  .brow input[type="text"],.brow input[type="number"],.brow input[type="color"]
+        {font-size:11px;border:1px solid var(--line);border-radius:6px;padding:4px 6px}
+  .brow input[type="color"]{width:32px;height:24px;padding:1px;cursor:pointer}
+  .brow .color-wrap{display:flex;align-items:center;gap:4px}
+  .brow .color-wrap span{font-size:10px;font-family:monospace}
+
+  .status{margin-top:10px;font-size:12px;color:var(--muted);background:#F0F4F9;border-radius:8px;padding:8px}
+  .status b{color:var(--ink)}
+
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+  select,input,textarea{font-family:inherit;font-size:12px;border:1px solid var(--line);
+            border-radius:8px;padding:6px 8px;background:#fff;color:var(--ink)}
+  button{cursor:pointer;border:1px solid var(--line);background:#fff;border-radius:8px;
+         padding:6px 12px;font-size:12px;transition:.12s}
+  button:hover{border-color:var(--accent);color:var(--accent)}
+  button.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  button.danger:hover{border-color:var(--danger);color:var(--danger)}
+  button.sm{padding:4px 8px;font-size:11px}
+  .meta{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}
+  .meta label{display:block;font-size:11px;color:var(--muted);margin-bottom:3px}
+  .meta input,.meta textarea{width:100%}
+  .row{display:flex;gap:8px;align-items:center}
+  .preview-wrap{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px}
+  .preview-box{flex:0 0 300px;background:#FBFCFE;border:1px solid var(--line);border-radius:12px;
+               padding:8px;position:relative;overflow:hidden}
+  .statebar{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .pill{padding:4px 10px;border-radius:999px;border:1px solid var(--line);cursor:pointer;font-size:11px;background:#fff}
+  .pill.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .prof-head{display:flex;justify-content:space-between;align-items:center;margin:6px 0 8px}
+  .entry{border:1px solid var(--line);border-radius:10px;padding:8px;margin-bottom:8px;background:#FBFCFE}
+  .entry .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+  .entry .ref{font-weight:600}
+  .entry .mini{display:flex;gap:4px}
+  .params{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .params label{font-size:10px;color:var(--muted);display:block;margin-bottom:2px}
+  .params input,.params textarea{width:100%;padding:4px 5px;font-size:11px}
+  .brushes-row{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-top:6px}
+  .brushes-row label{font-size:10px;color:var(--muted);display:block;margin-bottom:2px}
+  .brushes-row select{padding:3px 4px;font-size:11px}
+  .face-label{grid-column:1/5;font-size:10px;font-weight:600;color:var(--accent);
+              background:#EAF1FB;padding:2px 6px;border-radius:5px;margin-top:4px}
+  /* ---- sequence / phase control field ---- */
+  .seq-idx-field{background:#FEF6E7;border:1px solid #F2D49B;border-radius:6px;padding:3px 5px}
+  .seq-idx-field label{color:#A86A12 !important;font-weight:600}
+  .seq-idx-field input{background:#FFFDF7}
+  .seq-note{grid-column:1/5;font-size:9.5px;color:#A86A12;background:#FEF6E7;
+            border:1px solid #F2D49B;border-radius:5px;padding:3px 6px;margin-top:4px;line-height:1.4}
+  .pill.seq{background:#FFF7E6;border-color:#F2D49B;color:#A86A12}
+  .pill.seq.active{background:#E6A817;color:#fff;border-color:#E6A817}
+  pre{background:#0F172A;color:#E2E8F0;padding:12px;border-radius:10px;font-size:11px;
+      max-height:62vh;overflow:auto;white-space:pre-wrap;margin:0}
+  .right .btns{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .hint{font-size:11px;color:var(--muted);margin-top:6px}
+  .err{color:var(--danger);font-size:11px;min-height:14px}
+
+  /* ---- brush blink animation (driven per-brush) ---- */
+  @keyframes blinkAnim{0%,100%{opacity:1}50%{opacity:0.12}}
+  .blink{animation:blinkAnim 700ms ease-in-out infinite}
+</style>
+</head>
+<body>
+<header>
+  <h1>灯光图例配置工具</h1>
+  <p>左：基本图形库（从 shapes_schema.json）＋ 笔刷面板（可编辑/新增）。中：组合编辑与实时预览（含原点标记）。右：JSON 导出。</p>
+</header>
+<div class="layout">
+  <aside class="panel left">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <h2 style="margin:0">基本图形库</h2>
+    </div>
+    <div id="gallery" class="gallery"></div>
+
+    <h2 style="margin-top:14px;display:flex;justify-content:space-between;align-items:center">
+      笔刷
+      <span style="display:flex;gap:6px;flex-wrap:wrap">
+        <button id="importBrushes" class="sm">导入</button>
+        <button id="exportBrushes" class="sm">导出配置</button>
+        <button id="addBrushBtn" class="sm primary">＋ 新增</button>
+      </span>
+    </h2>
+    <div id="swatches" class="swatches"></div>
+    <input type="file" id="brushFileIn" accept=".json" style="display:none"/>
+
+    <!-- brush editor -->
+    <div id="brushEditor" class="brush-editor">
+      <h3>编辑笔刷 <span id="editBrushId" style="color:var(--accent)"></span></h3>
+      <div class="brow"><label>ID</label><input id="be_id" placeholder="brush_xxx"/></div>
+      <div class="brow"><label>填充色</label><div class="color-wrap"><input type="color" id="be_fill"/><span id="be_fill_txt"></span></div></div>
+      <div class="brow"><label>描边色</label><div class="color-wrap"><input type="color" id="be_stroke"/><span id="be_stroke_txt"></span></div></div>
+      <div class="brow"><label>描边宽</label><input type="number" id="be_sw" min="0" step="any"/></div>
+      <div class="brow"><label>填充不透明</label><input type="number" id="be_fop" min="0" max="1" step="any"/></div>
+      <div class="brow"><label>描边不透明</label><input type="number" id="be_sop" min="0" max="1" step="any"/></div>
+      <div class="brow"><label><input type="checkbox" id="be_blink"/> 闪烁</label><input type="number" id="be_bint" min="0" step="any" placeholder="间隔ms 700" style="width:90px"/></div>
+      <div class="brow" style="justify-content:flex-end;gap:6px;margin-top:8px">
+        <button id="be_save" class="primary sm">保存</button>
+        <button id="be_cancel" class="sm">取消</button>
+      </div>
+    </div>
+
+    <div class="status">当前选择：图形 <b id="selShape">—</b> ／ 笔刷 <b id="selBrush">—</b></div>
+  </aside>
+
+  <main class="center panel">
+    <div class="toolbar">
+      <select id="itemSelect" title="选择要编辑的项"></select>
+      <button id="newItem">＋ 新建项</button>
+      <button id="delItem" class="danger">删除项</button>
+      <button id="saveAll" class="primary">导出 lamp_template.json</button>
+    </div>
+    <div class="meta">
+      <div><label>ID</label><input id="m_id" placeholder="如 HZ_Q_Y"/></div>
+      <div><label>名称</label><input id="m_name" placeholder="滑行道中线灯单向黄"/></div>
+      <div style="grid-column:1/3"><label>描述</label><input id="m_desc" placeholder="切割半圆，朝向左"/></div>
+      <div><label>控制面数量<br/>ctlFaceNum</label><input id="m_ctlFaceNum" type="number" min="1" step="1" value="1"/></div>
+      <div class="hint" style="grid-column:2/4">控制面 > 1 时，profile 中各笔刷的 on/off/alarm/selected/unknown 会自动展开为 on_1…on_N 等，预览按面并排显示。</div>
+      <div style="grid-column:1/4;display:flex;gap:10px;align-items:flex-end;margin-top:2px">
+        <label style="display:flex;gap:4px;align-items:center;font-size:11px;color:var(--muted)">
+          <input type="checkbox" id="m_seqEnable"/> 启用序列轮巡（选中 on 自动交替）
+        </label>
+        <label style="font-size:11px;color:var(--muted)">切换间隔(ms)
+          <input id="m_seqInterval" type="number" min="50" step="any" value="800" style="width:80px"/>
+        </label>
+      </div>
+    </div>
+
+    <div class="preview-wrap">
+      <div class="preview-box"><div id="preview"></div></div>
+      <div style="flex:1">
+        <div class="statebar" id="statebar"></div>
+        <div class="hint" id="previewHint">预览取所选状态对应的笔刷颜色。红色十字 = 原点 (0,0)</div>
+      </div>
+    </div>
+
+    <div class="prof-head">
+      <h2 style="margin:0">profile 组成</h2>
+      <button id="addShape" class="primary">＋ 添加所选图形</button>
+    </div>
+    <div id="profileList"></div>
+    <div class="hint">用 ↑↓ 调整顺序，🗑 删除。参数实时生效。原点 (0,0) 是整个组合的定位中心。<br/>
+      多灯互斥/轮巡：给每个图形设「相位序号 seqIndex」(0,1,2…)。选中 on 状态即自动按间隔交替亮灭（同时仅一盏亮），由「启用序列轮巡」与「切换间隔」控制。</div>
+  </main>
+
+  <aside class="panel right">
+    <h2>当前项 JSON</h2>
+    <pre id="jsonOut"></pre>
+    <div class="btns">
+      <button id="copyJson">复制</button>
+      <button id="downloadItem">下载此项</button>
+      <button id="importBtn">导入 JSON</button>
+      <input type="file" id="fileIn" accept=".json" style="display:none"/>
+    </div>
+
+    <!-- apply single item JSON -->
+    <div style="margin-top:12px;border-top:1px solid var(--line);padding-top:10px">
+      <h3 style="font-size:12px;margin:0 0 6px;color:var(--muted)">应用单项 JSON（按 ID 更新或新增）</h3>
+      <textarea id="applyItemText" rows="5" placeholder='粘贴单项 JSON，如：{&quot;id&quot;:&quot;NEW_11&quot;,&quot;name&quot;:&quot;...&quot;,&quot;profile&quot;:[...]}' style="width:100%;font-size:11px;font-family:monospace;border-radius:8px"></textarea>
+      <div style="display:flex;gap:6px;margin-top:6px">
+        <button id="applyItemBtn" class="primary sm">应用</button>
+        <span id="applyErr" class="err"></span>
+      </div>
+    </div>
+
+    <div class="hint">导入可覆盖 shapes / brushes / lamp_template 数据。应用单项可按 ID 精准更新某一项。</div>
+  </aside>
+</div>
+<script>
+const SHAPES = {"version": "1.0", "description": "基础图形库 - 定义所有基本图形的参数结构", "shapes": {"semicircle": {"description": "半圆 - 默认朝向左侧 (startAngle=90, spanAngle=180)", "type": "semicircle", "defaultParams": {"radius": 4, "cutDistance": 0, "startAngle": 90, "spanAngle": 180, "rotation": 0, "fill": "${brush}", "stroke": "${brush.strokeColor}", "strokeWidth": "${brush.strokeWidth}", "opacity": "${brush.opacity}"}, "paramDescriptions": {"radius": "半径", "cutDistance": "切割距离（旧字段，等同 ArcCut，0=不切割，>0=保留不含圆心的部分）", "ArcCut": "弧形切割：同心环内径（0=不切割半圆盘，>0=切出半环）", "LineCut": "直线切割：垂直于对称轴、距圆心距离（0=不切割，保留远端帽形）", "startAngle": "起始角度（度），默认90°使中点朝左", "spanAngle": "跨度角度（度），默认180°为半圆", "rotation": "额外旋转角度（度）", "fill": "填充颜色", "stroke": "描边颜色", "strokeWidth": "描边宽度"}}, "circle": {"description": "圆形", "type": "circle", "defaultParams": {"radius": 4, "fill": "${brush}", "stroke": "${brush.strokeColor}", "strokeWidth": "${brush.strokeWidth}", "opacity": "${brush.opacity}"}, "paramDescriptions": {"radius": "半径", "fill": "填充颜色", "stroke": "描边颜色", "strokeWidth": "描边宽度"}}, "rect": {"description": "矩形（支持圆角）", "type": "rect", "defaultParams": {"width": 8, "height": 6, "rx": 0, "fill": "${brush}", "stroke": "${brush.strokeColor}", "strokeWidth": "${brush.strokeWidth}", "opacity": "${brush.opacity}"}, "paramDescriptions": {"width": "宽度", "height": "高度", "rx": "圆角半径（0=直角）", "fill": "填充颜色", "stroke": "描边颜色", "strokeWidth": "描边宽度"}}, "line": {"description": "线段", "type": "line", "defaultParams": {"x1": -4, "y1": 0, "x2": 4, "y2": 0, "stroke": "${brush.strokeColor}", "strokeWidth": "${brush.strokeWidth}", "opacity": "${brush.opacity}"}, "paramDescriptions": {"x1": "起点X", "y1": "起点Y", "x2": "终点X", "y2": "终点Y", "stroke": "描边颜色", "strokeWidth": "描边宽度"}}, "polygon": {"description": "多边形", "type": "polygon", "defaultParams": {"points": [], "fill": "${brush}", "stroke": "${brush.strokeColor}", "strokeWidth": "${brush.strokeWidth}", "opacity": "${brush.opacity}"}, "paramDescriptions": {"points": "顶点坐标数组 [[x1,y1], [x2,y2], ...]", "fill": "填充颜色", "stroke": "描边颜色", "strokeWidth": "描边宽度"}}, "arc": {"description": "弧形", "type": "arc", "defaultParams": {"radius": 4, "startAngle": 0, "spanAngle": 90, "stroke": "${brush.strokeColor}", "strokeWidth": "${brush.strokeWidth}", "opacity": "${brush.opacity}"}, "paramDescriptions": {"radius": "半径", "startAngle": "起始角度（度）", "spanAngle": "跨度角度（度）", "stroke": "描边颜色", "strokeWidth": "描边宽度"}}, "ellipse": {"description": "椭圆", "type": "ellipse", "defaultParams": {"rx": 5, "ry": 3, "fill": "${brush}", "stroke": "${brush.strokeColor}", "strokeWidth": "${brush.strokeWidth}", "opacity": "${brush.opacity}"}, "paramDescriptions": {"rx": "X轴半径", "ry": "Y轴半径", "fill": "填充颜色", "stroke": "描边颜色", "strokeWidth": "描边宽度"}}, "star": {"description": "星形", "type": "star", "defaultParams": {"outerRadius": 5, "innerRadius": 2.5, "numPoints": 5, "fill": "${brush}", "stroke": "${brush.strokeColor}", "strokeWidth": "${brush.strokeWidth}", "opacity": "${brush.opacity}"}, "paramDescriptions": {"outerRadius": "外半径", "innerRadius": "内半径", "numPoints": "星尖数量", "fill": "填充颜色", "stroke": "描边颜色", "strokeWidth": "描边宽度"}}, "arrow": {"description": "箭头", "type": "arrow", "defaultParams": {"x1": -5, "y1": 0, "x2": 5, "y2": 0, "headSize": 3, "fill": "${brush}", "stroke": "${brush.strokeColor}", "strokeWidth": "${brush.strokeWidth}", "opacity": "${brush.opacity}"}, "paramDescriptions": {"x1": "起点X", "y1": "起点Y", "x2": "终点X", "y2": "终点Y", "headSize": "箭头大小", "fill": "填充颜色", "stroke": "描边颜色", "strokeWidth": "描边宽度"}}, "cross": {"description": "十字形", "type": "cross", "defaultParams": {"size": 4, "width": 1.5, "fill": "${brush}", "stroke": "${brush.strokeColor}", "strokeWidth": "${brush.strokeWidth}", "opacity": "${brush.opacity}"}, "paramDescriptions": {"size": "十字臂长", "width": "十字臂宽", "fill": "填充颜色", "stroke": "描边颜色", "strokeWidth": "描边宽度"}}, "diamond": {"description": "菱形", "type": "diamond", "defaultParams": {"width": 6, "height": 6, "fill": "${brush}", "stroke": "${brush.strokeColor}", "strokeWidth": "${brush.strokeWidth}", "opacity": "${brush.opacity}"}, "paramDescriptions": {"width": "宽度", "height": "高度", "fill": "填充颜色", "stroke": "描边颜色", "strokeWidth": "描边宽度"}}}};
+const BRUSHES = [{"id": "brush_red", "fillColor": "#FF6B6B", "strokeColor": "#CC4444", "strokeWidth": 1, "fillOpacity": 1, "strokeOpacity": 1, "blinkEnable": false, "blinkIntervalMs": 700}, {"id": "brush_blue", "fillColor": "#4A9BFA", "strokeColor": "#2A7AD8", "strokeWidth": 1, "fillOpacity": 1, "strokeOpacity": 1, "blinkEnable": false, "blinkIntervalMs": 700}, {"id": "brush_white", "fillColor": "#F0F0F0", "strokeColor": "#D0D0D0", "strokeWidth": 1, "fillOpacity": 1, "strokeOpacity": 1, "blinkEnable": false, "blinkIntervalMs": 700}, {"id": "brush_yellow", "fillColor": "#FFD93D", "strokeColor": "#E6B800", "strokeWidth": 1, "fillOpacity": 1, "strokeOpacity": 1, "blinkEnable": false, "blinkIntervalMs": 700}, {"id": "brush_green", "fillColor": "#6BCB77", "strokeColor": "#4AA85A", "strokeWidth": 1, "fillOpacity": 1, "strokeOpacity": 1, "blinkEnable": false, "blinkIntervalMs": 700}, {"id": "brush_off", "fillColor": "#8A8A8F", "strokeColor": "#8A8A8F", "strokeWidth": 1, "fillOpacity": 1, "strokeOpacity": 1, "blinkEnable": false, "blinkIntervalMs": 700}, {"id": "brush_selected", "fillColor": "#CBCBCD", "strokeColor": "#F2F2F2", "strokeWidth": 2, "fillOpacity": 1, "strokeOpacity": 1, "blinkEnable": false, "blinkIntervalMs": 700}, {"id": "brush_alarm", "fillColor": "#800000", "strokeColor": "#F2F2F2", "strokeWidth": 2, "fillOpacity": 1, "strokeOpacity": 1, "blinkEnable": true, "blinkIntervalMs": 700}, {"id": "brush_unknown", "fillColor": "#FFFFFF", "strokeColor": "#FFFFFF", "strokeWidth": 2, "fillOpacity": 1, "strokeOpacity": 1, "blinkEnable": false, "blinkIntervalMs": 700}];
+let LAMP = [{"id": "HZ_Q_Y", "name": "滑行道中线灯单向黄", "description": "切割半圆，朝向左", "ctlFaceNum": 1, "profile": [{"ref": "semicircle", "brushes": {"on": "brush_yellow", "off": "brush_off", "alarm": "brush_alarm", "selected": "brush_selected", "unknown": "brush_unknown"}, "params": {"x": 0, "y": 0, "radius": 4, "ArcCut": 2}}]}, {"id": "HZ_Q_YY", "name": "滑行道中线灯双向黄", "description": "两个半圆组成双向灯", "ctlFaceNum": 1, "profile": [{"ref": "semicircle", "brushes": {"on": "brush_yellow", "off": "brush_off", "alarm": "brush_alarm", "selected": "brush_selected", "unknown": "brush_unknown"}, "params": {"x": 0, "y": 0, "radius": 4, "startAngle": 90, "spanAngle": 180}}, {"ref": "semicircle", "brushes": {"on": "brush_yellow", "off": "brush_off", "alarm": "brush_alarm", "selected": "brush_selected", "unknown": "brush_unknown"}, "params": {"x": 0, "y": 0, "radius": 4, "startAngle": 270, "spanAngle": 180}}, {"ref": "line", "params": {"x": 0, "y": 0, "x1": -4, "y1": 0, "x2": 4, "y2": 0}}]}, {"id": "HZ_Q_YG", "name": "滑行道中线灯半黄绿", "description": "上半黄，下半绿", "ctlFaceNum": 1, "profile": [{"ref": "semicircle", "brushes": {"on": "brush_yellow", "off": "brush_off", "alarm": "brush_alarm", "selected": "brush_selected", "unknown": "brush_unknown"}, "params": {"x": 0, "y": 0, "radius": 4, "startAngle": 90, "spanAngle": 180}}, {"ref": "semicircle", "brushes": {"on": "brush_green", "off": "brush_off", "alarm": "brush_alarm", "selected": "brush_selected", "unknown": "brush_unknown"}, "params": {"x": 0, "y": 0, "radius": 4, "startAngle": 270, "spanAngle": 180}}, {"ref": "line", "params": {"x": 0, "y": 0, "x1": -4, "y1": 0, "x2": 4, "y2": 0}}]}, {"id": "TZP", "name": "停止排灯", "description": "红色停止排灯（alarm 状态闪烁）", "ctlFaceNum": 1, "profile": [{"ref": "semicircle", "brushes": {"on": "brush_red", "off": "brush_off", "alarm": "brush_alarm", "selected": "brush_selected", "unknown": "brush_unknown"}, "params": {"x": 0, "y": 0, "radius": 5, "ArcCut": 2}}]}, {"id": "PAPI", "name": "坡度灯红白", "description": "2红2白四个矩形", "ctlFaceNum": 1, "profile": [{"ref": "rect", "brushes": {"on": "brush_red", "off": "brush_off", "alarm": "brush_alarm", "selected": "brush_selected", "unknown": "brush_unknown"}, "params": {"x": -8, "y": -4, "width": 14, "height": 6, "rx": 1}}, {"ref": "rect", "brushes": {"on": "brush_red", "off": "brush_off", "alarm": "brush_alarm", "selected": "brush_selected", "unknown": "brush_unknown"}, "params": {"x": 8, "y": -4, "width": 14, "height": 6, "rx": 1}}, {"ref": "rect", "brushes": {"on": "brush_white", "off": "brush_off", "alarm": "brush_alarm", "selected": "brush_selected", "unknown": "brush_unknown"}, "params": {"x": -8, "y": 4, "width": 14, "height": 6, "rx": 1}}, {"ref": "rect", "brushes": {"on": "brush_white", "off": "brush_off", "alarm": "brush_alarm", "selected": "brush_selected", "unknown": "brush_unknown"}, "params": {"x": 8, "y": 4, "width": 14, "height": 6, "rx": 1}}]}, {"id": "BJP_YY", "name": "标记牌双向黄（双控制面演示）", "description": "ctlFaceNum=2：两个控制面，面1黄/面2绿，演示多控制面展开", "ctlFaceNum": 2, "profile": [{"ref": "rect", "brushes": {"on_1": "brush_yellow", "on_2": "brush_green", "off_1": "brush_off", "off_2": "brush_off", "alarm_1": "brush_alarm", "alarm_2": "brush_alarm", "selected_1": "brush_selected", "selected_2": "brush_selected", "unknown_1": "brush_unknown", "unknown_2": "brush_unknown"}, "params": {"x": -6, "y": 0, "width": 10, "height": 8, "rx": 1}}, {"ref": "rect", "brushes": {"on_1": "brush_yellow", "on_2": "brush_green", "off_1": "brush_off", "off_2": "brush_off", "alarm_1": "brush_alarm", "alarm_2": "brush_alarm", "selected_1": "brush_selected", "selected_2": "brush_selected", "unknown_1": "brush_unknown", "unknown_2": "brush_unknown"}, "params": {"x": 6, "y": 0, "width": 10, "height": 8, "rx": 1}}]}, {"id": "PDJJD_L", "name": "跑道警戒灯立式", "description": "工字形警戒灯", "ctlFaceNum": 1, "profile": [{"ref": "rect", "brushes": {"on": "brush_yellow", "off": "brush_off", "alarm": "brush_alarm", "selected": "brush_selected", "unknown": "brush_unknown"}, "params": {"x": 0, "y": 0, "width": 6, "height": 12, "rx": 1}}, {"ref": "rect", "brushes": {"on": "brush_yellow", "off": "brush_off", "alarm": "brush_alarm", "selected": "brush_selected", "unknown": "brush_unknown"}, "params": {"x": 0, "y": -7, "width": 10, "height": 2}}, {"ref": "rect", "brushes": {"on": "brush_yellow", "off": "brush_off", "alarm": "brush_alarm", "selected": "brush_selected", "unknown": "brush_unknown"}, "params": {"x": 0, "y": 7, "width": 10, "height": 2}}]}, {"id": "GGD", "name": "高杆灯", "description": "高杆灯 - 大圆 + 内圈", "ctlFaceNum": 1, "profile": [{"ref": "circle", "brushes": {"on": "brush_white", "off": "brush_off", "alarm": "brush_alarm", "selected": "brush_selected", "unknown": "brush_unknown"}, "params": {"x": 0, "y": 0, "radius": 6}}, {"ref": "circle", "params": {"x": 0, "y": 0, "radius": 3, "fill": "#FFFFFF", "opacity": 0.3}}]}, {"id": "FXB", "name": "风向标", "description": "风向标 - 三角形 + 中心点", "ctlFaceNum": 1, "profile": [{"ref": "polygon", "brushes": {"on": "brush_white", "off": "brush_off", "alarm": "brush_alarm", "selected": "brush_selected", "unknown": "brush_unknown"}, "params": {"x": 0, "y": 0, "points": [[0, -6], [8, 0], [0, 6], [-2, 4], [-2, -4]]}}, {"ref": "circle", "params": {"x": 0, "y": 0, "radius": 2, "fill": "#FF0000", "stroke": "#CC0000", "strokeWidth": 0.5}}]}, {"id": "Sensor", "name": "微波传感器", "description": "传感器 - 半圆 + 弧线", "ctlFaceNum": 1, "profile": [{"ref": "semicircle", "brushes": {"on": "brush_white", "off": "brush_off", "alarm": "brush_alarm", "selected": "brush_selected", "unknown": "brush_unknown"}, "params": {"x": 0, "y": 0, "radius": 3, "startAngle": 270, "spanAngle": 180}}, {"ref": "arc", "params": {"x": 0, "y": 0, "radius": 4, "startAngle": 200, "spanAngle": 140}}]}, {"id": "SEQ_DEMO", "name": "双灯互斥轮巡演示（序列相位）", "description": "两个圆：左 seqIndex=0，右 seqIndex=1。预览选 seq_0/seq_1 看互斥，选 seq_cycle 看自动轮巡，同时仅一盏亮。", "ctlFaceNum": 1, "profile": [{"ref": "circle", "brushes": {"on": "brush_yellow", "off": "brush_off", "alarm": "brush_alarm", "selected": "brush_selected", "unknown": "brush_unknown"}, "params": {"radius": 2.5, "x": -4, "y": 0, "seqIndex": 0}}, {"ref": "circle", "brushes": {"on": "brush_yellow", "off": "brush_off", "alarm": "brush_alarm", "selected": "brush_selected", "unknown": "brush_unknown"}, "params": {"radius": 2.5, "x": 4, "y": 0, "seqIndex": 1}}], "seqEnable": true, "seqInterval": 800}];
+</script>
+
+<script>
+/* ============ data ============ */
+const SHAPE_ORDER = Object.keys(SHAPES.shapes);
+const BRUSH_MAP = {}; BRUSHES.forEach(b => BRUSH_MAP[b.id] = b);
+
+// Chinese names for shapes (from schema description field)
+const SHAPE_CN = {};
+Object.entries(SHAPES.shapes).forEach(([k,v]) => {
+  // extract Chinese name from description before the first comma/dash
+  const d = v.description || "";
+  const m = d.match(/^[\u4e00-\u9fa5]+/);
+  SHAPE_CN[k] = m ? m[0] : k;
+});
+
+const DEFAULTS = {
+  semicircle:{radius:4,ArcCut:0,LineCut:0,startAngle:90,spanAngle:180,rotation:0,x:0,y:0,seqIndex:-1},
+  circle:{radius:4,x:0,y:0,seqIndex:-1},
+  ellipse:{rx:5,ry:3,x:0,y:0,seqIndex:-1},
+  rect:{width:8,height:6,rx:0,x:0,y:0,seqIndex:-1},
+  line:{x1:-4,y1:0,x2:4,y2:0,x:0,y:0,seqIndex:-1},
+  polygon:{points:[[-3,-3],[3,-3],[4,2],[0,5],[-4,2]],x:0,y:0,seqIndex:-1},
+  arc:{radius:4,startAngle:0,spanAngle:90,x:0,y:0,seqIndex:-1},
+  star:{outerRadius:5,innerRadius:2.5,numPoints:5,x:0,y:0,rotation:0,seqIndex:-1},
+  arrow:{x1:-5,y1:0,x2:5,y2:0,headSize:3,x:0,y:0,seqIndex:-1},
+  cross:{size:4,width:1.5,x:0,y:0,seqIndex:-1},
+  diamond:{width:6,height:6,x:0,y:0,seqIndex:-1}
+};
+const PARAM_KEYS = {
+  semicircle:["radius","ArcCut","LineCut","startAngle","spanAngle","rotation","x","y","seqIndex"],
+  circle:["radius","x","y","seqIndex"],
+  ellipse:["rx","ry","x","y","seqIndex"],
+  rect:["width","height","rx","x","y","seqIndex"],
+  line:["x1","y1","x2","y2","x","y","seqIndex"],
+  polygon:["points","x","y","seqIndex"],
+  arc:["radius","startAngle","spanAngle","x","y","seqIndex"],
+  star:["outerRadius","innerRadius","numPoints","x","y","rotation","seqIndex"],
+  arrow:["x1","y1","x2","y2","headSize","x","y","seqIndex"],
+  cross:["size","width","x","y","seqIndex"],
+  diamond:["width","height","x","y","seqIndex"]
+};
+const STATES = ["on","off","alarm","selected","unknown"];
+
+/* ============ state ============ */
+let curIdx = 0;
+let selShape = "semicircle";
+let selBrush = "brush_yellow";
+let previewState = "on";
+let editingBrushIdx = -1;
+let seqTimer = null;
+
+/* ============ geometry ============ */
+function rad(d){return d*Math.PI/180;}
+function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
+function arcPts(r,s,e,n){n=n||64;const o=[];for(let i=0;i<=n;i++){const a=rad(s+(e-s)*i/n);o.push([r*Math.cos(a),r*Math.sin(a)]);}return o;}
+
+function semicirclePath(R,arcCut,lineCut,s,e){
+  const N=90;
+  if(!(lineCut>0)){
+    const outer=arcPts(R,s,e);
+    const start=[R*Math.cos(rad(s)),R*Math.sin(rad(s))];
+    const end=[R*Math.cos(rad(e)),R*Math.sin(rad(e))];
+    if(arcCut>0){
+      const inner=arcPts(arcCut,s,e);
+      const iend=[arcCut*Math.cos(rad(e)),arcCut*Math.sin(rad(e))];
+      const istart=[arcCut*Math.cos(rad(s)),arcCut*Math.sin(rad(s))];
+      return [start].concat(outer,[end,iend],inner.slice().reverse(),[istart]);
+    }
+    return [start].concat(outer,[end]);
+  }
+  if(lineCut>=R) return [];
+  const mA=rad((s+e)/2);
+  const phi=Math.acos(clamp(lineCut/R,-1,1));
+  const a1=mA-phi,a2=mA+phi;
+  const seq=[];
+  for(let i=0;i<=N;i++){const a=a1+(a2-a1)*i/N;seq.push([R*Math.cos(a),R*Math.sin(a)]);}
+  const innerArc=(arcCut>0)&&(lineCut<arcCut);
+  function onChord(a){const r=lineCut/Math.cos(a-mA);return [r*Math.cos(a),r*Math.sin(a)];}
+  const M=48;
+  if(innerArc){
+    const phi2=Math.acos(clamp(lineCut/arcCut,-1,1));
+    const b1=mA+phi2,b2=mA-phi2;
+    for(let i=1;i<=M;i++) seq.push(onChord(a2+(b1-a2)*i/M));
+    for(let i=0;i<=N;i++){const a=b1+(b2-b1)*i/N;seq.push([arcCut*Math.cos(a),arcCut*Math.sin(a)]);}
+    for(let i=1;i<=M;i++) seq.push(onChord(b2+(a1-b2)*i/M));
+  } else {
+    for(let i=1;i<=M;i++) seq.push(onChord(a2+(a1-a2)*i/M));
+  }
+  return seq;
+}
+function shapePoints(item){
+  const p=item.params,x=p.x||0,y=p.y||0,ref=item.ref,pts=[];
+  if(ref==="semicircle"){const R=p.radius||4,cut=(p.ArcCut!=null?p.ArcCut:(p.cutDistance||0)),s=p.startAngle||90,e=s+(p.spanAngle||180);
+    arcPts(R,s,e).forEach(q=>pts.push([x+q[0],y+q[1]]));if(cut>0)arcPts(cut,s,e).forEach(q=>pts.push([x+q[0],y+q[1]]));}
+  else if(ref==="circle"){const R=p.radius||4;arcPts(R,0,360).forEach(q=>pts.push([x+q[0],y+q[1]]));}
+  else if(ref==="rect"){const w=p.width||8,h=p.height||6;pts.push([x-w/2,y-h/2],[x+w/2,y+h/2],[x+w/2,y-h/2],[x-w/2,y+h/2]);}
+  else if(ref==="line"){pts.push([x+(p.x1||0),y+(p.y1||0)],[x+(p.x2||0),y+(p.y2||0)]);}
+  else if(ref==="polygon"){(p.points||[]).forEach(q=>pts.push([x+q[0],y+q[1]]));}
+  else if(ref==="arc"){const R=p.radius||4,s=p.startAngle||0,e=s+(p.spanAngle||90);arcPts(R,s,e).forEach(q=>pts.push([x+q[0],y+q[1]]));}
+  return pts;
+}
+/* Full symmetric geometric extent of a shape, so the view can center on the
+   shape's TRUE geometric center (= its origin (x,y), i.e. (0,0) by default).
+   Without this, a half-disk would be fit to its clipped bbox and the origin
+   marker would drift off the shape's real center. */
+function shapeFullExtent(item){
+  const p=item.params,x=p.x||0,y=p.y||0,ref=item.ref;
+  if(ref==="circle"||ref==="semicircle"||ref==="arc"){const R=p.radius||4;
+    return [[x-R,y-R],[x+R,y-R],[x-R,y+R],[x+R,y+R]];}
+  if(ref==="ellipse"){const rx=p.rx||5,ry=p.ry||3;
+    return [[x-rx,y-ry],[x+rx,y-ry],[x-rx,y+ry],[x+rx,y+ry]];}
+  if(ref==="rect"||ref==="diamond"){const w=(p.width||8)/2,h=(p.height||6)/2;
+    return [[x-w,y-h],[x+w,y-h],[x-w,y+h],[x+w,y+h]];}
+  if(ref==="star"){const oR=p.outerRadius||5;
+    return [[x-oR,y-oR],[x+oR,y-oR],[x-oR,y+oR],[x+oR,y+oR]];}
+  if(ref==="cross"){const sz=p.size||4;
+    return [[x-sz,y-sz],[x+sz,y-sz],[x-sz,y+sz],[x+sz,y+sz]];}
+  if(ref==="line"||ref==="arrow"){return [[x+(p.x1||0),y+(p.y1||0)],[x+(p.x2||0),y+(p.y2||0)]];}
+  if(ref==="polygon"){return (p.points||[]).map(q=>[x+q[0],y+q[1]]);}
+  return [];
+}
+function makeFit(profile,size){
+  size=size||160;const span=size-10;
+  let allp=[];
+  profile.forEach(it=>{allp=allp.concat(shapePoints(it)); allp=allp.concat(shapeFullExtent(it));});
+  if(allp.length===0) allp=[[0,0]];
+  const xs=allp.map(p=>p[0]),ys=allp.map(p=>p[1]);
+  const margin=0.4;
+  const minx=Math.min.apply(null,xs)-margin,maxx=Math.max.apply(null,xs)+margin;
+  const miny=Math.min.apply(null,ys)-margin,maxy=Math.max.apply(null,ys)+margin;
+  const w=maxx-minx,h=maxy-miny,cx=(minx+maxx)/2,cy=(miny+maxy)/2;
+  let S=Math.min(span/w,span/h);S=Math.min(S,26);
+  const half=size/2;
+  const rel=(mx,my)=>[half+(mx-cx)*S,half-(my-cy)*S];
+  return {rel,S,cx,cy};
+}
+function strokePx(unit,S){return Math.min(unit*S,6);}
+function curBrush(item,state){
+  if(!item.brushes) return null;
+  const id=item.brushes[state]||item.brushes["on"];
+  return BRUSH_MAP[id]||null;
+}
+function renderItem(item,rel,S,state){
+  const p=item.params,x=p.x||0,y=p.y||0,ref=item.ref;
+  const hasBrush=!!item.brushes;
+  const b=curBrush(item,state);
+  const op = b ? (b.fillOpacity!=null?b.fillOpacity:(b.opacity!=null?b.opacity:1)) : (p.opacity!=null?p.opacity:1);
+  const sop = b ? (b.strokeOpacity!=null?b.strokeOpacity:1) : 1;
+  const isBlink = !!(b && b.blinkEnable);
+  const blinkMs = (b && b.blinkIntervalMs) || 700;
+  const rot=p.rotation||0;
+  function RX(gx,gy){if(!rot)return [gx,gy];const dx=gx-x,dy=gy-y,a=rad(rot);
+    return [x+dx*Math.cos(a)-dy*Math.sin(a), y+dx*Math.sin(a)+dy*Math.cos(a)];}
+  function P(q){return rel(RX(q[0],q[1])[0],RX(q[0],q[1])[1]);}
+  let fill,stroke,sw;
+  if(b){fill=b.fillColor;stroke=b.strokeColor;sw=strokePx(b.strokeWidth,S);}
+  else {fill=p.fill||"#888";stroke=p.stroke||"none";sw=0;}
+  const out=[];
+  if(ref==="semicircle"){
+    const R=p.radius||4,arcCut=(p.ArcCut!=null?p.ArcCut:(p.cutDistance||0)),lineCut=(p.LineCut!=null?p.LineCut:(p.lineCut||0));
+    const s=p.startAngle||90,e=s+(p.spanAngle||180);
+    const seq=semicirclePath(R,arcCut,lineCut,s,e);
+    if(seq.length){
+      const d="M "+seq.map(q=>{const c=P([x+q[0],y+q[1]]);return c[0].toFixed(2)+","+c[1].toFixed(2);}).join(" L ")+" Z";
+      out.push('<path d="'+d+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="'+sw.toFixed(2)+'" opacity="'+op+'" stroke-opacity="'+sop+'"/>');
+    }
+  } else if(ref==="circle"){
+    const R=p.radius||4,seq=arcPts(R,0,360);
+    const d="M "+seq.map(q=>{const c=P([x+q[0],y+q[1]]);return c[0].toFixed(2)+","+c[1].toFixed(2);}).join(" L ")+" Z";
+    out.push('<path d="'+d+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="'+sw.toFixed(2)+'" opacity="'+op+'" stroke-opacity="'+sop+'"/>');
+  } else if(ref==="ellipse"){
+    const rx=p.rx||5,ry=p.ry||3,c=P([x,y]);
+    out.push('<ellipse cx="'+c[0].toFixed(2)+'" cy="'+c[1].toFixed(2)+'" rx="'+(rx*S).toFixed(2)+'" ry="'+(ry*S).toFixed(2)+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="'+sw.toFixed(2)+'" opacity="'+op+'" stroke-opacity="'+sop+'"/>');
+  } else if(ref==="rect"){
+    const w=p.width||8,h=p.height||6,rx=p.rx||0;
+    // SVG rect (x,y) is screen top-left; due to y-flip in P(), the math
+    // bottom-left (y+h/2) maps to minimum screen_y → correct corner
+    const c1=P([x-w/2,y+h/2]);const rxp=rx>0?Math.min(rx*S,w*S/2,h*S/2):0;
+    out.push('<rect x="'+c1[0].toFixed(2)+'" y="'+c1[1].toFixed(2)+'" width="'+(w*S).toFixed(2)+'" height="'+(h*S).toFixed(2)+'" rx="'+rxp.toFixed(2)+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="'+sw.toFixed(2)+'" opacity="'+op+'" stroke-opacity="'+sop+'"/>');
+  } else if(ref==="line"){
+    const a=P([x+(p.x1||0),y+(p.y1||0)]),bb=P([x+(p.x2||0),y+(p.y2||0)]);
+    out.push('<line x1="'+a[0].toFixed(2)+'" y1="'+a[1].toFixed(2)+'" x2="'+bb[0].toFixed(2)+'" y2="'+bb[1].toFixed(2)+'" stroke="'+stroke+'" stroke-width="'+sw.toFixed(2)+'" stroke-linecap="round" opacity="'+op+'" stroke-opacity="'+sop+'"/>');
+  } else if(ref==="polygon"){
+    const pts=p.points||[];
+    if(pts.length){
+      const d="M "+pts.map(q=>{const c=P([x+q[0],y+q[1]]);return c[0].toFixed(2)+","+c[1].toFixed(2);}).join(" L ")+" Z";
+      out.push('<path d="'+d+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="'+sw.toFixed(2)+'" opacity="'+op+'" stroke-opacity="'+sop+'"/>');
+    }
+  } else if(ref==="arc"){
+    const R=p.radius||4,s=p.startAngle||0,e=s+(p.spanAngle||90),seq=arcPts(R,s,e);
+    const d="M "+seq.map(q=>{const c=P([x+q[0],y+q[1]]);return c[0].toFixed(2)+","+c[1].toFixed(2);}).join(" L ");
+    out.push('<path d="'+d+'" fill="none" stroke="'+stroke+'" stroke-width="'+sw.toFixed(2)+'" stroke-linecap="round" opacity="'+op+'" stroke-opacity="'+sop+'"/>');
+  } else if(ref==="star"){
+    const oR=p.outerRadius||5,iR=p.innerRadius||2.5,n=p.numPoints||5,seq=[];
+    for(let i=0;i<n*2;i++){const rr=(i%2)?iR:oR,a=rad(90+i*180/n);seq.push([x+rr*Math.cos(a),y+rr*Math.sin(a)]);}
+    const d="M "+seq.map(q=>{const c=P(q);return c[0].toFixed(2)+","+c[1].toFixed(2);}).join(" L ")+" Z";
+    out.push('<path d="'+d+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="'+sw.toFixed(2)+'" opacity="'+op+'" stroke-opacity="'+sop+'"/>');
+  } else if(ref==="arrow"){
+    const ax=x+(p.x1||0),ay=y+(p.y1||0),bx=x+(p.x2||0),by=y+(p.y2||0);
+    const ang=Math.atan2(by-ay,bx-ax),hs=p.headSize||3;
+    const p1=[bx-hs*Math.cos(ang-0.5),by-hs*Math.sin(ang-0.5)];
+    const p2=[bx-hs*Math.cos(ang+0.5),by-hs*Math.sin(ang+0.5)];
+    const a=P([ax,ay]),b=P([bx,by]),q1=P(p1),q2=P(p2);
+    out.push('<line x1="'+a[0].toFixed(2)+'" y1="'+a[1].toFixed(2)+'" x2="'+b[0].toFixed(2)+'" y2="'+b[1].toFixed(2)+'" stroke="'+stroke+'" stroke-width="'+sw.toFixed(2)+'" stroke-linecap="round" opacity="'+op+'" stroke-opacity="'+sop+'"/>');
+    out.push('<polygon points="'+b[0].toFixed(2)+','+b[1].toFixed(2)+' '+q1[0].toFixed(2)+','+q1[1].toFixed(2)+' '+q2[0].toFixed(2)+','+q2[1].toFixed(2)+'" fill="'+stroke+'" opacity="'+op+'" stroke-opacity="'+sop+'"/>');
+  } else if(ref==="cross"){
+    const sz=p.size||4,wd=p.width||1.5;
+    const h1=P([x-sz,y-wd/2]),h2=P([x+sz,y-wd/2]),h3=P([x+sz,y+wd/2]),h4=P([x-sz,y+wd/2]);
+    const v1=P([x-wd/2,y-sz]),v2=P([x+wd/2,y-sz]),v3=P([x+wd/2,y+sz]),v4=P([x-wd/2,y+sz]);
+    out.push('<polygon points="'+[h1,h2,h3,h4].map(c=>c[0].toFixed(2)+','+c[1].toFixed(2)).join(' ')+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="'+sw.toFixed(2)+'" opacity="'+op+'" stroke-opacity="'+sop+'"/>');
+    out.push('<polygon points="'+[v1,v2,v3,v4].map(c=>c[0].toFixed(2)+','+c[1].toFixed(2)).join(' ')+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="'+sw.toFixed(2)+'" opacity="'+op+'" stroke-opacity="'+sop+'"/>');
+  } else if(ref==="diamond"){
+    const w=p.width||6,h=p.height||6;
+    const pts=[[x,y+h/2],[x+w/2,y],[x,y-h/2],[x-w/2,y]];
+    out.push('<polygon points="'+pts.map(q=>{const c=P(q);return c[0].toFixed(2)+','+c[1].toFixed(2);}).join(' ')+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="'+sw.toFixed(2)+'" opacity="'+op+'" stroke-opacity="'+sop+'"/>');
+  }
+  let svg=out.join("");
+  if(isBlink){
+    svg='<g class="blink" style="animation-duration:'+blinkMs+'ms">'+svg+'</g>';
+  }
+  return svg;
+}
+function originMarkAt(rel,cr){
+  cr=cr||10;
+  const O=rel(0,0);
+  return '<circle cx="'+O[0].toFixed(1)+'" cy="'+O[1].toFixed(1)+'" r="3" fill="#EF4444" opacity="0.8"/>'
+    +'<line x1="'+(O[0]-cr).toFixed(1)+'" y1="'+O[1].toFixed(1)+'" x2="'+(O[0]+cr).toFixed(1)+'" y2="'+O[1].toFixed(1)+'" stroke="#EF4444" stroke-width="1" opacity="0.6"/>'
+    +'<line x1="'+O[0].toFixed(1)+'" y1="'+(O[1]-cr).toFixed(1)+'" x2="'+O[0].toFixed(1)+'" y2="'+(O[1]+cr).toFixed(1)+'" stroke="#EF4444" stroke-width="1" opacity="0.6"/>'
+    +'<text x="'+(O[0]+5).toFixed(1)+'" y="'+(O[1]-6).toFixed(1)+'" fill="#EF4444" font-size="9" font-family="monospace" opacity="0.7">(0,0)</text>';
+}
+function renderComposite(profile,state,size){
+  size=size||300;
+  const {rel,S}=makeFit(profile,size);
+  const seqResolve=resolveSeqState(state,profile);
+  let body="";
+  profile.forEach((it,idx)=>{
+    let itemState=state;
+    if(seqResolve&&seqResolve.type==="seq"){
+      itemState=effectiveStateForItem(seqResolve,it,idx);
+    }
+    body+=renderItem(it,rel,S,itemState);
+  });
+  return '<svg viewBox="0 0 '+size+' '+size+'" width="100%" height="100%">'
+    +'<rect x="2" y="2" width="'+(size-4)+'" height="'+(size-4)+'" rx="14" fill="#FBFCFE" stroke="#E3E8EF"/>'
+    +body+originMarkAt(rel)+'</svg>';
+}
+function renderSingle(ref,params,brushId,size){
+  const item={ref:ref,brushes:{on:brushId,off:brushId,alarm:brushId,selected:brushId,unknown:brushId},params:params};
+  // single-shape gallery render: no origin mark needed
+  size=size||120;
+  const {rel,S}=makeFit([item],size);
+  let body=renderItem(item,rel,S,"on");
+  return '<svg viewBox="0 0 '+size+' '+size+'" width="100%" height="100%">'
+    +'<rect x="1" y="1" width="'+(size-2)+'" height="'+(size-2)+'" rx="10" fill="#FBFCFE" stroke="#E3E8EF"/>'
+    +body+'</svg>';
+}
+
+/* ============ UI: gallery (reference-style) ============ */
+function el(id){return document.getElementById(id);}
+function desc(ref,key){try{return SHAPES.shapes[ref].paramDescriptions[key]||key;}catch(e){return key;}}
+
+function buildHintText(ref){
+  /* Build the parameter hint lines shown under each gallery card */
+  const def = SHAPES.shapes[ref];
+  if(!def) return "";
+  const dp = def.defaultParams || {};
+  const pd = def.paramDescriptions || {};
+  const lines = [];
+
+  // Show key params that define this shape's appearance
+  const showKeys = Object.keys(dp).filter(k =>
+    !["fill","stroke","strokeWidth","opacity","x","y"].includes(k)
+  );
+
+  showKeys.forEach(k => {
+    const v = dp[k];
+    const lbl = pd[k] || k;
+    let vs = String(v);
+    // truncate long arrays
+    if(vs.length > 20) vs = vs.slice(0,20)+"…";
+    lines.push(lbl+"="+vs);
+  });
+
+  // Special: direction hint for semicircle
+  if(ref === "semicircle"){
+    const sa = dp.startAngle || 90;
+    const sp = dp.spanAngle || 180;
+    const mid = ((sa + sp/2) % 360 + 360) % 360;
+    const dirs = {0:"→ 右",90:"↑ 上",180:"← 左",270:"↓ 下"};
+    let dir = "";
+    Object.entries(dirs).forEach(([a,d]) => {
+      if(Math.abs(mid - (+a)) < 5 || Math.abs(mid - (+a) - 360) < 5) dir = d;
+    });
+    if(dir) lines.push("→ 中点"+dir.replace(/→ /,"").replace(/./,c=>"→ "+c).slice(0,5));
+  }
+
+  return lines.join("\n");
+}
+
+function buildGallery(){
+  const g=el("gallery");g.innerHTML="";
+  SHAPE_ORDER.forEach(ref=>{
+    const div=document.createElement("div");
+    div.className="gcard"+(ref===selShape?" active":"");
+    div.dataset.ref=ref;
+    const params=JSON.parse(JSON.stringify(DEFAULTS[ref]));
+    const cn = SHAPE_CN[ref] || ref;
+    div.innerHTML=
+      renderSingle(ref,params,"brush_blue",58)
+      +'<div class="gname">'+cn+'</div>'
+      +'<div class="gtype">'+ref+'</div>'
+      +'<div class="ghint">'+buildHintText(ref).replace(/\n/g,'<br/>')+'</div>';
+    div.onclick=()=>{selShape=ref;buildGallery();updateStatus();};
+    g.appendChild(div);
+  });
+}
+
+/* ============ UI: swatches (clickable + edit/delete) ============ */
+function buildSwatches(){
+  const s=el("swatches");s.innerHTML="";
+  BRUSHES.forEach((b,idx)=>{
+    const div=document.createElement("div");
+    div.className="sw"+(b.id===selBrush?" active":"");
+    div.dataset.id=b.id;
+    div.dataset.idx=idx;
+    div.innerHTML=
+      '<div class="chip" style="background:'+b.fillColor+'" title="点击编辑 '+b.id+'"></div>'
+      +'<div class="sname">'+b.id.replace("brush_","")+'</div>'
+      +'<span class="del-btn" data-del-idx="'+idx+'" title="删除">&times;</span>';
+    // click chip/name to select
+    div.onclick=(ev)=>{
+      if(ev.target.classList.contains("del-btn")) return;
+      selBrush=b.id;buildSwatches();updateStatus();
+    };
+    // double-click or click chip to open editor
+    const chip=div.querySelector(".chip");
+    chip.onclick=(ev)=>{
+      ev.stopPropagation();
+      openBrushEditor(idx);
+    };
+    // delete
+    const dbtn=div.querySelector(".del-btn");
+    dbtn.onclick=(ev)=>{
+      ev.stopPropagation();
+      if(BRUSHES.length <= 1){alert("至少保留一个笔刷");return;}
+      if(confirm("删除笔刷 "+b.id+" ?")){BRUSHES.splice(idx,1);buildSwatches();}
+    };
+    s.appendChild(div);
+  });
+}
+
+/* ============ UI: brush editor ============ */
+function openBrushEditor(idx){
+  editingBrushIdx=idx;
+  const ed=el("brushEditor");
+  const b = idx >= 0 && idx < BRUSHES.length ? BRUSHES[idx] : null;
+  ed.classList.add("open");
+  el("editBrushId").textContent = b ? b.id : "(新笔刷)";
+  el("be_id").value = b ? b.id : "brush_new";
+  el("be_fill").value = b ? b.fillColor : "#808080";
+  el("be_fill_txt").textContent = b ? b.fillColor : "#808080";
+  el("be_stroke").value = b ? b.strokeColor : "#606060";
+  el("be_stroke_txt").textContent = b ? b.strokeColor : "#606060";
+  el("be_sw").value = b ? b.strokeWidth : 1;
+  el("be_fop").value = b ? (b.fillOpacity!=null?b.fillOpacity:(b.opacity!=null?b.opacity:1)) : 1;
+  el("be_sop").value = b ? (b.strokeOpacity!=null?b.strokeOpacity:1) : 1;
+  el("be_blink").checked = !!(b && b.blinkEnable);
+  el("be_bint").value = b ? (b.blinkIntervalMs||700) : 700;
+}
+function closeBrushEditor(){
+  editingBrushIdx=-1;el("brushEditor").classList.remove("open");}
+el("addBrushBtn").onclick=()=>{openBrushEditor(-1);};
+el("be_cancel").onclick=()=>closeBrushEditor();
+
+el("be_fill").oninput=function(){el("be_fill_txt").textContent=this.value;};
+el("be_stroke").oninput=function(){el("be_stroke_txt").textContent=this.value;};
+
+el("be_save").onclick=()=>{
+  const id=el("be_id").value.trim();
+  if(!id){alert("请输入笔刷 ID");return;}
+  // parseFloat with explicit default: 0 and decimals are preserved (||1 would turn 0 into 1)
+  const num=(eid,def)=>{const v=parseFloat(el(eid).value);return isNaN(v)?def:v;};
+  const rec={
+    id:id,
+    fillColor:el("be_fill").value,
+    strokeColor:el("be_stroke").value,
+    strokeWidth:num("be_sw",1),
+    fillOpacity:num("be_fop",1),
+    strokeOpacity:num("be_sop",1),
+    blinkEnable:el("be_blink").checked,
+    blinkIntervalMs:num("be_bint",700)
+  };
+  if(editingBrushIdx>=0){
+    Object.assign(BRUSHES[editingBrushIdx],rec);
+    // update BRUSH_MAP too
+    BRUSH_MAP[rec.id]=rec;
+  } else {
+    BRUSHES.push(rec);
+    BRUSH_MAP[rec.id]=rec;
+  }
+  closeBrushEditor();
+  buildSwatches();
+  buildProfile(); // sync new/edited brush into profile dropdowns
+  // re-render preview if using this brush
+  renderPreview();
+};
+
+/* ============ status ============ */
+function updateStatus(){
+  el("selShape").textContent=(SHAPE_CN[selShape]||selShape)+" / "+selShape;
+  el("selBrush").textContent=selBrush;
+}
+
+/* ============ item select / state bar / sequence ============ */
+/* Detect if profile entries have seqIndex >= 0 (sequence mode).
+   Returns {hasSeq:true, maxSeq:N} or {hasSeq:false} */
+function detectSeqInfo(profile){
+  if(!profile||!profile.length) return {hasSeq:false};
+  let maxIdx=-1;
+  profile.forEach(e=>{ const s=(e.params&&e.params.seqIndex!=null)?e.params.seqIndex:-1; if(s>maxIdx)maxIdx=s; });
+  return {hasSeq:maxIdx>=0, maxSeq:maxIdx};
+}
+/* Map a sequence state (seq_0, seq_1, ..., seq_cycle) to actual on/off
+   for each item. Returns the effective brush-state string per item. */
+function resolveSeqState(state,profile){
+  if(!state.startsWith("seq_")) return null; // not a sequence state
+  if(state==="seq_cycle") return "cycle"; // special: handled by animation
+  const target=parseInt(state.slice(4),10);
+  if(isNaN(target)) return null;
+  // returns a map function: (item,index) => effective state string
+  return {type:"seq", target:target};
+}
+function effectiveStateForItem(seqResolve,item,idx){
+  if(!seqResolve||seqResolve.type!=="seq") return null;
+  const si=(item.params&&item.params.seqIndex!=null)?item.params.seqIndex:-1;
+  return (si===seqResolve.target) ? "on" : "off";
+}
+function buildItemSelect(){
+  const sel=el("itemSelect");sel.innerHTML="";
+  LAMP.forEach((t,i)=>{
+    const o=document.createElement("option");
+    o.value=i;o.textContent=(t.name||t.id||("项"+i))+"  /  "+(t.id||"");
+    sel.appendChild(o);
+  });
+  sel.value=curIdx;
+}
+function buildStateBar(){
+  const sb=el("statebar");sb.innerHTML="";
+  const t=LAMP[curIdx];
+  const faces=(t&&t.ctlFaceNum)||1;
+  // Build effective state list: expand "on" → on_1..on_N when faces>1
+  const effStates=[];
+  STATES.forEach(st=>{
+    if(st==="on"&&faces>1){
+      for(let f=1;f<=faces;f++) effStates.push("on_"+f);
+    } else {
+      effStates.push(st);
+    }
+  });
+  // No separate seq buttons — sequence cycle runs automatically under "on"
+  effStates.forEach(st=>{
+    const d=document.createElement("span");
+    d.className="pill"+(st===previewState?" active":"");
+    d.textContent=st;
+    d.onclick=()=>{previewState=st;buildStateBar();renderPreview();};
+    sb.appendChild(d);
+  });
+}
+
+function renderPreview(){
+  const t=LAMP[curIdx];if(!t)return;
+  // Clear any running sequence-cycle timer
+  if(seqTimer){clearInterval(seqTimer);seqTimer=null;}
+  // When previewing "on" (or a face's on state) and the profile has a sequence
+  // config, automatically run the cycle (mutual-exclusion / rotating lights).
+  const seqInfo=detectSeqInfo(t.profile);
+  const inOnState=/^on(_|$)/.test(previewState);
+  const seqEnabled=(t.seqEnable!==false);
+  const steps=seqInfo.maxSeq+1;
+  if(inOnState && seqInfo.hasSeq && seqEnabled && steps>1){
+    const interval=((t.seqInterval!=null)?t.seqInterval:800);
+    let step=0;
+    const tick=()=>{ el("preview").innerHTML=renderComposite(t.profile||[],"seq_"+step,300); step=(step+1)%steps; };
+    tick();
+    seqTimer=setInterval(tick,interval);
+  } else {
+    el("preview").innerHTML=renderComposite(t.profile||[],previewState,300);
+  }
+}
+function renderJson(){
+  const t=LAMP[curIdx];if(!t)return;
+  el("jsonOut").textContent=JSON.stringify(t,null,2);
+}
+
+/* ============ profile list ============ */
+function buildProfile(){
+  const wrap=el("profileList");wrap.innerHTML="";
+  const t=LAMP[curIdx];if(!t||!t.profile)return;
+  t.profile.forEach((entry,idx)=>{
+    const div=document.createElement("div");div.className="entry";
+    const ref=entry.ref;
+    let html='<div class="top"><span class="ref">'+ref+' #'+idx+'</span><span class="mini">'
+      +'<button data-act="up" data-i="'+idx+'">↑</button>'
+      +'<button data-act="down" data-i="'+idx+'">↓</button>'
+      +'<button data-act="del" data-i="'+idx+'" class="danger">🗑</button></span></div>';
+    html+='<div class="params">';
+    PARAM_KEYS[ref].forEach(key=>{
+      const val=entry.params[key];
+      const isColor=(key==="stroke");
+      const isPoints=(key==="points");
+      const isSeqIdx=(key==="seqIndex");
+      const labelTxt=isSeqIdx?"相位序号 seqIndex":desc(ref,key);
+      if(isPoints){
+        html+='<div style="grid-column:1/5"><label>'+labelTxt+'（坐标数组）</label>'
+          +'<textarea data-pk="'+key+'" data-i="'+idx+'" rows="2">'+JSON.stringify(val)+'</textarea></div>';
+      } else if(isColor){
+        html+='<div><label>'+labelTxt+'</label><input type="text" data-pk="'+key+'" data-i="'+idx+'" value="'+(val||"")+'"/></div>';
+      } else if(isSeqIdx){
+        html+='<div class="seq-idx-field"><label>'+labelTxt+'</label>'
+          +'<input type="number" min="-1" step="1" data-pk="'+key+'" data-i="'+idx+'" value="'+(val!=null?val:"-1")+'" title="-1=不参与序列；0,1,2…=第几步亮"/></div>';
+      } else {
+        html+='<div><label>'+labelTxt+'</label><input type="number" step="any" data-pk="'+key+'" data-i="'+idx+'" value="'+(val!=null?val:"")+'"/></div>';
+      }
+    });
+    html+='</div>';
+    html+='<div class="brushes-row">';
+    const faces=t.ctlFaceNum||1;
+    // Single row: expand "on" into on_1..on_N when faces>1
+    const effStates=[];
+    STATES.forEach(st=>{
+      if(st==="on"&&faces>1){
+        for(let f=1;f<=faces;f++) effStates.push(st+"_"+f);
+      } else {
+        effStates.push(st);
+      }
+    });
+    effStates.forEach(st=>{
+      const cur=(entry.brushes&&entry.brushes[st])||"";
+      let opts='<option value="">—</option>';
+      BRUSHES.forEach(b=>{opts+='<option value="'+b.id+'"'+(b.id===cur?" selected":"")+'>'+b.id.replace("brush_","")+'</option>';});
+      html+='<div><label>'+st+'</label><select data-bk="'+st+'" data-i="'+idx+'">'+opts+'</select></div>';
+    });
+    html+='</div>';
+    // Sequence note per entry
+    const si=(entry.params&&entry.params.seqIndex!=null)?entry.params.seqIndex:-1;
+    if(si>=0){
+      html+='<div class="seq-note">相位 '+si+'：选中「on」状态（或 on_'+si+'）时本图形亮起；序列自动轮巡时本图形在相位 '+si+' 亮、其余相位灭。</div>';
+    }
+    div.innerHTML=html;
+    wrap.appendChild(div);
+  });
+}
+
+function renderCurrent(){
+  // Clear any running sequence-cycle timer when switching items
+  if(seqTimer){clearInterval(seqTimer);seqTimer=null;}
+  const t=LAMP[curIdx];if(!t){return;}
+  el("m_id").value=t.id||"";
+  el("m_name").value=t.name||"";
+  el("m_desc").value=t.description||"";
+  const oldVal=el("m_ctlFaceNum").value;
+  el("m_ctlFaceNum").value=t.ctlFaceNum||1;
+  // Sequence cycle config
+  const seqInfo=detectSeqInfo(t.profile);
+  el("m_seqEnable").checked=(seqInfo.hasSeq)?(t.seqEnable!==false):false;
+  el("m_seqInterval").value=(t.seqInterval!=null)?t.seqInterval:800;
+  // Reset previewState if current state doesn't match face config
+  const faces=t.ctlFaceNum||1;
+  const oldFaces=(oldVal&&parseInt(oldVal,10))||1;
+  if(faces>oldFaces) migrateBrushesForFaces(t,oldFaces,faces);
+  if(faces>1&&previewState==="on") previewState="on_1";
+  if(faces<=1&&/^on_\d+$/.test(previewState)) previewState="on";
+  buildItemSelect();
+  buildStateBar();
+  buildProfile();
+  renderPreview();
+  renderJson();
+}
+function fullRender(){renderCurrent();}
+
+/* ============ events ============ */
+el("profileList").addEventListener("click",e=>{
+  const btn=e.target.closest("button[data-act]");if(!btn)return;
+  const i=+btn.dataset.i, act=btn.dataset.act, t=LAMP[curIdx];
+  if(act==="del"){t.profile.splice(i,1);}
+  else if(act==="up"&&i>0){const a=t.profile;const x=a[i];a[i]=a[i-1];a[i-1]=x;}
+  else if(act==="down"&&i<t.profile.length-1){const a=t.profile;const x=a[i];a[i]=a[i+1];a[i+1]=x;}
+  buildProfile();renderPreview();renderJson();
+});
+el("profileList").addEventListener("input",e=>{
+  const t=LAMP[curIdx];
+  if(e.target.dataset.pk!=null){
+    const i=+e.target.dataset.i,key=e.target.dataset.pk;
+    let v=e.target.value;
+    if(key==="points"){ try{ t.profile[i].params[key]=JSON.parse(v); e.target.style.borderColor=""; }catch(err){ e.target.style.borderColor="#EF4444"; return; } }
+    else if(key==="stroke"){ t.profile[i].params[key]=v; }
+    else { if(v===""||v==null){/*keep*/} else {v=parseFloat(v); if(isNaN(v))return;} t.profile[i].params[key]=v; }
+    // If seqIndex changed, refresh state bar so seq buttons appear/disappear
+    if(key==="seqIndex") buildStateBar();
+    renderPreview();renderJson();
+  }
+});
+el("profileList").addEventListener("change",e=>{
+  const t=LAMP[curIdx];
+  if(e.target.dataset.bk!=null){
+    const i=+e.target.dataset.i,st=e.target.dataset.bk,val=e.target.value;
+    if(!t.profile[i].brushes)t.profile[i].brushes={};
+    t.profile[i].brushes[st]=val||undefined;
+    renderPreview();renderJson();
+  }
+});
+
+const META_MAP={m_id:"id",m_name:"name",m_desc:"description",m_ctlFaceNum:"ctlFaceNum"};
+/* ============ migrate brushes when ctlFaceNum changes ============ */
+function migrateBrushesForFaces(item,oldFaces,newFaces){
+  if(!item.profile) return;
+  oldFaces=oldFaces||1; newFaces=newFaces||1;
+  if(newFaces<=oldFaces) return; // only need to expand, never shrink keys
+  item.profile.forEach(entry=>{
+    if(!entry.brushes) entry.brushes={};
+    const b=entry.brushes;
+    // Copy plain "on" → "on_1" (first time only)
+    if(oldFaces===1&&b.on!=null&&!b.on_1) b.on_1=b.on;
+    // For each state that should expand, seed new face keys from face-1 or "on_N"
+    STATES.forEach(st=>{
+      const srcKey=(st==="on")?"on_1":st;
+      for(let f=oldFaces+1; f<=newFaces; f++){
+        const dstKey=(st==="on")?(st+"_"+f):st;
+        if(b[dstKey]==null){
+          // try to copy from previous face's same state
+          const prevKey=(st==="on")?("on_"+(f-1)):st;
+          b[dstKey]=(b[prevKey]!=null)?b[prevKey]:(b[srcKey]!=null?b[srcKey]:"");
+        }
+      }
+    });
+    // Remove plain "on" key when faces>1 (keep only on_N)
+    if(newFaces>1 && b.on!=null && b.on_1!=null){ delete b.on; }
+  });
+}
+
+function bindMeta(){
+  Object.keys(META_MAP).forEach(eid=>{
+    el(eid).addEventListener("input",()=>{
+      const t=LAMP[curIdx];if(!t)return;
+      let v=el(eid).value;
+      if(META_MAP[eid]==="ctlFaceNum"){ v=parseInt(v,10)||1; if(v<1)v=1; el(eid).value=v; }
+      t[META_MAP[eid]]=v;
+      if(META_MAP[eid]==="ctlFaceNum"){
+        const oldFaces=t.ctlFaceNum||1;
+        if(v>1&&previewState==="on") previewState="on_1";
+        if(v>oldFaces) migrateBrushesForFaces(t,oldFaces,v);
+        buildStateBar(); buildProfile(); renderPreview(); renderJson();
+      }
+      buildItemSelect(); renderJson();
+    });
+  });
+}
+/* ============ sequence cycle config ============ */
+el("m_seqEnable").addEventListener("change",()=>{
+  const t=LAMP[curIdx];if(!t)return;
+  t.seqEnable=el("m_seqEnable").checked;
+  renderJson(); renderPreview();
+});
+el("m_seqInterval").addEventListener("input",()=>{
+  const t=LAMP[curIdx];if(!t)return;
+  let v=parseFloat(el("m_seqInterval").value);
+  if(isNaN(v)||v<50)v=50;
+  t.seqInterval=v;
+  renderJson(); renderPreview();
+});
+
+el("itemSelect").addEventListener("change",e=>{curIdx=+e.target.value;renderCurrent();});
+el("addShape").addEventListener("click",()=>{
+  const t=LAMP[curIdx];if(!t){alert("请先新建或选择一项");return;}
+  if(!t.profile)t.profile=[];
+  const params=JSON.parse(JSON.stringify(DEFAULTS[selShape]));
+  const faces=t.ctlFaceNum||1;
+  const brushes={};
+  // Same expansion as buildProfile: expand "on" → on_1..on_N
+  STATES.forEach(st=>{
+    if(st==="on"&&faces>1){
+      for(let f=1;f<=faces;f++) brushes[st+"_"+f]=selBrush;
+    } else {
+      brushes[st]=selBrush;
+    }
+  });
+  t.profile.push({ref:selShape,brushes:brushes,params:params});
+  buildProfile();renderPreview();renderJson();
+});
+el("newItem").addEventListener("click",()=>{
+  const n="NEW_"+(LAMP.length+1);
+  LAMP.push({id:n,name:"新建灯光",description:"",ctlFaceNum:1,profile:[]});
+  curIdx=LAMP.length-1;renderCurrent();
+});
+el("delItem").addEventListener("click",()=>{
+  if(LAMP.length<=1){alert("至少保留一项");return;}
+  LAMP.splice(curIdx,1);curIdx=Math.max(0,curIdx-1);renderCurrent();
+});
+el("saveAll").addEventListener("click",()=>download("lamp_template.json",JSON.stringify(LAMP,null,2)));
+el("exportBrushes").addEventListener("click",()=>download("brushes_config.json",JSON.stringify(BRUSHES,null,2)));
+el("importBrushes").onclick=()=>el("brushFileIn").click();
+el("brushFileIn").addEventListener("change",e=>{
+  const f=e.target.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    try{
+      const data=JSON.parse(rd.result);
+      const arr = Array.isArray(data) ? data : (Array.isArray(data.brushes)?data.brushes:null);
+      if(!arr || !arr.length || !arr.every(b=>b && b.fillColor!=null && b.strokeColor!=null)){
+        alert("不是有效的笔刷数组（每项需含 fillColor / strokeColor）");return;
+      }
+      BRUSHES.length=0; arr.forEach(b=>{BRUSHES.push(b);BRUSH_MAP[b.id]=b;});
+      buildSwatches(); renderPreview(); renderJson();
+    }catch(err){ alert("解析失败："+err.message); }
+  };
+  rd.readAsText(f); e.target.value="";
+});
+el("downloadItem").addEventListener("click",()=>download((LAMP[curIdx].id||"item")+".json",JSON.stringify(LAMP[curIdx],null,2)));
+el("copyJson").addEventListener("click",()=>{
+  navigator.clipboard.writeText(JSON.stringify(LAMP[curIdx],null,2)).then(()=>{
+    const b=el("copyJson");const o=b.textContent;b.textContent="已复制 ✓";setTimeout(()=>b.textContent=o,1200);
+  });
+});
+el("importBtn").onclick=()=>el("fileIn").click();
+el("fileIn").addEventListener("change",e=>{
+  const f=e.target.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    try{
+      const data=JSON.parse(rd.result);
+      if(Array.isArray(data)){
+        // distinguish a brushes array (each has fillColor/strokeColor) from a lamp template array
+        const looksLikeBrushes = data.length>0 && data.every(b=>b && b.fillColor!=null && b.strokeColor!=null);
+        if(looksLikeBrushes){ BRUSHES.length=0;data.forEach(b=>{BRUSHES.push(b);BRUSH_MAP[b.id]=b;});buildSwatches();renderPreview(); }
+        else { LAMP=data; curIdx=0; }
+      }
+      else if(data.shapes){ Object.assign(SHAPES,data); rebuildAll(); }
+      else if(Array.isArray(data.brushes)){ BRUSHES.length=0;data.brushes.forEach(b=>{BRUSHES.push(b);BRUSH_MAP[b.id]=b;});buildSwatches();renderPreview(); }
+      else if(data.id||data.ref){ LAMP.push(data); curIdx=LAMP.length-1; }
+      fullRender();
+    }catch(err){ alert("解析失败："+err.message); }
+  };
+  rd.readAsText(f);
+  e.target.value="";
+});
+function rebuildAll(){buildGallery();buildSwatches();}
+
+/* ============ apply single item JSON (by ID: update or insert) ============ */
+el("applyItemBtn").addEventListener("click",()=>{
+  const txt=el("applyItemText").value.trim();
+  el("applyErr").textContent="";
+  if(!txt){el("applyErr").textContent="请粘贴 JSON";return;}
+  try{
+    const item=JSON.parse(txt);
+    if(!item.id){el("applyErr").textContent="JSON 必须包含 id 字段";return;}
+    // find existing index by id
+    const idx=LAMP.findIndex(t=>t.id===item.id);
+    if(idx>=0){
+      Object.assign(LAMP[idx],item);
+      curIdx=idx;
+      el("applyErr").textContent="已更新项 "+item.id;
+      el("applyErr").style.color="#16A34A";
+    } else {
+      LAMP.push(item);
+      curIdx=LAMP.length-1;
+      el("applyErr").textContent="已新增项 "+item.id;
+      el("applyErr").style.color="#2A7AD8";
+    }
+    fullRender();
+  }catch(err){
+    el("applyErr").textContent="解析失败："+err.message;el("applyErr").style.color="";
+  }
+});
+
+function download(name,text){
+  const blob=new Blob([text],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+}
+
+/* ============ init ============ */
+buildGallery();buildSwatches();updateStatus();bindMeta();
+if(!LAMP.length){LAMP.push({id:"NEW_1",name:"新建灯光",description:"",profile:[]});}
+curIdx=Math.min(curIdx,LAMP.length-1);
+renderCurrent();
+</script>
+
+</body>
+</html>

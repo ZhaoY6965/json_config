@@ -443,6 +443,70 @@ function updatePreviewManually(dataArray) {
 }
 
 // ============================================================
+// 外部数据注入（从提取面板直接设置源/目标数据）
+// ============================================================
+
+/** 由外部将数据设为源数据（JSON 1） */
+export function setSourceData(data, fileName) {
+    json1Data = data;
+    json1Fields = extractFieldDetails(data);
+    var total = getDataCount(data);
+
+    var fileInfoEl = document.getElementById('json1FileInfo');
+    if (fileInfoEl) fileInfoEl.textContent = fileName || '（来自字段提取，' + total + ' 条）';
+    var meta = document.getElementById('json1Meta');
+    if (meta) meta.style.display = 'block';
+    var countEl = document.getElementById('json1CountDisplay');
+    if (countEl) countEl.textContent = total;
+    var fieldCountEl = document.getElementById('json1FieldCountDisplay');
+    if (fieldCountEl) fieldCountEl.textContent = json1Fields.length;
+
+    renderFieldsTable('json1FieldsContainer', json1Fields);
+    populateFieldSelect('sourceFieldSelect', json1Fields);
+    updateFieldDetail('sourceFieldDetail', json1Fields, document.getElementById('sourceFieldSelect').value);
+    updateReplaceSummary();
+
+    showStatus('源数据已更新 — ' + json1Fields.length + ' 个字段, ' + total + ' 组', 'success');
+}
+
+/** 由外部将数据设为目标数据（JSON 2） */
+export function setTargetData(data, fileName) {
+    json2Data = data;
+    json2Fields = extractFieldDetails(data);
+    var total = getDataCount(data);
+
+    var fileInfoEl = document.getElementById('json2FileInfo');
+    if (fileInfoEl) fileInfoEl.textContent = fileName || '（来自字段提取，' + total + ' 条）';
+    var meta = document.getElementById('json2Meta');
+    if (meta) meta.style.display = 'block';
+    var countEl = document.getElementById('json2CountDisplay');
+    if (countEl) countEl.textContent = total;
+    var fieldCountEl = document.getElementById('json2FieldCountDisplay');
+    if (fieldCountEl) fieldCountEl.textContent = json2Fields.length;
+
+    renderFieldsTable('json2FieldsContainer', json2Fields);
+    populateFieldSelect('targetFieldSelect', json2Fields);
+    updateFieldDetail('targetFieldDetail', json2Fields, document.getElementById('targetFieldSelect').value);
+    updateReplaceSummary();
+
+    showStatus('目标数据已更新 — ' + json2Fields.length + ' 个字段, ' + total + ' 组', 'success');
+}
+
+/** 获取当前源数据摘要（用于状态显示） */
+export function getSourceInfo() {
+    if (!json1Data) return null;
+    var total = getDataCount(json1Data);
+    return { fields: json1Fields.length, count: total };
+}
+
+/** 获取当前目标数据摘要（用于状态显示） */
+export function getTargetInfo() {
+    if (!json2Data) return null;
+    var total = getDataCount(json2Data);
+    return { fields: json2Fields.length, count: total };
+}
+
+// ============================================================
 // 原有简单导入功能（保留兼容）
 // ============================================================
 
@@ -612,6 +676,12 @@ export function initImportPanel() {
             if (el) el.value = '';
             el = document.getElementById('replaceSummary');
             if (el) el.style.display = 'none';
+
+            // 同步更新提取面板的源/目标状态显示
+            var srcStatus = document.getElementById('extractSrcStatus');
+            if (srcStatus) { srcStatus.textContent = '源数据: 空'; srcStatus.style.color = 'var(--text-secondary)'; }
+            var tgtStatus = document.getElementById('extractTgtStatus');
+            if (tgtStatus) { tgtStatus.textContent = '目标数据: 空'; tgtStatus.style.color = 'var(--text-secondary)'; }
 
             showStatus('已清空所有导入数据', 'info');
         });

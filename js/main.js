@@ -27,6 +27,7 @@ import {
 import { initConfigProject, getCurrentConfig, getCurrentSchema, getCurrentKey, updateCurrentData, getFkOptions, isProjectLoaded, loadSingleFile, autoSave } from './configProject.js';
 import { FieldType, DataShape, getForeignKeyFields } from './configSchema.js';
 import { initCardDesigner, onConfigSelected as onCardConfigSelected } from './cardDesigner.js';
+import { initWizardPanel } from './projectWizard.js';
 
 // ============================================================
 // 初始化
@@ -40,6 +41,7 @@ function init() {
     initTemplateLibPanel();
     initConfigProject();
     initCardDesigner();
+    initWizardPanel();
     bindEvents();
     bindTemplateLibEvents();
     bindConfigEvents();
@@ -72,7 +74,7 @@ function bindTemplateLibEvents() {
 
     document.addEventListener('template-lib-load-extract', function(e) {
         // 切换到字段提取页，后续可扩展自动填充逻辑
-        switchTab('tab-extract');
+        switchTab('tab-extract-replace');
     });
 
     document.addEventListener('template-lib-load-data', function(e) {

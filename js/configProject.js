@@ -30,7 +30,6 @@ function bindDom() {
         refreshBtn: document.getElementById('refreshConfigBtn'),
         schemaBadge: document.getElementById('schemaBadge'),
         importFileInput: document.getElementById('configFileInput'),
-        dropZone: document.getElementById('configDropZone'),
     };
 }
 
@@ -570,23 +569,29 @@ export function initConfigProject() {
         }
     });
 
-    if (dom.dropZone) {
-        ['dragenter','dragover'].forEach(ev => dom.dropZone.addEventListener(ev, e => { e.preventDefault(); e.stopPropagation(); }));
-        dom.dropZone.addEventListener('dragover', function(e) {
-            dom.dropZone.style.borderColor = 'var(--accent-color)';
-            dom.dropZone.style.background = 'var(--bg-hover)';
+    // 全左侧区域拖拽导入：整个配置项目面板都是拖拽目标
+    var panelEl = dom.panel;
+    if (panelEl) {
+        ['dragenter','dragover'].forEach(function(ev) {
+            panelEl.addEventListener(ev, function(e) { e.preventDefault(); e.stopPropagation(); });
         });
-        dom.dropZone.addEventListener('dragleave', function(e) {
-            dom.dropZone.style.borderColor = 'var(--border-color)';
-            dom.dropZone.style.background = '';
+        panelEl.addEventListener('dragover', function(e) {
+            panelEl.style.outline = '2px dashed var(--accent-color)';
+            panelEl.style.outlineOffset = '-10px';
         });
-        dom.dropZone.addEventListener('drop', function(e) {
+        panelEl.addEventListener('dragleave', function(e) {
+            if (e.target === panelEl || !panelEl.contains(e.relatedTarget)) {
+                panelEl.style.outline = '';
+                panelEl.style.outlineOffset = '';
+            }
+        });
+        panelEl.addEventListener('drop', function(e) {
             e.preventDefault(); e.stopPropagation();
-            dom.dropZone.style.borderColor = 'var(--border-color)';
-            dom.dropZone.style.background = '';
-            const files = e.dataTransfer.files;
+            panelEl.style.outline = '';
+            panelEl.style.outlineOffset = '';
+            var files = e.dataTransfer.files;
             if (!files.length) return;
-            let hasDir = false;
+            var hasDir = false;
             for (var f of files) { if (f.webkitRelativePath && f.webkitRelativePath.includes('/')) { hasDir = true; break; } }
             if (hasDir) loadFromFiles(files);
             else { for (var sf of files) { if (sf.name.endsWith('.json')) importSingleFile(sf); } }
