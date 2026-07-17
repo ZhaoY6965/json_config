@@ -128,13 +128,16 @@ function renderFieldsTable(containerId, fields) {
     if (!tbody) return;
     tbody.innerHTML = '';
 
-    if (fields.length === 0) {
-        container.style.display = 'none';
-        return;
-    }
+    // 始终显示容器（由 flex:1 填满空间）
     container.style.display = 'block';
 
     var cellStyle = 'padding:3px 6px; border-bottom:1px solid var(--border-color);';
+
+    // 无数据时：居中显示空提示行
+    if (fields.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="padding:40px 8px; text-align:center; color:var(--text-tertiary,#999); font-size:12px;">点击上方按钮导入 JSON 文件</td></tr>';
+        return;
+    }
     var limit = Math.min(fields.length, 100);
 
     for (var i = 0; i < limit; i++) {
@@ -655,14 +658,22 @@ export function initImportPanel() {
             el = document.getElementById('json1Meta');
             if (el) el.style.display = 'none';
             el = document.getElementById('json1FieldsContainer');
-            if (el) el.style.display = 'none';
+            if (el) {
+                el.style.display = 'block';
+                var tb = el.querySelector('tbody');
+                if (tb) tb.innerHTML = '<tr><td colspan="4" style="padding:40px 8px; text-align:center; color:var(--text-tertiary,#999); font-size:12px;">点击上方按钮导入 JSON 文件</td></tr>';
+            }
 
             el = document.getElementById('json2FileInfo');
             if (el) el.textContent = '未选择文件';
             el = document.getElementById('json2Meta');
             if (el) el.style.display = 'none';
             el = document.getElementById('json2FieldsContainer');
-            if (el) el.style.display = 'none';
+            if (el) {
+                el.style.display = 'block';
+                var tb = el.querySelector('tbody');
+                if (tb) tb.innerHTML = '<tr><td colspan="4" style="padding:40px 8px; text-align:center; color:var(--text-tertiary,#999); font-size:12px;">点击上方按钮导入 JSON 文件</td></tr>';
+            }
 
             populateFieldSelect('sourceFieldSelect', []);
             populateFieldSelect('targetFieldSelect', []);

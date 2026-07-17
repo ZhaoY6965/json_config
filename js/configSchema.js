@@ -353,21 +353,6 @@ const schemas = {
     },
 };
 
-// ========== 外键关系图 ==========
-export const fkGraph = {
-    site_config: { children: ['soc_config','circuit_config','circuit_group_config','workstation_config'] },
-    soc_config: { parent: 'site_config', children: ['ccr_config'] },
-    ccr_config: { parent: 'soc_config', children: ['circuit_config'] },
-    circuit_config: { parent: 'ccr_config', children: ['node_config','segment_config','single_lamp_config'] },
-    circuit_group_config: { parent: 'circuit_config' },
-    workstation_config: { parent: 'site_config' },
-    lamp_model_config: { children: ['lamp_template'] },
-    lamp_template: { children: ['single_lamp_position'] },
-    segment_config: { parent: 'circuit_config', children: ['single_lamp_config'] },
-    node_config: { parent: 'circuit_config' },
-    single_lamp_config: { parent: 'segment_config' },
-    single_lamp_position: { parent: 'lamp_template' },
-};
 
 // ========== API ==========
 
@@ -378,9 +363,6 @@ export function getSchemaByFileName(fileName) {
     return null;
 }
 
-export function getSchemaByKey(key) {
-    return schemas[key] || null;
-}
 
 export function getAllSchemas() {
     return Object.entries(schemas).map(([key, s]) => ({ key, ...s }));
@@ -428,22 +410,5 @@ export function getForeignKeyFields(schemaKey) {
     return schema.fields.filter(f => f.fk);
 }
 
-export function getReverseForeignKeys(targetSchemaKey) {
-    const result = [];
-    for (const [key, schema] of Object.entries(schemas)) {
-        for (const field of schema.fields) {
-            if (field.fk && field.fk.target === targetSchemaKey) {
-                result.push({ schemaKey: key, schema, field });
-            }
-        }
-    }
-    return result;
-}
 
-export function getSchemaLabel(schemaKey) {
-    return schemas[schemaKey]?.label || schemaKey;
-}
 
-export function getSchemaKeys() {
-    return Object.keys(schemas);
-}

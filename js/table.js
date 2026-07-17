@@ -34,7 +34,7 @@ export function addRow(field = '', prefix = '', start = '', step = 1) {
         <td><input type="text" class="prefix-input" value="${prefix}" placeholder="固定前缀"></td>
         <td><input type="text" class="start-input" value="${start}" placeholder="起始数字，留空不递增"></td>
         <td></td>
-        <td><button class="btn-sm delete-row-btn" style="background:var(--msg-error-bg); color:var(--msg-error-text); border:1px solid var(--msg-error-border);">✕</button></td>
+        <td><button class="btn-sm delete-row-btn" style="background:var(--msg-error-bg); color:var(--msg-error-text); border:1px solid var(--msg-error-border);">删除</button></td>
     `;
     const td = tr.querySelectorAll('td')[4];
     td.appendChild(stepSelect);

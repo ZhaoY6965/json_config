@@ -70,14 +70,6 @@ body {
     height: 100vh;
 }
 
-/* ===== 灯光图例标签激活时隐藏右侧JSON预览 ===== */
-.container:has(#tab-legend.active) .right-panel {
-    display: none;
-}
-.container:has(#tab-legend.active) .left-panel {
-    flex: 1;
-}
-
 /* ===== 头部 ===== */
 header { margin-bottom: 18px; }
 h1 {
@@ -115,11 +107,33 @@ h1 {
     background: var(--bg-container);
     border-bottom: 3px solid var(--accent-color);
 }
+.workbench-panels {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
 .workbench-panel {
     display: none;
 }
 .workbench-panel.active {
     display: block;
+    flex: 1;
+    min-height: 0;
+}
+
+/* 字段提取/替换页面：左右分栏，两栏等高（=面板高度），右栏三等分、无滚动 */
+#tab-extract-replace.active {
+    display: flex !important;
+    flex: 1;
+    min-height: 0;
+    gap: 12px;
+    align-items: stretch;
+    padding: 4px 0;
+}
+#tab-extract-replace.active > div {
+    display: flex;
+    flex-direction: column;
 }
 
 /* ===== 批量表格 ===== */
@@ -188,16 +202,9 @@ h1 {
     box-shadow: 0 0 0 2px var(--focus-shadow);
 }
 .batch-table .btn-sm {
-    padding: 2px 10px;
+    padding: 4px 12px;
     font-size: 12px;
-    border-radius: 20px;
-    background: var(--msg-error-bg);
-    color: var(--msg-error-text);
-    border: 1px solid var(--msg-error-border);
-    cursor: pointer;
-}
-.batch-table .btn-sm:hover {
-    background: var(--msg-error-border);
+    border-radius: 6px;
 }
 .batch-actions {
     display: flex;
@@ -248,73 +255,77 @@ h1 {
     flex-wrap: wrap;
 }
 .btn {
-    padding: 10px 22px;
-    border: none;
-    border-radius: 40px;
+    padding: 6px 16px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-family: inherit;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 13px;
+    line-height: 1.4;
     cursor: pointer;
-    transition: all 0.15s;
+    transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
     background: var(--btn-bg);
     color: var(--btn-text);
+    white-space: nowrap;
 }
 .btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 14px var(--shadow-color);
+    box-shadow: 0 3px 8px var(--shadow-color);
 }
+.btn:active { transform: translateY(1px); }
 .btn-primary {
     background: var(--btn-primary-bg);
     color: var(--btn-primary-text);
-    box-shadow: 0 4px 10px var(--btn-primary-shadow);
 }
 .btn-primary:hover { background: var(--btn-primary-hover); }
 .btn-outline {
     background: transparent;
-    border: 2px solid var(--border-color);
-    color: var(--text-primary);
+    border: 1px solid var(--btn-primary-bg);
+    color: var(--btn-primary-bg);
 }
-.btn-outline:hover { background: var(--bg-hover); }
+.btn-outline:hover { background: rgba(91,155,213,0.14); }
 .btn-accent {
-    background: var(--accent-color, #2a78ff);
-    color: #fff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
 }
 .btn-accent:hover { filter: brightness(1.08); }
 .btn-success {
-    background: var(--btn-success-bg);
-    color: var(--btn-success-text);
-    box-shadow: 0 4px 10px var(--btn-success-shadow);
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
 }
-.btn-success:hover { background: var(--btn-success-hover); }
+.btn-success:hover { background: var(--btn-primary-hover); }
 .btn-warning {
-    background: #e8853a;
-    color: white;
-    box-shadow: 0 4px 10px rgba(232,133,58,0.25);
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
 }
-.btn-warning:hover { background: #d0702a; }
+.btn-warning:hover { background: var(--btn-primary-hover); }
 .btn-danger {
-    background: transparent;
-    color: var(--msg-error-text, #d33);
-    border: 2px solid var(--msg-error-text, #d33);
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: 1px solid transparent;
 }
-.btn-danger:hover { background: var(--msg-error-text, #d33); color: #fff; }
+.btn-danger:hover { background: var(--btn-primary-hover); color: #fff; }
+/* 尺寸变体：仅调整尺寸，不覆盖主/次按钮配色（修复 .btn-sm 被染成红色的问题） */
 .btn-sm {
-    padding: 2px 10px;
+    padding: 4px 12px;
     font-size: 12px;
-    border-radius: 20px;
-    background: var(--msg-error-bg);
-    color: var(--msg-error-text);
-    border: 1px solid var(--msg-error-border);
+}
+.btn-xs {
+    padding: 3px 9px;
+    font-size: 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: var(--btn-bg);
+    color: var(--btn-text);
     cursor: pointer;
 }
-.btn-sm:hover { background: var(--msg-error-border); }
 .btn:disabled {
-    opacity: 0.6;
+    opacity: 0.55;
     cursor: not-allowed;
-    transform: none !important;
+    box-shadow: none;
 }
 
 /* ===== 模态框 ===== */
@@ -407,85 +418,87 @@ h1 {
    主题变量（白色 & 深色）
    ============================================================ */
 :root {
-    --bg-body: #f0f5fa;
+    /* 主背景：白色浅色主题 */
+    --bg-body: #f4f6f9;
     --bg-container: #ffffff;
-    --bg-selector: #f7fafc;
-    --bg-input: #fafcff;
-    --bg-input-focus: #ffffff;
-    --bg-preview: #142433;
-    --bg-hover: #f8fafc;
-    --text-primary: #0b1e33;
-    --text-secondary: #5a6e85;
-    --text-preview: #cbd5e1;
-    --border-color: #e3eaf2;
-    --accent-color: #2b7be4;
-    --required-color: #e53e3e;
-    --focus-shadow: rgba(43,123,228,0.15);
-    --shadow-color: rgba(0,20,40,0.08);
-    --btn-bg: #f1f4f9;
-    --btn-text: #1e3347;
-    --btn-primary-bg: #2b7be4;
-    --btn-primary-text: white;
-    --btn-primary-shadow: rgba(43,123,228,0.25);
-    --btn-primary-hover: #1a66c9;
-    --btn-success-bg: #0f973d;
-    --btn-success-text: white;
-    --btn-success-shadow: rgba(15,151,61,0.25);
-    --btn-success-hover: #0d7e33;
-    --msg-success-bg: #e6f7ed;
-    --msg-success-text: #0b4d2a;
-    --msg-success-border: #b3e6c9;
-    --msg-error-bg: #fde8e8;
-    --msg-error-text: #8b1e1e;
-    --msg-error-border: #fbc4c4;
-    --msg-info-bg: #e3effa;
-    --msg-info-text: #1a497a;
-    --msg-info-border: #b3d4f0;
+    --bg-selector: #eef1f5;
+    --bg-input: #ffffff;
+    --bg-input-focus: #e8f0f7;
+    --bg-preview: #f6f8fa;
+    --bg-hover: #e8edf2;
+    /* 深色文字，保证白底可读 */
+    --text-primary: #1f2a33;
+    --text-secondary: #5a6b7a;
+    --text-tertiary: #8a99a8;
+    --text-preview: #2a3a47;
+    --border-color: #d0d7de;
+    --accent-color: #5b9bd5;
+    --required-color: #d9534f;
+    --focus-shadow: rgba(91,155,213,0.18);
+    --shadow-color: rgba(0,0,0,0.10);
+    --btn-bg: #5b9bd5;
+    --btn-text: #ffffff;
+    --btn-primary-bg: #5b9bd5;
+    --btn-primary-text: #ffffff;
+    --btn-primary-shadow: rgba(91,155,213,0.30);
+    --btn-primary-hover: #4a8ac4;
+    --btn-success-bg: #3f9d6b;
+    --btn-success-text: #ffffff;
+    --btn-success-shadow: rgba(63,157,107,0.30);
+    --btn-success-hover: #358a5c;
+    --msg-success-bg: rgba(63,157,107,0.12);
+    --msg-success-text: #2f7d52;
+    --msg-success-border: #bfe3cd;
+    --msg-error-bg: rgba(217,83,79,0.10);
+    --msg-error-text: #c0392b;
+    --msg-error-border: #f0c4c0;
+    --msg-info-bg: rgba(91,155,213,0.12);
+    --msg-info-text: #2a6aa8;
+    --msg-info-border: #c0d8ec;
 }
 [data-theme="dark"] {
-    --bg-body: #121212;
-    --bg-container: #1e1e1e;
-    --bg-selector: #2d2d2d;
-    --bg-input: #2a2a2a;
-    --bg-input-focus: #333333;
-    --bg-preview: #0d0d0d;
-    --bg-hover: #2d2d2d;
-    --text-primary: #e8e8e8;
-    --text-secondary: #aaaaaa;
-    --text-preview: #cbd5e1;
-    --border-color: #444444;
-    --accent-color: #4a9eff;
-    --required-color: #ff6b6b;
-    --focus-shadow: rgba(74,158,255,0.25);
-    --shadow-color: rgba(0,0,0,0.4);
-    --btn-bg: #333333;
-    --btn-text: #e8e8e8;
-    --btn-primary-bg: #3a7bd5;
-    --btn-primary-text: white;
-    --btn-primary-shadow: rgba(58,123,213,0.3);
-    --btn-primary-hover: #2a66b5;
-    --btn-success-bg: #2d8f4e;
-    --btn-success-text: white;
-    --btn-success-shadow: rgba(45,143,78,0.3);
-    --btn-success-hover: #237a40;
-    --msg-success-bg: #1a3a28;
-    --msg-success-text: #b3e6c9;
-    --msg-success-border: #2d5a40;
-    --msg-error-bg: #3a1a1a;
-    --msg-error-text: #fbc4c4;
-    --msg-error-border: #5a2d2d;
-    --msg-info-bg: #1a2a3a;
-    --msg-info-text: #b3d4f0;
-    --msg-info-border: #2d4a5a;
+    --bg-body: #2a4350;
+    --bg-container: #2a4350;
+    --bg-selector: #233a47;
+    --bg-input: #233a47;
+    --bg-input-focus: #2a4350;
+    --bg-preview: #1a2c37;
+    --bg-hover: #355064;
+    --text-primary: #eaf2f7;
+    --text-secondary: #9fb2c1;
+    --text-preview: #cfe0ea;
+    --border-color: #456275;
+    --accent-color: #6fb1d6;
+    --required-color: #e87b7b;
+    --focus-shadow: rgba(111,177,214,0.22);
+    --shadow-color: rgba(0,0,0,0.35);
+    --btn-bg: #5b9bd5;
+    --btn-text: #ffffff;
+    --btn-primary-bg: #5b9bd5;
+    --btn-primary-text: #ffffff;
+    --btn-primary-shadow: rgba(91,155,213,0.30);
+    --btn-primary-hover: #4a8ac4;
+    --btn-success-bg: #3f9d6b;
+    --btn-success-text: #ffffff;
+    --btn-success-shadow: rgba(63,157,107,0.30);
+    --btn-success-hover: #358a5c;
+    --msg-success-bg: rgba(63,157,107,0.16);
+    --msg-success-text: #8fd6ab;
+    --msg-success-border: #2f6b48;
+    --msg-error-bg: rgba(232,123,123,0.14);
+    --msg-error-text: #f0a3a3;
+    --msg-error-border: #6b3a3a;
+    --msg-info-bg: rgba(111,177,214,0.16);
+    --msg-info-text: #a9d4ec;
+    --msg-info-border: #3a5a6b;
 }
 /* ===== 大号按钮样式 ===== */
 .btn-lg {
-    padding: 10px 28px !important;
-    font-size: 16px !important;
-    font-weight: 600 !important;
-    border-radius: 40px !important;
-    min-width: 100px;
-    letter-spacing: 0.3px;
+    padding: 9px 22px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 6px;
+    min-width: 96px;
 }
 
 /* ===== 字段提取页 - checkbox 表格 ===== */
@@ -539,9 +552,9 @@ h1 {
     margin-bottom: 8px;
 }
 .selection-controls .btn-xs {
-    padding: 2px 8px;
-    font-size: 11px;
-    border-radius: 12px;
+    padding: 3px 9px;
+    font-size: 12px;
+    border-radius: 6px;
     border: 1px solid var(--border-color);
     background: var(--btn-bg);
     color: var(--btn-text);
@@ -571,7 +584,7 @@ h1 {
     padding: 4px 14px;
     font-size: 12px;
     font-weight: 600;
-    border-radius: 20px;
+    border-radius: 6px;
     border: 1px solid var(--border-color);
     background: var(--btn-bg);
     color: var(--btn-text);
@@ -579,8 +592,9 @@ h1 {
     transition: all 0.15s;
 }
 .filter-btn:hover {
-    border-color: var(--accent-color);
-    color: var(--accent-color);
+    background: var(--btn-primary-hover);
+    border-color: var(--btn-primary-hover);
+    color: #fff;
 }
 .filter-btn.active {
     background: var(--accent-color);

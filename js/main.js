@@ -11,9 +11,10 @@ import {
     exitEditMode
 } from './batch.js';
 import { renderQuickEditButtons, addQuickEditText } from './quickEdit.js';
+import { dialog } from './dialog.js';
 import { handleImport, initImportPanel } from './import.js';
 import { initExtractorPanel } from './extractor.js';
-import { initTemplateLibPanel, loadAllTemplates } from './templateLib.js';
+import { initTemplateLibPanel } from './templateLib.js';
 import {
     enablePreviewEdit,
     applyPreviewEdit,
@@ -24,7 +25,7 @@ import {
     downloadFile,
     copyToClipboard
 } from './preview.js';
-import { initConfigProject, getCurrentConfig, getCurrentSchema, getCurrentKey, updateCurrentData, getFkOptions, isProjectLoaded, loadSingleFile, autoSave } from './configProject.js';
+import { initConfigProject, getCurrentConfig, updateCurrentData, getFkOptions, autoSave } from './configProject.js';
 import { FieldType, DataShape, getForeignKeyFields } from './configSchema.js';
 import { initCardDesigner, onConfigSelected as onCardConfigSelected } from './cardDesigner.js';
 import { initWizardPanel } from './projectWizard.js';
@@ -33,19 +34,54 @@ import { initWizardPanel } from './projectWizard.js';
 // 初始化
 // ============================================================
 function init() {
-    buildTable([]);
-    updatePreview();
-    renderQuickEditButtons();
-    initImportPanel();
-    initExtractorPanel();
-    initTemplateLibPanel();
-    initConfigProject();
-    initCardDesigner();
-    initWizardPanel();
-    bindEvents();
-    bindTemplateLibEvents();
-    bindConfigEvents();
-    console.log('✅ 设备配置生成器启动成功（模块化）');
+    // 每步独立执行：任一面板初始化失败也不会拖垮其他功能（尤其保证 bindEvents 一定执行，
+    // 导入/下载/预览等核心按钮才能正常绑定）。
+    var steps = [
+        ['buildTable', function () { buildTable([]); }],
+        ['updatePreview', updatePreview],
+        ['renderQuickEditButtons', renderQuickEditButtons],
+        ['initImportPanel', initImportPanel],
+        ['initExtractorPanel', initExtractorPanel],
+        ['initTemplateLibPanel', initTemplateLibPanel],
+        ['initConfigProject', initConfigProject],
+        ['initCardDesigner', initCardDesigner],
+        ['initWizardPanel', initWizardPanel],
+        ['bindEvents', bindEvents],
+        ['bindTemplateLibEvents', bindTemplateLibEvents],
+        ['bindConfigEvents', bindConfigEvents]
+    ];
+    var failed = [];
+    steps.forEach(function (s) {
+        try {
+            s[1]();
+        } catch (err) {
+            failed.push(s[0]);
+            console.error('[INIT-FAIL] ' + s[0] + ':', err);
+        }
+    });
+    if (failed.length) {
+        console.warn('[INIT] 以下初始化步骤失败：', failed.join(', '));
+        showInitErrorBanner(failed);
+    } else {
+        console.log('✅ 设备配置生成器启动成功（模块化）');
+    }
+}
+
+// 初始化失败时在页面顶部显示醒目横幅（无需打开控制台即可看到是哪个模块出错）
+function showInitErrorBanner(failed) {
+    try {
+        var bar = document.createElement('div');
+        bar.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;'
+            + 'background:#d9534f;color:#fff;padding:8px 14px;font-size:13px;'
+            + 'font-family:system-ui,sans-serif;box-shadow:0 2px 6px rgba(0,0,0,.25);';
+        bar.textContent = '部分功能初始化失败：' + failed.join('、') + '（其余功能已尽量保持可用；按 F12 查看 [INIT-FAIL] 详情）';
+        var close = document.createElement('span');
+        close.textContent = ' ✕';
+        close.style.cssText = 'cursor:pointer;float:right;font-weight:bold;';
+        close.onclick = function () { bar.remove(); };
+        bar.appendChild(close);
+        document.body.appendChild(bar);
+    } catch (e) { /* ignore */ }
 }
 
 // 切换到指定 Tab（供模板库加载时跳转）
@@ -69,7 +105,7 @@ function bindTemplateLibEvents() {
             });
             exitEditMode();
         }
-        switchTab('tab-generate');
+        switchTab('tab-extract-replace');
     });
 
     document.addEventListener('template-lib-load-extract', function(e) {
@@ -82,7 +118,7 @@ function bindTemplateLibEvents() {
         if (data && Array.isArray(data)) {
             setPreview(data, '（模板数据，共 ' + data.length + ' 条）');
         }
-        switchTab('tab-generate');
+        switchTab('tab-extract-replace');
     });
 }
 
@@ -218,18 +254,6 @@ function bindConfigEvents() {
 }
 
 // 根据字段类型返回建议列宽(px)，用于固定布局 + 横向滚动
-function columnWidthFor(f) {
-    if (!f) return 110;
-    if (f.fk) return 150;                  // 外键下拉需要较宽
-    if (f.key === 'id') return 92;         // id 只读列
-    if (f.key === 'name') return 150;      // 名称列
-    if (f.type === FieldType.OBJECT || f.type === FieldType.ARRAY) return 170; // 复杂结构
-    if (f.type === FieldType.HEX) return 110;
-    if (f.options) return 84;              // 枚举下拉
-    if (f.type === FieldType.BOOL) return 72;
-    if (f.type === FieldType.INT || f.type === FieldType.FLOAT) return 74;     // 数值窄列
-    return 112;                            // 普通文本
-}
 
 function buildConfigEditor(data, schema, key) {
     editorSchema = schema;
@@ -501,7 +525,7 @@ function onHexInput(e) {
     onCellChange(e);
 }
 
-function onComplexFieldClick(e) {
+async function onComplexFieldClick(e) {
     var rowIdx = parseInt(e.target.dataset.rowIndex);
     var fieldKey = e.target.dataset.fieldKey;
     if (isNaN(rowIdx) || !fieldKey) return;
@@ -509,7 +533,7 @@ function onComplexFieldClick(e) {
     var curVal = item ? item[fieldKey] : '';
     try {
         var parsed = typeof curVal === 'object' ? curVal : JSON.parse(curVal);
-        var edited = prompt('编辑JSON (字段: ' + fieldKey + '):', JSON.stringify(parsed, null, 2));
+        var edited = await dialog.prompt('编辑JSON (字段: ' + fieldKey + '):', JSON.stringify(parsed, null, 2));
         if (edited !== null) {
             var newVal = JSON.parse(edited);
             editorData[rowIdx][fieldKey] = newVal;

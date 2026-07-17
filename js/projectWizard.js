@@ -1,6 +1,7 @@
 // projectWizard.js — 工程创建向导
 // 从0起步的机场灯光配置工程创建流程，按 Phase 0~7 共25个JSON步骤逐步生成
 import { showStatus } from './core.js';
+import { dialog } from './dialog.js';
 import { TEMPLATE_FIELDS, TEMPLATE_DEFAULTS, TEMPLATE_OBJECTS } from './templateFields.js';
 
 // ============================================================
@@ -502,7 +503,7 @@ function renderCardArrayEditor(container, state, onChange, rerender, opts) {
         }
         container.addEventListener('input', handleEdit);
         container.addEventListener('change', handleEdit);
-        container.addEventListener('click', function(e) {
+        container.addEventListener('click', async function(e) {
             if (e.target.classList.contains('add-group-btn')) openAddGroupModal(state, rerender, onChange);
             else if (e.target.classList.contains('batch-del-btn')) openBatchDeleteModal(state, rerender, onChange);
             else if (e.target.classList.contains('add-field-btn')) openAddFieldModal(state, rerender, onChange);
@@ -512,7 +513,7 @@ function renderCardArrayEditor(container, state, onChange, rerender, opts) {
                 var gi = +e.target.getAttribute('data-del-group');
                 var g = state.data[gi];
                 var gname = g ? (g.id || g.name || ('#' + (gi + 1))) : ('#' + (gi + 1));
-                if (confirm('确定删除配置组「' + gname + '」？此操作不可撤销。')) {
+                if (await dialog.confirm('确定删除配置组「' + gname + '」？此操作不可撤销。', '删除配置组', true)) {
                     state.data.splice(gi, 1);
                     rerender();
                     onChange(state.data);
@@ -577,7 +578,7 @@ function openAddGroupModal(state, rerender, onChange) {
     var overlay = showWizardModal('批量新增配置组', body, function(ov) {
         var cntEl = ov.querySelector('.ag-count');
         var count = parseInt(cntEl.value, 10);
-        if (isNaN(count) || count < 1) { alert('请输入有效的创建数量（≥1）'); return false; }
+        if (isNaN(count) || count < 1) { dialog.alert('请输入有效的创建数量（≥1）'); return false; }
 
         // 收集每个字段的取值配置
         var cfgs = editable.map(function(f, k) {
@@ -689,8 +690,8 @@ function openAddFieldModal(state, rerender, onChange) {
 
     var overlay = showWizardModal('新增字段', body, function(ov) {
         var key = ov.querySelector('.af-key').value.trim();
-        if (!key) { alert('请输入字段名称'); return false; }
-        if (state.fields.some(function(f) { return f.key === key; })) { alert('字段名「' + key + '」已存在'); return false; }
+        if (!key) { dialog.alert('请输入字段名称'); return false; }
+        if (state.fields.some(function(f) { return f.key === key; })) { dialog.alert('字段名「' + key + '」已存在'); return false; }
         var type = ov.querySelector('.af-type').value;
         var ftype = (type === 'number') ? 'number' : (type === 'boolean' ? 'boolean' : 'text');
         state.fields.push({ key: key, label: key, type: ftype });
@@ -723,7 +724,7 @@ function openAddFieldModal(state, rerender, onChange) {
 
 /** 删除字段：弹出窗口，列出当前全部字段，用户选择其一删除（同时从每个配置组移除该键） */
 function openDeleteFieldModal(state, rerender, onChange) {
-    if (!state.fields.length) { alert('当前没有可删除的字段'); return; }
+    if (!state.fields.length) { dialog.alert('当前没有可删除的字段'); return; }
     var optsHtml = '';
     state.fields.forEach(function(f, idx) {
         optsHtml += '<option value="' + idx + '">' + escapeHtml(f.label) + ' (' + escapeHtml(f.key) + ')</option>';
@@ -734,7 +735,7 @@ function openDeleteFieldModal(state, rerender, onChange) {
         + '<select class="df-key form-input form-input-sm">' + optsHtml + '</select></div>';
     showWizardModal('删除字段', body, function(ov) {
         var idx = parseInt(ov.querySelector('.df-key').value, 10);
-        if (isNaN(idx) || idx < 0 || idx >= state.fields.length) { alert('请选择有效字段'); return false; }
+        if (isNaN(idx) || idx < 0 || idx >= state.fields.length) { dialog.alert('请选择有效字段'); return false; }
         var fk = state.fields[idx].key;
         state.fields.splice(idx, 1);
         state.data.forEach(function(it) { if (it && fk in it) delete it[fk]; });
@@ -745,7 +746,7 @@ function openDeleteFieldModal(state, rerender, onChange) {
 
 /** 批量删除配置组：勾选多个配置组，确认后一并删除 */
 function openBatchDeleteModal(state, rerender, onChange) {
-    if (!state.data.length) { alert('当前没有可删除的配置组'); return; }
+    if (!state.data.length) { dialog.alert('当前没有可删除的配置组'); return; }
     var itemsHtml = '';
     state.data.forEach(function(it, i) {
         var label = it.id || it.name || ('#' + (i + 1));
@@ -762,7 +763,7 @@ function openBatchDeleteModal(state, rerender, onChange) {
 
     var overlay = showWizardModal('批量删除配置组', body, function(ov) {
         var chks = Array.prototype.slice.call(ov.querySelectorAll('.bd-chk:checked'));
-        if (!chks.length) { alert('请至少勾选一个配置组'); return false; }
+        if (!chks.length) { dialog.alert('请至少勾选一个配置组'); return false; }
         var idxs = chks.map(function(c) { return parseInt(c.dataset.i, 10); });
         idxs.sort(function(a, b) { return b - a; }); // 从后往前删，避免索引偏移
         idxs.forEach(function(i) { state.data.splice(i, 1); });
@@ -830,7 +831,7 @@ function openCcrPageDesignModal(state, rerender, onChange) {
     var siteSet = {};
     all.forEach(function(it) { if (it && it.site_id) siteSet[it.site_id] = true; });
     var sites = Object.keys(siteSet).sort();
-    if (!sites.length) { alert('当前 ccr_config 中没有任何 site_id，无法进入页面设计。请先在配置组中填写 site_id。'); return; }
+    if (!sites.length) { dialog.alert('当前 ccr_config 中没有任何 site_id，无法进入页面设计。请先在配置组中填写 site_id。'); return; }
 
     // 工作副本：所有改动落在 work 上，保存时才写回 state.data
     var work = JSON.parse(JSON.stringify(all));
@@ -1334,9 +1335,9 @@ function renderBasicShapesForm(container, data, onChange) {
 
         var delBtn = document.getElementById('bsDeleteShape');
         if (delBtn) {
-            delBtn.addEventListener('click', function() {
+            delBtn.addEventListener('click', async function() {
                 if (!selectedKey) return;
-                if (!confirm('\u786e\u5b9a\u5220\u9664\u56fe\u5f62 "' + selectedKey + '" \uff1f')) return;
+                if (!(await dialog.confirm('\u786e\u5b9a\u5220\u9664\u56fe\u5f62 "' + selectedKey + '" \uff1f', '删除图形', true))) return;
                 delete data.shapes[selectedKey];
                 selectedKey = null;
                 render();
@@ -1494,8 +1495,8 @@ function renderGenericObjectEditor(container, obj, onChange) {
                 var del = document.createElement('button');
                 del.type = 'button'; del.className = 'card-del-btn'; del.textContent = '×';
                 del.title = '删除该项';
-                del.addEventListener('click', function() {
-                    if (confirm('确认删除该项「' + headId + '」？')) { arr.splice(idx, 1); rebuildAll(); }
+                del.addEventListener('click', async function() {
+                    if (await dialog.confirm('确认删除该项「' + headId + '」？', '删除项', true)) { arr.splice(idx, 1); rebuildAll(); }
                 });
                 head.appendChild(del);
                 card.appendChild(head);
@@ -1606,8 +1607,8 @@ function renderGenericObjectEditor(container, obj, onChange) {
                 var del = document.createElement('button');
                 del.type = 'button'; del.className = 'obj-row-del'; del.textContent = '×';
                 del.title = '删除该字段';
-                del.addEventListener('click', function() {
-                    if (confirm('确认删除字段「' + key + '」？')) { delete targetObj[key]; rebuildAll(); }
+                del.addEventListener('click', async function() {
+                    if (await dialog.confirm('确认删除字段「' + key + '」？', '删除字段', true)) { delete targetObj[key]; rebuildAll(); }
                 });
                 labelWrap.appendChild(del);
                 row.appendChild(labelWrap);
@@ -1644,8 +1645,8 @@ function renderGenericObjectEditor(container, obj, onChange) {
         addBtn.type = 'button'; addBtn.className = 'btn btn-outline btn-sm'; addBtn.textContent = '＋ 新增字段';
         addBtn.addEventListener('click', function() {
             var k = keyInp.value.trim();
-            if (!k) { alert('请输入字段名'); return; }
-            if (k in rootObj) { alert('字段「' + k + '」已存在'); return; }
+            if (!k) { dialog.alert('请输入字段名'); return; }
+            if (k in rootObj) { dialog.alert('字段「' + k + '」已存在'); return; }
             rootObj[k] = defaultValueForType(typeSel.value);
             keyInp.value = '';
             rebuildAll();
@@ -1846,7 +1847,7 @@ function handleGenerate() {
 
         var statusEl = document.getElementById('stepStatus');
         if (statusEl) {
-            statusEl.textContent = '✔ 已生成';
+            statusEl.textContent = '已生成';
             statusEl.style.color = 'var(--msg-success-text)';
         }
 
@@ -1879,7 +1880,7 @@ function collectStepData(step) {
 // 保存到文件夹
 // ============================================================
 
-function saveAllFiles() {
+async function saveAllFiles() {
     var generatedSteps = [];
     for (var i = 0; i < STEPS.length; i++) {
         if (wizardState.generatedData[STEPS[i].id]) {
@@ -1892,7 +1893,7 @@ function saveAllFiles() {
         return;
     }
 
-    if (!confirm('将下载 ' + generatedSteps.length + ' 个 JSON 文件到浏览器下载目录。\n是否继续？')) return;
+    if (!(await dialog.confirm('将下载 ' + generatedSteps.length + ' 个 JSON 文件到浏览器下载目录。\n是否继续？'))) return;
 
     for (var i = 0; i < generatedSteps.length; i++) {
         var step = generatedSteps[i];
@@ -1932,7 +1933,12 @@ function updateUI() {
 /** 渲染竖排导航栏 */
 function renderSidebar() {
     var sidebar = dom.sidebar;
-    if (!sidebar) return;
+    if (!sidebar) {
+        // 兜底：重新查找（防止 init 时 DOM 尚未就绪）
+        sidebar = document.getElementById('wizardSidebar');
+        if (!sidebar) return;
+        dom.sidebar = sidebar;
+    }
 
     var html = '';
     for (var i = 0; i < STEPS.length; i++) {
@@ -1962,7 +1968,7 @@ function renderPlaceholder() {
     if (dom.stepTitle) dom.stepTitle.textContent = '工程创建向导';
     if (dom.stepDesc) dom.stepDesc.textContent = '从左侧导航栏选择一个配置文件开始编辑。编辑后点击「生成」，全部完成后点击「保存到文件夹」。';
     body.innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--text-secondary);">'
-        + '<div style="font-size:32px;margin-bottom:12px;">📂</div>'
+        + ''
         + '<div style="font-size:15px;font-weight:500;">选择一个配置文件</div>'
         + '<div style="font-size:12px;margin-top:6px;">从左侧导航栏点击任意文件开始编辑</div>'
         + '</div>';
@@ -2155,9 +2161,9 @@ function renderStepEditor(step) {
         body.innerHTML = ''
             + '<div class="step-editor">'
             + '  <div class="wizard-bigfile">'
-            + '    <div class="wizard-bigfile-icon">📦</div>'
+            + ''
             + '    <div class="wizard-bigfile-title">' + escapeHtml(step.fileName) + ' 已按默认模板载入</div>'
-            + '    <div class="wizard-bigfile-meta">' + countLabel + ' · 约 ' + sizeMB + ' MB · <span style="color:var(--msg-success-text);">✔ 已生成</span></div>'
+            + '    <div class="wizard-bigfile-meta">' + countLabel + ' · 约 ' + sizeMB + ' MB · <span style="color:var(--msg-success-text);">已生成</span></div>'
             + '    <div class="wizard-bigfile-tip">该文件体积较大，为保证界面流畅未在此内联编辑。内容已加载为默认模板，保存时将原样输出。如需修改，请用外部编辑器调整后放回工程目录。</div>'
             + '  </div>'
             + '</div>';
@@ -2173,7 +2179,7 @@ function renderStepEditor(step) {
         + '        <div style="font-size:12px; color:var(--text-secondary);">'
         + '            文件名: <strong>' + escapeHtml(step.fileName) + '</strong>'
         + '            <span id="stepStatus" style="margin-left:12px; font-weight:600; '
-        + (isGenerated ? 'color:var(--msg-success-text);">✔ 已生成' : 'color:var(--text-secondary);">未生成')
+        + (isGenerated ? 'color:var(--msg-success-text);">已生成' : 'color:var(--text-secondary);">未生成')
         + '            </span>'
         + '        </div>'
         + '        <div style="font-size:11px; color:var(--text-secondary);">'

@@ -192,7 +192,7 @@
       <button id="addShape" class="primary">＋ 添加所选图形</button>
     </div>
     <div id="profileList"></div>
-    <div class="hint">用 ↑↓ 调整顺序，🗑 删除。参数实时生效。原点 (0,0) 是整个组合的定位中心。<br/>
+    <div class="hint">用 ↑↓ 调整顺序，点击删除按钮移除。参数实时生效。原点 (0,0) 是整个组合的定位中心。<br/>
       多灯互斥/轮巡：给每个图形设「相位序号 seqIndex」(0,1,2…)。选中 on 状态即自动按间隔交替亮灭（同时仅一盏亮），由「启用序列轮巡」与「切换间隔」控制。</div>
   </main>
 
@@ -566,10 +566,10 @@ function buildSwatches(){
     };
     // delete
     const dbtn=div.querySelector(".del-btn");
-    dbtn.onclick=(ev)=>{
+    dbtn.onclick=async (ev)=>{
       ev.stopPropagation();
-      if(BRUSHES.length <= 1){alert("至少保留一个笔刷");return;}
-      if(confirm("删除笔刷 "+b.id+" ?")){BRUSHES.splice(idx,1);buildSwatches();}
+      if(BRUSHES.length <= 1){window.AppDialog.alert("至少保留一个笔刷");return;}
+      if(await window.AppDialog.confirm("删除笔刷 "+b.id+" ?","删除笔刷",true)){BRUSHES.splice(idx,1);buildSwatches();}
     };
     s.appendChild(div);
   });
@@ -603,7 +603,7 @@ el("be_stroke").oninput=function(){el("be_stroke_txt").textContent=this.value;};
 
 el("be_save").onclick=()=>{
   const id=el("be_id").value.trim();
-  if(!id){alert("请输入笔刷 ID");return;}
+  if(!id){window.AppDialog.alert("请输入笔刷 ID");return;}
   // parseFloat with explicit default: 0 and decimals are preserved (||1 would turn 0 into 1)
   const num=(eid,def)=>{const v=parseFloat(el(eid).value);return isNaN(v)?def:v;};
   const rec={
@@ -728,7 +728,7 @@ function buildProfile(){
     let html='<div class="top"><span class="ref">'+ref+' #'+idx+'</span><span class="mini">'
       +'<button data-act="up" data-i="'+idx+'">↑</button>'
       +'<button data-act="down" data-i="'+idx+'">↓</button>'
-      +'<button data-act="del" data-i="'+idx+'" class="danger">🗑</button></span></div>';
+      +'<button data-act="del" data-i="'+idx+'" class="danger">删除</button></span></div>';
     html+='<div class="params">';
     PARAM_KEYS[ref].forEach(key=>{
       const val=entry.params[key];
@@ -897,7 +897,7 @@ el("m_seqInterval").addEventListener("input",()=>{
 
 el("itemSelect").addEventListener("change",e=>{curIdx=+e.target.value;renderCurrent();});
 el("addShape").addEventListener("click",()=>{
-  const t=LAMP[curIdx];if(!t){alert("请先新建或选择一项");return;}
+  const t=LAMP[curIdx];if(!t){window.AppDialog.alert("请先新建或选择一项");return;}
   if(!t.profile)t.profile=[];
   const params=JSON.parse(JSON.stringify(DEFAULTS[selShape]));
   const faces=t.ctlFaceNum||1;
@@ -918,8 +918,8 @@ el("newItem").addEventListener("click",()=>{
   LAMP.push({id:n,name:"新建灯光",description:"",ctlFaceNum:1,profile:[]});
   curIdx=LAMP.length-1;renderCurrent();
 });
-el("delItem").addEventListener("click",()=>{
-  if(LAMP.length<=1){alert("至少保留一项");return;}
+el("delItem").addEventListener("click",async ()=>{
+  if(LAMP.length<=1){window.AppDialog.alert("至少保留一项");return;}
   LAMP.splice(curIdx,1);curIdx=Math.max(0,curIdx-1);renderCurrent();
 });
 el("saveAll").addEventListener("click",()=>download("lamp_template.json",JSON.stringify(LAMP,null,2)));
@@ -933,18 +933,18 @@ el("brushFileIn").addEventListener("change",e=>{
       const data=JSON.parse(rd.result);
       const arr = Array.isArray(data) ? data : (Array.isArray(data.brushes)?data.brushes:null);
       if(!arr || !arr.length || !arr.every(b=>b && b.fillColor!=null && b.strokeColor!=null)){
-        alert("不是有效的笔刷数组（每项需含 fillColor / strokeColor）");return;
+        window.AppDialog.alert("不是有效的笔刷数组（每项需含 fillColor / strokeColor）");return;
       }
       BRUSHES.length=0; arr.forEach(b=>{BRUSHES.push(b);BRUSH_MAP[b.id]=b;});
       buildSwatches(); renderPreview(); renderJson();
-    }catch(err){ alert("解析失败："+err.message); }
+    }catch(err){ window.AppDialog.alert("解析失败："+err.message); }
   };
   rd.readAsText(f); e.target.value="";
 });
 el("downloadItem").addEventListener("click",()=>download((LAMP[curIdx].id||"item")+".json",JSON.stringify(LAMP[curIdx],null,2)));
 el("copyJson").addEventListener("click",()=>{
   navigator.clipboard.writeText(JSON.stringify(LAMP[curIdx],null,2)).then(()=>{
-    const b=el("copyJson");const o=b.textContent;b.textContent="已复制 ✓";setTimeout(()=>b.textContent=o,1200);
+    const b=el("copyJson");const o=b.textContent;b.textContent="已复制";setTimeout(()=>b.textContent=o,1200);
   });
 });
 el("importBtn").onclick=()=>el("fileIn").click();
@@ -964,7 +964,7 @@ el("fileIn").addEventListener("change",e=>{
       else if(Array.isArray(data.brushes)){ BRUSHES.length=0;data.brushes.forEach(b=>{BRUSHES.push(b);BRUSH_MAP[b.id]=b;});buildSwatches();renderPreview(); }
       else if(data.id||data.ref){ LAMP.push(data); curIdx=LAMP.length-1; }
       fullRender();
-    }catch(err){ alert("解析失败："+err.message); }
+    }catch(err){ window.AppDialog.alert("解析失败："+err.message); }
   };
   rd.readAsText(f);
   e.target.value="";
@@ -1010,6 +1010,9 @@ if(!LAMP.length){LAMP.push({id:"NEW_1",name:"新建灯光",description:"",profil
 curIdx=Math.min(curIdx,LAMP.length-1);
 renderCurrent();
 </script>
+
+<!-- 程序自带弹窗（替代浏览器内置 alert/confirm），供本页经典脚本通过 window.AppDialog 调用 -->
+<script type="module" src="js/dialog.js"></script>
 
 </body>
 </html>

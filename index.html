@@ -18,10 +18,8 @@
                 <!-- 工作台标签栏 -->
                 <div class="workbench-tabs">
                     <button class="workbench-tab active" data-target="tab-config-project">配置项目</button>
-                    <button class="workbench-tab" data-target="tab-generate">生成模板</button>
                     <button class="workbench-tab" data-target="tab-extract-replace">字段提取/替换</button>
                     <button class="workbench-tab" data-target="tab-template-lib">模板库</button>
-                    <button class="workbench-tab" data-target="tab-legend">灯光图例</button>
                     <button class="workbench-tab" data-target="tab-wizard">工程创建</button>
                 </div>
 
@@ -33,7 +31,7 @@
                             <!-- 项目操作栏 -->
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
                                 <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                                    <div style="font-weight:600; font-size:16px; color:var(--text-primary);">📁 配置</div>
+                                    <div style="font-weight:600; font-size:14px; color:var(--text-primary);">配置</div>
                                     <select id="projectSelector" style="display:none; font-size:13px; padding:3px 8px; border:1px solid var(--border-color); border-radius:4px; background:var(--bg-input); color:var(--text-primary);"></select>
                                 </div>
                                 <div style="display:flex; gap:6px; flex-wrap:wrap;">
@@ -74,7 +72,7 @@
                             <div id="configEditorSection" style="display:none; border:1px solid var(--border-color); border-radius:8px; padding:12px;">
                                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
                                     <div style="font-weight:600; font-size:14px; color:var(--text-primary);">
-                                        ✏️ <span id="configEditorTitle">编辑配置</span>
+                                        <span id="configEditorTitle">编辑配置</span>
                                     </div>
                                     <div style="display:flex; gap:6px;">
                                         <button class="btn btn-outline btn-sm" id="configAddRowBtn">添加行</button>
@@ -95,236 +93,179 @@
                         </div>
                     </div>
 
-                    <!-- ===== 生成模板面板（完整） ===== -->
-                    <div id="tab-generate" class="workbench-panel">
-                        <div style="margin:8px 0; font-size:13px; color:var(--text-secondary);">
-                            点击“生成预览”查看JSON，点击“编辑”修改批次
-                        </div>
-
-                        <!-- 快捷编辑按钮区 -->
-                        <div style="margin-bottom:8px; padding:8px 12px; background:var(--bg-selector); border-radius:8px; border:1px solid var(--border-color);">
-                            <div style="font-size:12px; font-weight:600; color:var(--text-secondary); margin-bottom:6px;">⚡ 快捷编辑（点击按钮插入到当前输入框光标位置）</div>
-                            <div id="quickEditContainer" style="display:flex; flex-wrap:wrap; gap:6px; min-height:28px;">
-                                <!-- 由 JS 动态渲染 -->
-                            </div>
-                            <div style="margin-top:6px; display:flex; gap:8px; align-items:center;">
-                                <input type="text" id="quickEditInput" placeholder="输入常用文本" style="padding:4px 10px; border:1px solid var(--border-color); border-radius:4px; font-size:13px; background:var(--bg-input); color:var(--text-primary); width:160px;">
-                                <button class="btn btn-primary btn-sm" id="addQuickEditBtn" style="padding:4px 12px; font-size:12px;">添加</button>
-                            </div>
-                        </div>
-
-                        <div class="batch-table-wrapper">
-                            <table class="batch-table" id="batchTable">
-                                <thead>
-                                    <tr>
-                                        <th style="width:6%;">序号</th>
-                                        <th style="width:16%;">字段</th>
-                                        <th style="width:24%;">前缀（固定）</th>
-                                        <th style="width:24%;">起始数字</th>
-                                        <th style="width:18%;">步长</th>
-                                        <th style="width:10%;">操作</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="batchTableBody"></tbody>
-                            </table>
-                        </div>
-                        <div style="margin-top:8px; display:flex; gap:12px; flex-wrap:wrap;">
-                            <button class="btn btn-primary btn-lg" id="addRowBtn">添加行</button>
-                            <button class="btn btn-primary btn-lg" id="clearTableBtn">清空表格</button>
-                            <button class="btn btn-primary btn-lg" id="previewBtn">生成预览</button>
-                        </div>
-                        <div style="margin-top:8px; font-size:12px; color:var(--text-secondary);">
-                            字段值 = 前缀 + (起始数字 + n × 步长)，n从0开始。起始数字为空则只输出前缀。
-                        </div>
-                        <div class="batch-actions" style="margin-top:12px;">
-                            <button class="btn btn-warning btn-lg" id="updateBatchBtn" style="display:none;">更新批次</button>
-                            <button class="btn btn-outline btn-lg" id="cancelEditBtn" style="display:none;">取消编辑</button>
-                        </div>
-
-                    </div>
-
-                    <!-- ===== 字段提取/替换面板（提取+三选一保存+字段替换） ===== -->
+                    <!-- ===== 字段提取/替换面板（左右分栏：左=批量生成模板，右=字段提取+替换） ===== -->
                     <div id="tab-extract-replace" class="workbench-panel">
-                        <div style="padding:8px 0;">
-                            <!-- 说明 -->
-                            <div style="margin-bottom:10px; font-size:13px; color:var(--text-secondary);">
-                                加载 JSON 文件 → 选择字段 → 提取预览 → 保存提取结果到本地/源数据/目标数据。
-                                源数据和目标数据准备好后，在下方的替换区执行字段替换。
-                            </div>
-
-                            <!-- 上部：字段提取 -->
-                            <div id="extractDropZone" style="border:1px solid var(--border-color); border-radius:8px; padding:12px; margin-bottom:12px;">
-                                <div style="font-weight:600; font-size:14px; color:var(--text-primary); margin-bottom:8px;">📄 加载 JSON 文件</div>
-                                <button class="btn btn-outline btn-sm" id="extractFileBtn">选择 JSON 文件</button>
-                                <input type="file" id="extractFileInput" accept=".json" style="display:none;">
-                                <div id="extractFileInfo" style="margin-top:6px; font-size:13px; color:var(--text-secondary);">未选择文件</div>
-                                <div id="extractMeta" style="margin-top:6px; display:none;">
-                                    <div style="font-size:13px; color:var(--text-secondary);">
-                                        数据组数：<strong id="extractCountDisplay" style="color:var(--text-primary);">0</strong>
-                                        &nbsp;|&nbsp;字段数：<strong id="extractFieldCountDisplay" style="color:var(--text-primary);">0</strong>
-                                    </div>
+                        <!-- ═══ 左栏：批量生成模板 ═══ -->
+                        <div style="flex:0 0 48%; min-width:380px; display:flex; flex-direction:column; gap:8px; overflow:hidden; padding:4px 0;">
+                            <!-- 快捷编辑 -->
+                            <div style="padding:6px 10px; background:var(--bg-selector); border-radius:6px; border:1px solid var(--border-color); flex-shrink:0;">
+                                <div style="font-size:11px; font-weight:600; color:var(--text-secondary); margin-bottom:4px;">快捷编辑</div>
+                                <div id="quickEditContainer" style="display:flex; flex-wrap:wrap; gap:4px; min-height:24px;"></div>
+                                <div style="margin-top:4px; display:flex; gap:6px; align-items:center;">
+                                    <input type="text" id="quickEditInput" placeholder="输入常用文本" style="padding:3px 8px; border:1px solid var(--border-color); border-radius:4px; font-size:12px; background:var(--bg-input); color:var(--text-primary); width:140px;">
+                                    <button class="btn btn-primary btn-sm" id="addQuickEditBtn">添加</button>
                                 </div>
                             </div>
+                            <!-- 批次表格（弹性填充，与右栏等高） -->
+                            <div class="batch-table-wrapper" style="flex:1; min-height:0; overflow:auto;">
+                                <table class="batch-table" id="batchTable">
+                                    <thead><tr>
+                                        <th style="width:5%;">#</th>
+                                        <th style="width:14%;">字段</th>
+                                        <th style="width:26%;">前缀</th>
+                                        <th style="width:22%;">起始</th>
+                                        <th style="width:16%;">步长</th>
+                                        <th style="width:9%;"></th>
+                                    </tr></thead>
+                                    <tbody id="batchTableBody"></tbody>
+                                </table>
+                            </div>
+                            <!-- 操作按钮 -->
+                            <div style="display:flex; gap:8px; flex-wrap:wrap; flex-shrink:0;">
+                                <button class="btn btn-primary btn-sm" id="addRowBtn">添加行</button>
+                                <button class="btn btn-outline btn-sm" id="clearTableBtn">清空</button>
+                                <button class="btn btn-primary btn-sm" id="previewBtn">生成预览</button>
+                            </div>
+                            <div class="batch-actions" style="display:flex; gap:8px; flex-shrink:0;">
+                                <button class="btn btn-warning btn-sm" id="updateBatchBtn" style="display:none;">更新批次</button>
+                                <button class="btn btn-outline btn-sm" id="cancelEditBtn" style="display:none;">取消</button>
+                            </div>
+                        </div>
 
-                            <!-- 字段选择 + 行筛选（合并左右布局） -->
-                            <div style="border:1px solid var(--border-color); border-radius:8px; padding:12px; margin-bottom:12px; display:flex; gap:16px; flex-wrap:nowrap;">
-                                <!-- 左侧：字段选择 -->
+                        <!-- ═══ 右栏：字段提取 + 字段替换 ═══ -->
+                        <div style="flex:1; min-width:420px; display:flex; flex-direction:column; gap:10px; overflow:hidden; padding:4px 0;">
+                            <!-- ── ① 字段提取（三等分） ── -->
+                            <div style="border:1px solid var(--border-color); border-radius:8px; padding:10px; display:flex; gap:12px; flex-shrink:0; flex:1; min-height:0; overflow:hidden;">
+                                <!-- 提取：加载+选择 -->
                                 <div style="flex:1; min-width:0;">
-                                    <div style="font-weight:600; font-size:14px; color:var(--text-primary); margin-bottom:8px;">🔍 字段选择</div>
-                                    <div class="selection-controls">
+                                    <div style="font-weight:600; font-size:13px; color:var(--text-primary); margin-bottom:6px;">加载 & 选择</div>
+                                    <div style="margin-bottom:6px;">
+                                        <button class="btn btn-outline btn-xs" id="extractFileBtn">选择 JSON 文件</button>
+                                        <input type="file" id="extractFileInput" accept=".json" style="display:none;">
+                                        <span id="extractFileInfo" style="font-size:11px; color:var(--text-secondary); margin-left:6px;">未选择文件</span>
+                                        <div id="extractMeta" style="display:none; font-size:11px; color:var(--text-secondary); margin-top:2px;">
+                                            数据组数：<strong id="extractCountDisplay">0</strong> | 字段数：<strong id="extractFieldCountDisplay">0</strong>
+                                        </div>
+                                    </div>
+                                    <div class="selection-controls" style="margin-bottom:4px;">
                                         <button class="btn-xs" id="extractSelectAllBtn">全选</button>
                                         <button class="btn-xs" id="extractInvertBtn">反选</button>
                                         <button class="btn-xs" id="extractDeselectAllBtn">清空</button>
-                                        <span class="selection-count" id="extractSelectionCount">已选 0 个字段</span>
+                                        <span class="selection-count" id="extractSelectionCount" style="font-size:11px;">已选 0 个字段</span>
                                     </div>
-                                    <div id="extractFieldsContainer" style="max-height:300px; overflow-y:auto; border:1px solid var(--border-color); border-radius:4px; display:none;">
+                                    <div id="extractFieldsContainer" style="max-height:110px; overflow-y:auto; border:1px solid var(--border-color); border-radius:4px; display:none;">
                                         <table class="extract-table">
-                                            <thead>
-                                                <tr>
-                                                    <th style="width:30px;"></th>
-                                                    <th>字段名</th>
-                                                    <th>类型</th>
-                                                    <th class="center">组数</th>
-                                                    <th>示例值</th>
-                                                </tr>
-                                            </thead>
+                                            <thead><tr>
+                                                <th style="width:24px;"></th><th>字段名</th><th>类型</th><th class="center">组数</th><th>示例值</th>
+                                            </tr></thead>
                                             <tbody id="extractFieldsBody"></tbody>
                                         </table>
                                     </div>
                                 </div>
-                                <!-- 右侧：行筛选 + 按钮 -->
-                                <div style="width:340px; flex-shrink:0;">
-                                    <div style="font-weight:600; font-size:14px; color:var(--text-primary); margin-bottom:8px;">📊 行筛选</div>
-                                    <div style="margin-bottom:10px;">
-                                        <div style="margin-bottom:8px;">
-                                            <label style="display:block; font-size:11px; font-weight:600; color:var(--text-secondary); margin-bottom:3px;">起始位置（从1开始）</label>
-                                            <input type="number" id="extractStartIndex" value="1" min="1" style="width:100%; padding:5px 8px; border:1px solid var(--border-color); border-radius:6px; background:var(--bg-input); color:var(--text-primary); font-size:12px; box-sizing:border-box;">
-                                        </div>
-                                        <div style="margin-bottom:8px;">
-                                            <label style="display:block; font-size:11px; font-weight:600; color:var(--text-secondary); margin-bottom:3px;">提取数量（留空=全部）</label>
-                                            <input type="number" id="extractCount" value="" min="1" placeholder="全部" style="width:100%; padding:5px 8px; border:1px solid var(--border-color); border-radius:6px; background:var(--bg-input); color:var(--text-primary); font-size:12px; box-sizing:border-box;">
-                                        </div>
+                                <!-- 提取：筛选+操作 -->
+                                <div style="width:260px; flex-shrink:0;">
+                                    <div style="font-weight:600; font-size:13px; color:var(--text-primary); margin-bottom:6px;">行筛选 & 操作</div>
+                                    <div style="margin-bottom:6px;">
+                                        <label style="display:block; font-size:10px; color:var(--text-secondary); margin-bottom:2px;">起始位置（从1开始）</label>
+                                        <input type="number" id="extractStartIndex" value="1" min="1" style="width:100%; padding:3px 6px; border:1px solid var(--border-color); border-radius:4px; background:var(--bg-input); color:var(--text-primary); font-size:11px; box-sizing:border-box;">
                                     </div>
-                                    <div style="display:flex; gap:6px; flex-wrap:wrap;">
-                                        <button class="btn btn-primary btn-sm" id="extractPreviewBtn">🔍 提取预览</button>
-                                        <button class="btn btn-primary btn-sm" id="saveExtractLocal">💾 本地</button>
-                                        <button class="btn btn-outline btn-sm" id="saveExtractAsSource">📥 作为源数据</button>
-                                        <button class="btn btn-outline btn-sm" id="saveExtractAsTarget">📥 作为目标数据</button>
+                                    <div style="margin-bottom:6px;">
+                                        <label style="display:block; font-size:10px; color:var(--text-secondary); margin-bottom:2px;">数量（留空=全部）</label>
+                                        <input type="number" id="extractCount" value="" min="1" placeholder="全部" style="width:100%; padding:3px 6px; border:1px solid var(--border-color); border-radius:4px; background:var(--bg-input); color:var(--text-primary); font-size:11px; box-sizing:border-box;">
                                     </div>
-                                    <div style="margin-top:8px; font-size:11px; display:flex; gap:12px; flex-wrap:wrap;">
+                                    <div style="display:flex; gap:4px; flex-wrap:wrap; margin-bottom:4px;">
+                                        <button class="btn btn-primary btn-xs" id="extractPreviewBtn">预览</button>
+                                        <button class="btn btn-primary btn-xs" id="saveExtractLocal">本地</button>
+                                        <button class="btn btn-outline btn-xs" id="saveExtractAsSource">源数据</button>
+                                        <button class="btn btn-outline btn-xs" id="saveExtractAsTarget">目标数据</button>
+                                    </div>
+                                    <div style="font-size:10px; display:flex; gap:10px;">
                                         <span id="extractSrcStatus" style="color:var(--text-secondary);">源: 空</span>
                                         <span id="extractTgtStatus" style="color:var(--text-secondary);">目标: 空</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- 下部：字段替换 -->
-                            <div style="border:1px solid var(--border-color); border-radius:8px; padding:12px;">
-                                <div style="font-weight:600; font-size:14px; color:var(--text-primary); margin-bottom:8px;">🔁 字段替换</div>
-
-                                <!-- 两个JSON并排显示 -->
-                                <div style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom:12px;">
-                                    <!-- JSON 1（源） -->
-                                    <div id="sourceDropZone" style="flex:1; min-width:200px; border:1px solid var(--border-color); border-radius:8px; padding:12px;">
-                                        <div style="font-weight:600; font-size:13px; color:var(--text-primary); margin-bottom:6px;">📄 JSON 1（源数据）</div>
-                                        <button class="btn btn-outline btn-sm" id="importJson1Btn">选择 JSON 文件</button>
-                                        <input type="file" id="json1FileInput" accept=".json" style="display:none;">
-                                        <div id="json1FileInfo" style="margin-top:6px; font-size:12px; color:var(--text-secondary);">未选择文件</div>
-                                        <div id="json1Meta" style="margin-top:6px; display:none;">
-                                            <div style="font-size:12px; color:var(--text-secondary);">
-                                                组数：<strong id="json1CountDisplay" style="color:var(--text-primary);">0</strong>
-                                                &nbsp;|&nbsp;字段：<strong id="json1FieldCountDisplay" style="color:var(--text-primary);">0</strong>
-                                            </div>
+                            <!-- ── ② 源/目标数据（三等分） ── -->
+                            <div style="border:1px solid var(--border-color); border-radius:8px; padding:10px; flex:1; min-height:0; display:flex; flex-direction:column; overflow:hidden;">
+                                <div style="font-weight:600; font-size:13px; color:var(--text-primary); margin-bottom:6px; flex-shrink:0;">源/目标数据</div>
+                                <div style="display:flex; gap:10px; flex:1; min-height:0;">
+                                    <div id="sourceDropZone" style="flex:1; min-width:180px; border:1px solid var(--border-color); border-radius:6px; padding:8px; display:flex; flex-direction:column; overflow:hidden;">
+                                        <div style="font-weight:600; font-size:12px; color:var(--text-primary); margin-bottom:4px; flex-shrink:0;">JSON 1（源数据）</div>
+                                        <div style="flex-shrink:0;">
+                                            <button class="btn btn-outline btn-xs" id="importJson1Btn">选择 JSON 文件</button>
+                                            <input type="file" id="json1FileInput" accept=".json" style="display:none;">
                                         </div>
-                                        <div id="json1FieldsContainer" style="margin-top:8px; max-height:160px; overflow-y:auto; border:1px solid var(--border-color); border-radius:4px; display:none;">
-                                            <table style="width:100%; border-collapse:collapse; font-size:11px;">
-                                                <thead>
-                                                    <tr>
-                                                        <th style="padding:2px 6px; background:var(--bg-selector); text-align:left; position:sticky; top:0;">字段名</th>
-                                                        <th style="padding:2px 6px; background:var(--bg-selector); text-align:left; position:sticky; top:0;">类型</th>
-                                                        <th style="padding:2px 6px; background:var(--bg-selector); text-align:center; position:sticky; top:0;">组数</th>
-                                                        <th style="padding:2px 6px; background:var(--bg-selector); text-align:left; position:sticky; top:0;">示例</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody></tbody>
+                                        <div id="json1FileInfo" style="font-size:11px; color:var(--text-secondary); margin-top:3px; flex-shrink:0;">未选择文件</div>
+                                        <div id="json1Meta" style="display:none; font-size:11px; color:var(--text-secondary); margin-top:2px; flex-shrink:0;">
+                                            组数：<strong id="json1CountDisplay">0</strong> | 字段：<strong id="json1FieldCountDisplay">0</strong>
+                                        </div>
+                                        <div id="json1FieldsContainer" style="margin-top:4px; flex:1; min-height:0; overflow-y:auto; border:1px solid var(--border-color); border-radius:3px;">
+                                            <table style="width:100%; border-collapse:collapse; font-size:10px;">
+                                                <thead><tr>
+                                                    <th style="padding:1px 4px; background:var(--bg-selector);">字段名</th><th style="padding:1px 4px; background:var(--bg-selector);">类型</th><th style="padding:1px 4px; background:var(--bg-selector); text-align:center;">组数</th><th style="padding:1px 4px; background:var(--bg-selector);">示例</th>
+                                                </tr></thead><tbody></tbody>
                                             </table>
                                         </div>
                                     </div>
-
-                                    <!-- JSON 2（目标） -->
-                                    <div id="targetDropZone" style="flex:1; min-width:200px; border:1px solid var(--border-color); border-radius:8px; padding:12px;">
-                                        <div style="font-weight:600; font-size:13px; color:var(--text-primary); margin-bottom:6px;">📄 JSON 2（目标数据）</div>
-                                        <button class="btn btn-outline btn-sm" id="importJson2Btn">选择 JSON 文件</button>
-                                        <input type="file" id="json2FileInput" accept=".json" style="display:none;">
-                                        <div id="json2FileInfo" style="margin-top:6px; font-size:12px; color:var(--text-secondary);">未选择文件</div>
-                                        <div id="json2Meta" style="margin-top:6px; display:none;">
-                                            <div style="font-size:12px; color:var(--text-secondary);">
-                                                组数：<strong id="json2CountDisplay" style="color:var(--text-primary);">0</strong>
-                                                &nbsp;|&nbsp;字段：<strong id="json2FieldCountDisplay" style="color:var(--text-primary);">0</strong>
-                                            </div>
+                                    <div id="targetDropZone" style="flex:1; min-width:180px; border:1px solid var(--border-color); border-radius:6px; padding:8px; display:flex; flex-direction:column; overflow:hidden;">
+                                        <div style="font-weight:600; font-size:12px; color:var(--text-primary); margin-bottom:4px; flex-shrink:0;">JSON 2（目标数据）</div>
+                                        <div style="flex-shrink:0;">
+                                            <button class="btn btn-outline btn-xs" id="importJson2Btn">选择 JSON 文件</button>
+                                            <input type="file" id="json2FileInput" accept=".json" style="display:none;">
                                         </div>
-                                        <div id="json2FieldsContainer" style="margin-top:8px; max-height:160px; overflow-y:auto; border:1px solid var(--border-color); border-radius:4px; display:none;">
-                                            <table style="width:100%; border-collapse:collapse; font-size:11px;">
-                                                <thead>
-                                                    <tr>
-                                                        <th style="padding:2px 6px; background:var(--bg-selector); text-align:left; position:sticky; top:0;">字段名</th>
-                                                        <th style="padding:2px 6px; background:var(--bg-selector); text-align:left; position:sticky; top:0;">类型</th>
-                                                        <th style="padding:2px 6px; background:var(--bg-selector); text-align:center; position:sticky; top:0;">组数</th>
-                                                        <th style="padding:2px 6px; background:var(--bg-selector); text-align:left; position:sticky; top:0;">示例</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody></tbody>
+                                        <div id="json2FileInfo" style="font-size:11px; color:var(--text-secondary); margin-top:3px; flex-shrink:0;">未选择文件</div>
+                                        <div id="json2Meta" style="display:none; font-size:11px; color:var(--text-secondary); margin-top:2px; flex-shrink:0;">
+                                            组数：<strong id="json2CountDisplay">0</strong> | 字段：<strong id="json2FieldCountDisplay">0</strong>
+                                        </div>
+                                        <div id="json2FieldsContainer" style="margin-top:4px; flex:1; min-height:0; overflow-y:auto; border:1px solid var(--border-color); border-radius:3px;">
+                                            <table style="width:100%; border-collapse:collapse; font-size:10px;">
+                                                <thead><tr>
+                                                    <th style="padding:1px 4px; background:var(--bg-selector);">字段名</th><th style="padding:1px 4px; background:var(--bg-selector);">类型</th><th style="padding:1px 4px; background:var(--bg-selector); text-align:center;">组数</th><th style="padding:1px 4px; background:var(--bg-selector);">示例</th>
+                                                </tr></thead><tbody></tbody>
                                             </table>
                                         </div>
                                     </div>
                                 </div>
+                            </div>
 
-                                <!-- 字段替换配置 -->
-                                <div style="border:1px solid var(--border-color); border-radius:8px; padding:12px;">
-                                    <div style="font-weight:600; font-size:13px; color:var(--text-primary); margin-bottom:10px;">🔁 替换配置</div>
-
-                                    <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; margin-bottom:8px;">
-                                        <div style="flex:1; min-width:160px;">
-                                            <label style="display:block; font-size:11px; font-weight:600; color:var(--text-secondary); margin-bottom:3px;">源字段（JSON 1）</label>
-                                            <select id="sourceFieldSelect" style="width:100%; padding:5px 8px; border:1px solid var(--border-color); border-radius:6px; background:var(--bg-input); color:var(--text-primary); font-size:12px;">
-                                                <option value="">-- 请加载源数据 --</option>
-                                            </select>
-                                            <div id="sourceFieldDetail" style="font-size:10px; color:var(--text-secondary); margin-top:2px;"></div>
-                                        </div>
-                                        <div style="flex:1; min-width:160px;">
-                                            <label style="display:block; font-size:11px; font-weight:600; color:var(--text-secondary); margin-bottom:3px;">目标字段（JSON 2）</label>
-                                            <select id="targetFieldSelect" style="width:100%; padding:5px 8px; border:1px solid var(--border-color); border-radius:6px; background:var(--bg-input); color:var(--text-primary); font-size:12px;">
-                                                <option value="">-- 请加载目标数据 --</option>
-                                            </select>
-                                            <div id="targetFieldDetail" style="font-size:10px; color:var(--text-secondary); margin-top:2px;"></div>
-                                        </div>
+                            <!-- ── ③ 替换配置（三等分） ── -->
+                            <div style="border:1px solid var(--border-color); border-radius:6px; padding:8px; flex:1; min-height:0; overflow:auto;">
+                                <div style="font-weight:600; font-size:12px; color:var(--text-primary); margin-bottom:6px;">替换配置</div>
+                                <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; margin-bottom:6px;">
+                                    <div style="flex:1; min-width:140px;">
+                                        <label style="display:block; font-size:10px; color:var(--text-secondary); margin-bottom:2px;">源字段（JSON 1）</label>
+                                        <select id="sourceFieldSelect" style="width:100%; padding:3px 6px; border:1px solid var(--border-color); border-radius:4px; background:var(--bg-input); color:var(--text-primary); font-size:11px;"><option value="">-- 请加载源数据 --</option></select>
+                                        <div id="sourceFieldDetail" style="font-size:9px; color:var(--text-secondary);"></div>
                                     </div>
-
-                                    <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; margin-bottom:8px;">
-                                        <div style="min-width:100px;">
-                                            <label style="display:block; font-size:11px; font-weight:600; color:var(--text-secondary); margin-bottom:3px;">起始位置（从1开始）</label>
-                                            <input type="number" id="replaceStartIndex" value="1" min="1" style="width:100%; padding:5px 8px; border:1px solid var(--border-color); border-radius:6px; background:var(--bg-input); color:var(--text-primary); font-size:12px; box-sizing:border-box;">
-                                        </div>
-                                        <div style="min-width:100px;">
-                                            <label style="display:block; font-size:11px; font-weight:600; color:var(--text-secondary); margin-bottom:3px;">替换数量（留空=自动）</label>
-                                            <input type="number" id="replaceCount" value="" min="1" placeholder="自动" style="width:100%; padding:5px 8px; border:1px solid var(--border-color); border-radius:6px; background:var(--bg-input); color:var(--text-primary); font-size:12px; box-sizing:border-box;">
-                                        </div>
-                                        <div style="min-width:180px;">
-                                            <label style="display:block; font-size:11px; font-weight:600; color:var(--text-secondary); margin-bottom:3px;">替换模式</label>
-                                            <select id="replaceMode" style="width:100%; padding:5px 8px; border:1px solid var(--border-color); border-radius:6px; background:var(--bg-input); color:var(--text-primary); font-size:12px;">
-                                                <option value="override_rename">覆盖字段名（目标→源字段名）</option>
-                                                <option value="keep_name">保留字段名（只替换值）</option>
-                                                <option value="append_new">新增到目标文件</option>
-                                            </select>
-                                        </div>
+                                    <div style="flex:1; min-width:140px;">
+                                        <label style="display:block; font-size:10px; color:var(--text-secondary); margin-bottom:2px;">目标字段（JSON 2）</label>
+                                        <select id="targetFieldSelect" style="width:100%; padding:3px 6px; border:1px solid var(--border-color); border-radius:4px; background:var(--bg-input); color:var(--text-primary); font-size:11px;"><option value="">-- 请加载目标数据 --</option></select>
+                                        <div id="targetFieldDetail" style="font-size:9px; color:var(--text-secondary);"></div>
                                     </div>
-
-                                    <div id="replaceSummary" style="font-size:11px; color:var(--text-secondary); margin-bottom:8px; padding:6px 10px; background:var(--bg-selector); border-radius:6px; display:none;"></div>
-
-                                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                                        <button class="btn btn-primary btn-sm" id="generateReplaceBtn">生成替换预览</button>
-                                        <button class="btn btn-outline btn-sm" id="clearImportBtn">清空全部</button>
+                                </div>
+                                <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:flex-end; margin-bottom:6px;">
+                                    <div style="min-width:80px;">
+                                        <label style="display:block; font-size:10px; color:var(--text-secondary); margin-bottom:2px;">起始位置</label>
+                                        <input type="number" id="replaceStartIndex" value="1" min="1" style="width:100%; padding:3px 6px; border:1px solid var(--border-color); border-radius:4px; background:var(--bg-input); color:var(--text-primary); font-size:11px; box-sizing:border-box;">
                                     </div>
+                                    <div style="min-width:80px;">
+                                        <label style="display:block; font-size:10px; color:var(--text-secondary); margin-bottom:2px;">替换数量</label>
+                                        <input type="number" id="replaceCount" value="" min="1" placeholder="自动" style="width:100%; padding:3px 6px; border:1px solid var(--border-color); border-radius:4px; background:var(--bg-input); color:var(--text-primary); font-size:11px; box-sizing:border-box;">
+                                    </div>
+                                    <div style="min-width:160px;">
+                                        <label style="display:block; font-size:10px; color:var(--text-secondary); margin-bottom:2px;">替换模式</label>
+                                        <select id="replaceMode" style="width:100%; padding:3px 6px; border:1px solid var(--border-color); border-radius:4px; background:var(--bg-input); color:var(--text-primary); font-size:11px;">
+                                            <option value="override_rename">覆盖字段名（目标→源字段名）</option>
+                                            <option value="keep_name">保留字段名（只替换值）</option>
+                                            <option value="append_new">新增到目标文件</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div id="replaceSummary" style="font-size:10px; color:var(--text-secondary); margin-bottom:4px; padding:4px 8px; background:var(--bg-selector); border-radius:4px; display:none;"></div>
+                                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                                    <button class="btn btn-primary btn-sm" id="generateReplaceBtn">生成替换预览</button>
+                                    <button class="btn btn-outline btn-sm" id="clearImportBtn">清空全部</button>
                                 </div>
                             </div>
                         </div>
@@ -334,7 +275,7 @@
                     <div id="tab-template-lib" class="workbench-panel">
                         <div style="padding:8px 0;">
                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
-                                <div style="font-weight:600; font-size:16px; color:var(--text-primary);">📂 模板库</div>
+                                <div style="font-weight:600; font-size:14px; color:var(--text-primary);">模板库</div>
                                 <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
                                     <button class="btn btn-outline btn-sm" id="templateLibSetupFolderBtn">设置本地文件夹</button>
                                     <button class="btn btn-outline btn-sm" id="templateLibClearFolderBtn" style="display:none;">取消关联</button>
@@ -355,7 +296,7 @@
                                     <button class="filter-btn" id="filterLocalBtn">本地文件夹</button>
                                 </div>
                                 <div style="flex:1; min-width:160px;">
-                                    <input type="text" id="templateLibSearchInput" placeholder="🔍 搜索模板（用途/创建人）..." style="width:100%; padding:6px 12px; border:1px solid var(--border-color); border-radius:6px; font-size:13px; background:var(--bg-input); color:var(--text-primary); box-sizing:border-box;">
+                                    <input type="text" id="templateLibSearchInput" placeholder="搜索模板（用途/创建人）..." style="width:100%; padding:6px 12px; border:1px solid var(--border-color); border-radius:6px; font-size:13px; background:var(--bg-input); color:var(--text-primary); box-sizing:border-box;">
                                 </div>
                             </div>
 
@@ -387,27 +328,16 @@
                         </div>
                     </div>
 
-                    <!-- ===== 灯光图例面板 ===== -->
-                    <div id="tab-legend" class="workbench-panel">
-                        <div style="padding:8px 0; height:calc(100vh - 160px); display:flex; flex-direction:column;">
-                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-shrink:0;">
-                                <div style="font-weight:600; font-size:14px; color:var(--text-primary);">🎨 灯光图例配置工具</div>
-                                <div style="font-size:12px; color:var(--text-secondary);">编辑 lamp_template.json 中的灯光图例 / 笔刷 / 图形组合</div>
-                            </div>
-                            <iframe src="legend_editor.html" style="flex:1; width:100%; border:none; border-radius:8px; background:#fff; min-height:400px;"></iframe>
-                        </div>
-                    </div>
-
                     <!-- ===== 工程创建向导面板 ===== -->
                     <div id="tab-wizard" class="workbench-panel">
                         <div class="wizard-container">
                             <!-- 顶部：工程信息 -->
                             <div class="wizard-header">
                                 <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-                                    <div style="font-weight:700; font-size:18px; color:var(--text-primary);">🏗️ 工程创建向导</div>
+                                    <div style="font-weight:700; font-size:16px; color:var(--text-primary);">工程创建向导</div>
                                     <div style="margin-left:auto; display:flex; gap:6px;">
                                         <button class="btn btn-primary btn-sm" id="wizardGenerateBtn" style="display:none;">生成</button>
-                                        <button class="btn btn-success btn-sm" id="wizardSaveBtn" style="display:none;">💾 保存到文件夹</button>
+                                        <button class="btn btn-success btn-sm" id="wizardSaveBtn" style="display:none;">保存到文件夹</button>
                                     </div>
                                 </div>
                                 <div id="wizardStepTitle" style="font-size:14px; font-weight:600; color:var(--text-primary); margin-top:10px;">工程创建向导</div>
@@ -444,10 +374,6 @@
             <div class="preview-header">
                 <span>JSON 预览</span>
                 <span id="previewCount" style="font-size:13px; color:var(--text-secondary);"></span>
-                <span>
-                    <button class="btn btn-sm btn-outline" id="editPreviewBtn" style="padding:2px 12px; font-size:12px;">编辑预览</button>
-                    <button class="btn btn-sm btn-success" id="applyPreviewBtn" style="display:none; padding:2px 12px; font-size:12px;">应用修改</button>
-                </span>
             </div>
             <div id="previewContainer" class="preview-box" style="position:relative;">
                 <pre id="previewDisplay" style="margin:0; white-space:pre-wrap; word-break:break-all; font-family:inherit; background:transparent; color:var(--text-preview);">// 等待生成配置...</pre>
@@ -458,6 +384,8 @@
                 <button class="btn btn-primary btn-lg" id="downloadBtn">下载 JSON 文件</button>
                 <button class="btn btn-outline btn-lg" id="copyBtn">复制到剪贴板</button>
                 <button class="btn btn-outline btn-lg" id="clearPreviewBtn" style="color:var(--msg-error-text); border-color:var(--msg-error-border);">清空显示</button>
+                <button class="btn btn-outline btn-lg" id="editPreviewBtn">编辑预览</button>
+                <button class="btn btn-primary btn-lg" id="applyPreviewBtn" style="display:none;">应用修改</button>
             </div>
         </div>
     </div>
@@ -492,7 +420,7 @@
     <!-- 二次确认模态框 -->
     <div id="confirmModal" class="modal" style="display:none;">
         <div class="modal-content">
-            <h3>⚠️ 确认清空</h3>
+            <h3>确认清空</h3>
             <p style="font-size:14px; color:var(--text-secondary);">确定要清空表格吗？这将删除所有行。</p>
             <div class="modal-actions">
                 <button id="confirmCancelBtn" class="btn btn-outline btn-lg">取消</button>
@@ -517,7 +445,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 id="cdDesignTitle">卡片页面设计</h3>
-                <button class="btn btn-outline btn-sm" id="cardDesignerClose" style="font-size:18px;line-height:1;padding:2px 10px;">×</button>
+                <button class="btn btn-outline btn-sm" id="cardDesignerClose" style="line-height:1;padding:2px 10px;">×</button>
             </div>
             <div class="modal-body">
                 <div class="cd-left-panel">
@@ -573,6 +501,22 @@
         </div>
     </div>
 
+    <!-- 工作台 Tab 切换：事件委托兜底，确保点击可靠响应（不依赖各按钮单独绑定） -->
+    <script>
+    document.addEventListener('click', function(e) {
+        var tab = e.target.closest('.workbench-tab');
+        if (!tab || !tab.dataset.target) return;
+        if (typeof switchTab === 'function') {
+            switchTab(tab.dataset.target);
+        } else {
+            document.querySelectorAll('.workbench-tab').forEach(function(t) { t.classList.remove('active'); });
+            document.querySelectorAll('.workbench-panel').forEach(function(p) { p.classList.remove('active'); });
+            tab.classList.add('active');
+            var panel = document.getElementById(tab.dataset.target);
+            if (panel) panel.classList.add('active');
+        }
+    });
+    </script>
     <script type="module" src="js/main.js"></script>
 </body>
 </html>

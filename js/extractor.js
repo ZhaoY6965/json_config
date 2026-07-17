@@ -1,5 +1,6 @@
 // extractor.js — 字段提取 (Field Extraction) tab functionality
 import { showStatus } from './core.js';
+import { dialog } from './dialog.js';
 import { setPreview } from './preview.js';
 import { setSourceData, setTargetData, getSourceInfo, getTargetInfo } from './import.js';
 
@@ -215,13 +216,15 @@ function previewExtraction() {
     showStatus('提取完成，共 ' + result.length + ' 条数据已显示在右侧预览');
 }
 
-function saveAsConfigTemplate() {
+async function saveAsConfigTemplate() {
     if (!extractData) { showStatus('请先加载数据文件'); return; }
 
-    var name = prompt('请输入模板名称:');
-    if (!name) return;
-    var creator = prompt('请输入创建者:');
-    if (!creator) return;
+    var name = await dialog.prompt('请输入模板名称:');
+    if (name === null || !name.trim()) return;
+    name = name.trim();
+    var creator = await dialog.prompt('请输入创建者:');
+    if (creator === null || !creator.trim()) return;
+    creator = creator.trim();
 
     var checkboxes = document.querySelectorAll('#extractFieldsBody .field-checkbox:checked');
     var fields = [];
@@ -248,14 +251,16 @@ function saveAsConfigTemplate() {
     showStatus('配置模板 "' + name + '" 已保存');
 }
 
-function saveAsDataTemplate() {
+async function saveAsDataTemplate() {
     var result = generateExtraction();
     if (!result) return;
 
-    var name = prompt('请输入模板名称:');
-    if (!name) return;
-    var creator = prompt('请输入创建者:');
-    if (!creator) return;
+    var name = await dialog.prompt('请输入模板名称:');
+    if (name === null || !name.trim()) return;
+    name = name.trim();
+    var creator = await dialog.prompt('请输入创建者:');
+    if (creator === null || !creator.trim()) return;
+    creator = creator.trim();
 
     var template = {
         name: name,
@@ -290,22 +295,22 @@ function saveExtractionLocal() {
 }
 
 /** 保存提取结果到源数据槽（JSON 1），供字段替换使用 */
-function saveExtractionAsSource() {
+async function saveExtractionAsSource() {
     var result = generateExtraction();
     if (!result) return;
     var srcInfo = getSourceInfo();
-    if (srcInfo && !confirm('源数据已有 ' + srcInfo.count + ' 条数据，确定要覆盖吗？')) return;
+    if (srcInfo && !(await dialog.confirm('源数据已有 ' + srcInfo.count + ' 条数据，确定要覆盖吗？'))) return;
     setSourceData(result);
     updateSlotStatus();
     showStatus('提取结果已设为源数据，共 ' + result.length + ' 条数据', 'success');
 }
 
 /** 保存提取结果到目标数据槽（JSON 2），供字段替换使用 */
-function saveExtractionAsTarget() {
+async function saveExtractionAsTarget() {
     var result = generateExtraction();
     if (!result) return;
     var tgtInfo = getTargetInfo();
-    if (tgtInfo && !confirm('目标数据已有 ' + tgtInfo.count + ' 条数据，确定要覆盖吗？')) return;
+    if (tgtInfo && !(await dialog.confirm('目标数据已有 ' + tgtInfo.count + ' 条数据，确定要覆盖吗？'))) return;
     setTargetData(result);
     updateSlotStatus();
     showStatus('提取结果已设为目标数据，共 ' + result.length + ' 条数据', 'success');

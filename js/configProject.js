@@ -2,9 +2,10 @@
 // 支持：多目录加载、单文件拖拽导入、最近目录记忆
 
 import { showStatus } from './core.js';
+import { dialog } from './dialog.js';
 import {
     getSchemaByFileName, detectConfigType, getAllSchemas,
-    getSchemaByKey, getForeignKeyFields, DataShape, FieldType
+    getForeignKeyFields, DataShape, FieldType
 } from './configSchema.js';
 
 // ========== 工作区状态 ==========
@@ -326,11 +327,11 @@ function renderConfigList() {
     }
 }
 
-function removeConfig(key) {
+async function removeConfig(key) {
     const proj = getActiveProject();
     if (!proj || !proj.configs[key]) return;
     const label = proj.configs[key].schema.label || key;
-    if (!confirm('确定从项目中移除 "' + label + '" 吗？')) return;
+    if (!(await dialog.confirm('确定从项目中移除 "' + label + '" 吗？'))) return;
     delete proj.configs[key];
     if (proj.currentConfigKey === key) {
         proj.currentConfigKey = null;
@@ -397,10 +398,6 @@ export function getCurrentConfig() {
     return (p && p.currentConfigKey) ? p.configs[p.currentConfigKey] || null : null;
 }
 
-export function getCurrentSchema() {
-    const c = getCurrentConfig();
-    return c ? c.schema : null;
-}
 
 export function getCurrentKey() {
     const p = getActiveProject();
@@ -415,10 +412,6 @@ export function updateCurrentData(newData) {
     renderConfigList();
 }
 
-export function getConfigData(schemaKey) {
-    const cfgs = getActiveConfigs();
-    return cfgs[schemaKey] ? cfgs[schemaKey].data : null;
-}
 
 export function getFkOptions(targetSchemaKey, idField, displayField) {
     const cfg = getActiveConfigs()[targetSchemaKey];
@@ -434,18 +427,7 @@ export function getAllLoadedConfigs() {
     return p ? p.configs : {};
 }
 
-export function isProjectLoaded() {
-    return !!getActiveProject() && Object.keys(getActiveConfigs()).length > 0;
-}
 
-export function getProjects() { return Object.values(projects); }
-export function getActiveProjectId() { return activeProjectId; }
-export function switchToProject(projId) { if (projects[projId]) switchProject(projId); }
-export async function loadSingleFile(file) { return importSingleFile(file); }
-export function importJsonData(fileName, data) {
-    const p = getActiveProject();
-    return p ? importJsonDataIntoProj(p, fileName, data) : null;
-}
 
 /**
  * 自动保存当前配置到本地文件

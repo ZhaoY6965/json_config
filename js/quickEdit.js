@@ -89,7 +89,7 @@ export function renderQuickEditButtons() {
         wrapper.appendChild(btn);
         
         const delBtn = document.createElement('button');
-        delBtn.textContent = '✕';
+        delBtn.textContent = '删除';
         delBtn.style.cssText = 'padding:0 4px; border:none; background:transparent; color:var(--msg-error-text); cursor:pointer; font-size:12px; line-height:1;';
         delBtn.title = '删除此快捷文本';
         delBtn.addEventListener('click', (e) => {

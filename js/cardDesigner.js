@@ -3,6 +3,7 @@
 // 模式二：站点模式（ccr_config / circuit_config）— 按 site 分组，用户自定义行列，拖拽写回 card_row/card_colum
 
 import { showStatus } from './core.js';
+import { dialog } from './dialog.js';
 import { getAllLoadedConfigs, getCurrentKey } from './configProject.js';
 
 // ========== 状态 ==========
@@ -211,7 +212,7 @@ function buildGridTable(gridLabel, rows, cols, containerKey, placements, items, 
     cornerTh.textContent = '';
     headRow.appendChild(cornerTh);
 
-    for (let c = 1; c <= cols; c++) {
+    for (let c = 0; c < cols; c++) {
         const th = document.createElement('th');
         th.style.cssText = 'position:sticky;top:0;z-index:2;background:var(--bg-selector);border:1px solid var(--border-color);padding:2px 4px;text-align:center;font-size:10px;color:var(--text-secondary);';
         th.textContent = c;
@@ -223,7 +224,7 @@ function buildGridTable(gridLabel, rows, cols, containerKey, placements, items, 
     const tbody = document.createElement('tbody');
     const containerPlacements = (placements && placements[containerKey]) ? placements[containerKey] : {};
 
-    for (let r = 1; r <= rows; r++) {
+    for (let r = 0; r < rows; r++) {
         const tr = document.createElement('tr');
 
         const rowLabel = document.createElement('th');
@@ -231,7 +232,7 @@ function buildGridTable(gridLabel, rows, cols, containerKey, placements, items, 
         rowLabel.textContent = r;
         tr.appendChild(rowLabel);
 
-        for (let c = 1; c <= cols; c++) {
+        for (let c = 0; c < cols; c++) {
             const td = document.createElement('td');
             td.className = 'cd-grid-cell';
             td.dataset.row = r;
@@ -268,7 +269,7 @@ function buildGridTable(gridLabel, rows, cols, containerKey, placements, items, 
             td.addEventListener('dragleave', function(e) {
                 this.style.background = this.querySelector('.cd-cell-inner') ? 'var(--accent-color, #0078D4)' : '';
             });
-            td.addEventListener('drop', function(e) {
+            td.addEventListener('drop', async function(e) {
                 e.preventDefault();
                 const droppedId = e.dataTransfer.getData('text/plain');
                 if (!droppedId) return;
@@ -286,7 +287,7 @@ function buildGridTable(gridLabel, rows, cols, containerKey, placements, items, 
                     }
                     const existingId = containerPlacements[targetR] ? containerPlacements[targetR][targetC] : null;
                     if (existingId) {
-                        if (!confirm('该位置已有项目，是否交换？')) {
+                        if (!(await dialog.confirm('该位置已有项目，是否交换？'))) {
                             dragSource = null;
                             return;
                         }
@@ -309,23 +310,23 @@ function buildGridTable(gridLabel, rows, cols, containerKey, placements, items, 
             });
             // 双击/右键/键盘 删除
             ['dblclick', 'contextmenu'].forEach(evtType => {
-                td.addEventListener(evtType, function(e) {
+                td.addEventListener(evtType, async function(e) {
                     if (evtType === 'contextmenu') e.preventDefault();
                     const rid = parseInt(this.dataset.row);
                     const cid = parseInt(this.dataset.col);
                     if (containerPlacements[rid] && containerPlacements[rid][cid]) {
-                        if (confirm('\u79fb\u9664\u8be5\u4f4d\u7f6e\u7684\u9879\u76ee\u5417?')) {
+                        if (await dialog.confirm('\u79fb\u9664\u8be5\u4f4d\u7f6e\u7684\u9879\u76ee\u5417?')) {
                             onDrop(containerKey, rid, cid, '__REMOVE__');
                         }
                     }
                 });
             });
-            td.addEventListener('keydown', function(e) {
+            td.addEventListener('keydown', async function(e) {
                 if (e.key === 'Delete' || e.key === 'Backspace') {
                     const rid = parseInt(this.dataset.row);
                     const cid = parseInt(this.dataset.col);
                     if (containerPlacements[rid] && containerPlacements[rid][cid]) {
-                        if (confirm('\u79fb\u9664 (' + rid + ',' + cid + ') \u7684\u9879\u76ee?')) {
+                        if (await dialog.confirm('\u79fb\u9664 (' + rid + ',' + cid + ') \u7684\u9879\u76ee?')) {
                             onDrop(containerKey, rid, cid, '__REMOVE__');
                         }
                     }
@@ -545,12 +546,12 @@ function renderCcrList(siteId) {
     }
 }
 
-function handleCcrCardDrop(containerKey, row, col, ccrId) {
+async function handleCcrCardDrop(containerKey, row, col, ccrId) {
     if (ccrId === '__REMOVE__') {
         removePlacement(ccrState, containerKey, row, col);
         return;
     }
-    if (!containerKey || !row || !col || !ccrId) return;
+    if (!containerKey || row == null || col == null || !ccrId) return;
     const r = parseInt(row), c = parseInt(col);
     if (isNaN(r) || isNaN(c)) return;
 
@@ -560,7 +561,7 @@ function handleCcrCardDrop(containerKey, row, col, ccrId) {
     }
     if (!ccrState.placements[containerKey]) ccrState.placements[containerKey] = {};
     if (!ccrState.placements[containerKey][r]) ccrState.placements[containerKey][r] = {};
-    if (ccrState.placements[containerKey][r][c]) { if (!confirm('\u66ff\u6362?')) return; }
+    if (ccrState.placements[containerKey][r][c]) { if (!(await dialog.confirm('\u66ff\u6362?'))) return; }
     ccrState.placements[containerKey][r][c] = ccrId;
 
     const card = ccrState.cards.find(ca => ca.id === containerKey);
@@ -677,12 +678,12 @@ function renderCircuitList(siteId) {
     }
 }
 
-function handleCircuitCardDrop(containerKey, row, col, circuitId) {
+async function handleCircuitCardDrop(containerKey, row, col, circuitId) {
     if (circuitId === '__REMOVE__') {
         removePlacement(circuitState, containerKey, row, col);
         return;
     }
-    if (!containerKey || !row || !col || !circuitId) return;
+    if (!containerKey || row == null || col == null || !circuitId) return;
     const r = parseInt(row), c = parseInt(col);
     if (isNaN(r) || isNaN(c)) return;
     for (var cId in circuitState.placements) {
@@ -691,7 +692,7 @@ function handleCircuitCardDrop(containerKey, row, col, circuitId) {
     }
     if (!circuitState.placements[containerKey]) circuitState.placements[containerKey] = {};
     if (!circuitState.placements[containerKey][r]) circuitState.placements[containerKey][r] = {};
-    if (circuitState.placements[containerKey][r][c]) { if (!confirm('\u66ff\u6362?')) return; }
+    if (circuitState.placements[containerKey][r][c]) { if (!(await dialog.confirm('\u66ff\u6362?'))) return; }
     circuitState.placements[containerKey][r][c] = circuitId;
 
     const card = circuitState.cards.find(ca => ca.id === containerKey);
@@ -1017,7 +1018,7 @@ function renderCcrSiteList(siteId) {
     }
 }
 
-function handleCcrSiteDrop(siteId, row, col, ccrId) {
+async function handleCcrSiteDrop(siteId, row, col, ccrId) {
     if (ccrId === '__REMOVE__') {
         removeSitePlacement(ccrSiteState, siteId, row, col);
         renderCcrSiteGrid();
@@ -1025,7 +1026,7 @@ function handleCcrSiteDrop(siteId, row, col, ccrId) {
         updatePlacementInfo();
         return;
     }
-    if (!siteId || !row || !col || !ccrId) return;
+    if (!siteId || row == null || col == null || !ccrId) return;
     const r = parseInt(row), c = parseInt(col);
     if (isNaN(r) || isNaN(c)) return;
 
@@ -1036,7 +1037,7 @@ function handleCcrSiteDrop(siteId, row, col, ccrId) {
     }
     if (!ccrSiteState.placements[siteId]) ccrSiteState.placements[siteId] = {};
     if (!ccrSiteState.placements[siteId][r]) ccrSiteState.placements[siteId][r] = {};
-    if (ccrSiteState.placements[siteId][r][c]) { if (!confirm('\u66ff\u6362?')) return; }
+    if (ccrSiteState.placements[siteId][r][c]) { if (!(await dialog.confirm('\u66ff\u6362?'))) return; }
 
     ccrSiteState.placements[siteId][r][c] = ccrId;
     renderCcrSiteGrid();
@@ -1287,7 +1288,7 @@ function renderCircuitSiteList(siteId) {
     }
 }
 
-function handleCircuitSiteDrop(siteId, row, col, circuitId) {
+async function handleCircuitSiteDrop(siteId, row, col, circuitId) {
     if (circuitId === '__REMOVE__') {
         removeSitePlacement(circuitSiteState, siteId, row, col);
         renderCircuitSiteGrid();
@@ -1295,7 +1296,7 @@ function handleCircuitSiteDrop(siteId, row, col, circuitId) {
         updatePlacementInfo();
         return;
     }
-    if (!siteId || !row || !col || !circuitId) return;
+    if (!siteId || row == null || col == null || !circuitId) return;
     var r = parseInt(row), c = parseInt(col);
     if (isNaN(r) || isNaN(c)) return;
 
@@ -1305,7 +1306,7 @@ function handleCircuitSiteDrop(siteId, row, col, circuitId) {
     }
     if (!circuitSiteState.placements[siteId]) circuitSiteState.placements[siteId] = {};
     if (!circuitSiteState.placements[siteId][r]) circuitSiteState.placements[siteId][r] = {};
-    if (circuitSiteState.placements[siteId][r][c]) { if (!confirm('\u66ff\u6362?')); return; }
+    if (circuitSiteState.placements[siteId][r][c]) { if (!(await dialog.confirm('\u66ff\u6362?'))) return; }
 
     circuitSiteState.placements[siteId][r][c] = circuitId;
     renderCircuitSiteGrid();
@@ -1387,7 +1388,7 @@ function restoreExistingPlacements(items, placements, rowField, colField) {
         var r = item[rowField];
         var c = item[colField];
         var sid = item.site_id || '_default_';
-        if (r != null && c != null && typeof r === 'number' && typeof c === 'number' && r >= 1 && c >= 1) {
+        if (r != null && c != null && typeof r === 'number' && typeof c === 'number' && r >= 0 && c >= 0) {
             if (!placements[sid]) placements[sid] = {};
             if (!placements[sid][r]) placements[sid][r] = {};
             placements[sid][r][c] = item.id;
@@ -1524,9 +1525,7 @@ export function initCardDesigner() {
         cardDom.closeBtn.addEventListener('click', closeDesigner);
     }
     if (cardDom.modal) {
-        cardDom.modal.addEventListener('click', function(e) {
-            if (e.target === cardDom.modal) closeDesigner();
-        });
+        // 模态弹窗：点击弹窗之外的遮罩不再关闭，避免误触丢失编辑数据；仅保留点击外部时收起下拉菜单
         cardDom.modal.addEventListener('click', function() { closeSiteDropdown(); });
         cardDom.modal.addEventListener('click', function() { closeSortDropdown(); });
     }
@@ -1586,8 +1585,8 @@ export function initCardDesigner() {
 
     // 清空按钮
     if (cardDom.clearBtn) {
-        cardDom.clearBtn.addEventListener('click', function() {
-            if (!confirm('\u6e05\u7a7a\u6240\u6709\u653e\u7f6e?')) return;
+        cardDom.clearBtn.addEventListener('click', async function() {
+            if (!(await dialog.confirm('\u6e05\u7a7a\u6240\u6709\u653e\u7f6e?'))) return;
             switch (currentDesignMode) {
                 case 'ccr_card':
                     ccrState.placements = {};

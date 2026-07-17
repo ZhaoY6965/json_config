@@ -3,6 +3,7 @@
 // ============================================================
 
 import { showStatus } from './core.js';
+import { dialog } from './dialog.js';
 import { setPreview } from './preview.js';
 import {
     isFileSystemAccessSupported,
@@ -241,7 +242,7 @@ async function deleteTemplateFromLib(index) {
         return;
     }
 
-    if (!confirm('确定要删除模板"' + tpl.name + '"吗？')) return;
+    if (!(await dialog.confirm('确定要删除模板"' + tpl.name + '"吗？'))) return;
 
     try {
         if (tpl.source === 'browser') {
@@ -285,7 +286,7 @@ async function handleSetupFolder() {
  * 清除本地文件夹连接
  */
 async function handleClearFolder() {
-    if (!confirm('确定要断开本地文件夹连接吗？')) return;
+    if (!(await dialog.confirm('确定要断开本地文件夹连接吗？'))) return;
 
     try {
         await clearStoredFolder();
