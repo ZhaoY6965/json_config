@@ -1,0 +1,1637 @@
+[
+  {
+    "id": "HZ_Q_Y",
+    "name": "滑行道中线灯单向黄",
+    "description": "切割半圆",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on": "brush_yellow",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "x": 0,
+          "y": 0,
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0.5
+        }
+      }
+    ]
+  },
+  {
+    "id": "PAPI",
+    "name": "坡度灯红白",
+    "description": "2红2白四个矩形",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "rect",
+        "brushes": {
+          "on": "brush_red",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "width": 8,
+          "height": 2,
+          "rx": 0,
+          "x": 0,
+          "y": 6
+        }
+      },
+      {
+        "ref": "rect",
+        "brushes": {
+          "on": "brush_red",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "width": 8,
+          "height": 2,
+          "rx": 0,
+          "x": 0,
+          "y": 2
+        }
+      },
+      {
+        "ref": "rect",
+        "brushes": {
+          "on": "brush_white",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "width": 8,
+          "height": 2,
+          "rx": 0,
+          "x": 0,
+          "y": -2
+        }
+      },
+      {
+        "ref": "rect",
+        "brushes": {
+          "on": "brush_white",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "width": 8,
+          "height": 2,
+          "rx": 0,
+          "x": 0,
+          "y": -6
+        }
+      }
+    ]
+  },
+  {
+    "id": "BJP-YY",
+    "name": "标记牌双向黄",
+    "ctlFaceNum": 1,
+    "description": "",
+    "profile": [
+      {
+        "ref": "rect",
+        "brushes": {
+          "on": "brush_yellow",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "width": 2,
+          "height": 8,
+          "rx": 0,
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "ref": "line",
+        "brushes": {
+          "on": "brush_yellow",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "x1": 0,
+          "y1": 3.9,
+          "x2": 0,
+          "y2": -3.9,
+          "x": 0,
+          "y": 0,
+          "strokeWidth": 0,
+          "stroke": "#FFFFFF"
+        }
+      }
+    ]
+  },
+  {
+    "id": "BJP-Y",
+    "name": "标记牌单向黄",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "rect",
+        "brushes": {
+          "on": "brush_yellow",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "width": 2,
+          "height": 8,
+          "rx": 0,
+          "x": 0,
+          "y": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": "BSYDQD",
+    "name": "太阳能不适用地区灯",
+    "description": "圆",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "circle",
+        "brushes": {
+          "on": "brush_red",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "x": 0,
+          "y": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": "CBD",
+    "name": "侧边灯",
+    "description": "半圆",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on": "brush_red",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0.5,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": "CBPCKZSD",
+    "name": "除冰坪出口指示灯",
+    "description": "半圆",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on": "brush_yellow",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0.5,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": "FXB",
+    "name": "风向标",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "polygon",
+        "brushes": {
+          "on": "brush_red",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "points": [
+            [
+              -5,
+              -2
+            ],
+            [
+              -3,
+              -1.8
+            ],
+            [
+              -3,
+              1.8
+            ],
+            [
+              -5,
+              2
+            ]
+          ],
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "ref": "polygon",
+        "brushes": {
+          "on": "brush_white",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "points": [
+            [
+              -3,
+              -1.8
+            ],
+            [
+              -1,
+              -1.6
+            ],
+            [
+              -1,
+              1.6
+            ],
+            [
+              -3,
+              1.8
+            ]
+          ],
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "ref": "polygon",
+        "brushes": {
+          "on": "brush_red",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "points": [
+            [
+              -1,
+              -1.6
+            ],
+            [
+              1,
+              -1.4
+            ],
+            [
+              1,
+              1.4
+            ],
+            [
+              -1,
+              1.6
+            ]
+          ],
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "ref": "polygon",
+        "brushes": {
+          "on": "brush_white",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "points": [
+            [
+              1,
+              -1.4
+            ],
+            [
+              3,
+              -1.2
+            ],
+            [
+              3,
+              1.2
+            ],
+            [
+              1,
+              1.4
+            ]
+          ],
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "ref": "polygon",
+        "brushes": {
+          "on": "brush_red",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "points": [
+            [
+              3,
+              -1.2
+            ],
+            [
+              5,
+              -1
+            ],
+            [
+              5,
+              1
+            ],
+            [
+              3,
+              1.2
+            ]
+          ],
+          "x": 0,
+          "y": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": "GGD",
+    "name": "高杆灯",
+    "description": "八边形",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "polygon",
+        "brushes": {
+          "on": "brush_white",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "points": [
+            [
+              4,
+              0
+            ],
+            [
+              2.828,
+              2.828
+            ],
+            [
+              0,
+              4
+            ],
+            [
+              -2.828,
+              2.828
+            ],
+            [
+              -4,
+              0
+            ],
+            [
+              -2.828,
+              -2.828
+            ],
+            [
+              0,
+              -4
+            ],
+            [
+              2.828,
+              -2.828
+            ]
+          ],
+          "x": 0,
+          "y": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": "HB",
+    "name": "立式滑行道边灯",
+    "description": "圆",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "circle",
+        "brushes": {
+          "on": "brush_blue",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "x": 0,
+          "y": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": "HB-Q",
+    "name": "嵌入式滑行道边灯",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "circle",
+        "brushes": {
+          "on": "brush_blue",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "x": 0,
+          "y": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": "HXDXJD",
+    "name": "滑行道相交灯",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on": "brush_yellow",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0.5,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": "HZ_Q_G",
+    "name": "滑行道中线灯单向绿",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on": "brush_green",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0.5,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": "HZ_Q_GG",
+    "name": "滑行道中线灯双向绿",
+    "ctlFaceNum": 2,
+    "description": "",
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown",
+          "on_1": "brush_green",
+          "on_2": "brush_green"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0.5,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": "HZ_Q_Y",
+    "name": "滑行道中线灯单向黄",
+    "description": "",
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on": "brush_yellow",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0.5,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": "HZ_Q_YY",
+    "name": "滑行道中线灯双向黄",
+    "description": "",
+    "ctlFaceNum": 2,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on_1": "brush_yellow",
+          "on_2": "brush_yellow",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0.5,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": "HZ_Q_YG",
+    "name": "滑行道中线灯半黄绿",
+    "description": "",
+    "ctlFaceNum": 2,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on_1": "brush_yellow",
+          "on_2": "brush_green",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0.5,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": "JJD",
+    "name": "进近灯",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on": "brush_white",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0.5,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": "JWCZYDD",
+    "name": "机位操作引导灯",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "circle",
+        "brushes": {
+          "on": "brush_yellow",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "x": 0,
+          "y": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": "JZJRPD",
+    "name": "禁止进入排灯",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on": "brush_red",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_yellow"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0.5,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": "KHRKZSD",
+    "name": "快滑入口指示灯",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on": "brush_yellow",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0.5,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": "MDD-Q",
+    "name": "嵌入式跑道末端灯",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on": "brush_red",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0.5,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": "PB-Q-WW",
+    "name": "嵌入式跑道边灯双向白",
+    "description": "",
+    "ctlFaceNum": 2,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on_1": "brush_white",
+          "on_2": "brush_white",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0.5,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": "PB-Q-YW",
+    "name": "嵌入式跑道边灯半黄白",
+    "description": "",
+    "ctlFaceNum": 2,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on": "brush_yellow",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown",
+          "on_1": "brush_yellow",
+          "on_2": "brush_white"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0.5,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": "PB-WW",
+    "name": "立式跑道边灯双向白",
+    "description": "",
+    "ctlFaceNum": 2,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on": "brush_yellow",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown",
+          "on_1": "brush_white",
+          "on_2": "brush_white"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0.5,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": "PB-YW",
+    "name": "立式跑道边灯半黄白",
+    "description": "",
+    "ctlFaceNum": 2,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on_1": "brush_yellow",
+          "on_2": "brush_white",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0.5,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": "PDJDD",
+    "name": "跑道接地带灯",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on": "brush_white",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0.5,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0
+        }
+      }
+    ]
+  },
+  {
+    "id": "PDJJD-L",
+    "name": "跑道警戒灯立式",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "rect",
+        "brushes": {
+          "on": "brush_black",
+          "off": "brush_black",
+          "alarm": "brush_black",
+          "selected": "brush_black",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "width": 10,
+          "height": 4,
+          "rx": 1,
+          "x": 0,
+          "y": 0
+        }
+      },
+      {
+        "ref": "circle",
+        "brushes": {
+          "on": "brush_yellow",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 1.5,
+          "x": 2.5,
+          "y": 0,
+          "seqIndex": 0
+        }
+      },
+      {
+        "ref": "circle",
+        "brushes": {
+          "on": "brush_yellow",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 1.5,
+          "x": -2.5,
+          "y": 0,
+          "seqIndex": 1
+        }
+      }
+    ],
+    "seqEnable": true,
+    "seqInterval": 800
+  },
+  {
+    "id": "PDJJD-Q",
+    "name": "跑道警戒灯嵌入式",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "circle",
+        "brushes": {
+          "on": "brush_silver",
+          "off": "brush_silver",
+          "alarm": "brush_silver",
+          "selected": "brush_silver",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "x": 0,
+          "y": 0,
+          "seqIndex": -1
+        }
+      },
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on": "brush_yellow",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 1.2,
+          "ArcCut": 0,
+          "LineCut": 0.1,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": -90,
+          "x": 1.5,
+          "y": -1.5,
+          "seqIndex": 0
+        }
+      },
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on": "brush_yellow",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 1.2,
+          "ArcCut": 0,
+          "LineCut": 0.1,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": -90,
+          "x": -1.5,
+          "y": -1.5,
+          "seqIndex": 1
+        }
+      }
+    ],
+    "seqEnable": true
+  },
+  {
+    "id": "PDJRD",
+    "name": "跑道进入灯",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on": "brush_red",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0,
+          "seqIndex": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "PDZTD",
+    "name": "跑道状态灯",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on": "brush_red",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0,
+          "seqIndex": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "PZ-Q-RW",
+    "name": "嵌入式跑道中线灯半红白",
+    "description": "",
+    "ctlFaceNum": 2,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on_1": "brush_red",
+          "on_2": "brush_white",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0,
+          "seqIndex": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "PZ-Q-WW",
+    "name": "嵌入式跑道中线灯双向白",
+    "description": "",
+    "ctlFaceNum": 2,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on_1": "brush_white",
+          "on_2": "brush_white",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0,
+          "seqIndex": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "QFDDD",
+    "name": "起飞等待灯",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on": "brush_red",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0,
+          "seqIndex": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "RK-L",
+    "name": "立式跑道入口灯",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on": "brush_green",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0,
+          "seqIndex": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "RK-Q",
+    "name": "嵌入式跑道入口灯",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on": "brush_green",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0,
+          "seqIndex": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "RKYP",
+    "name": "入口翼排灯",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on": "brush_green",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0,
+          "seqIndex": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "RKYP-Q",
+    "name": "嵌入式跑道入口翼排灯",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on": "brush_green",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0,
+          "seqIndex": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "Sensor",
+    "name": "微波传感器",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "circle",
+        "brushes": {
+          "on": "brush_yellow",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "x": 0,
+          "y": 0,
+          "seqIndex": -1
+        }
+      },
+      {
+        "ref": "arc",
+        "brushes": {
+          "on": "brush_yellow",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 3,
+          "startAngle": 0,
+          "spanAngle": 180,
+          "x": 0,
+          "y": 0,
+          "seqIndex": -1
+        }
+      },
+      {
+        "ref": "arc",
+        "brushes": {
+          "on": "brush_yellow",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 2,
+          "startAngle": 0,
+          "spanAngle": 180,
+          "x": 0,
+          "y": 0,
+          "seqIndex": -1
+        }
+      },
+      {
+        "ref": "arc",
+        "brushes": {
+          "on": "brush_yellow",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 1,
+          "startAngle": 0,
+          "spanAngle": 180,
+          "x": 0,
+          "y": 0,
+          "seqIndex": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "SXSGD-L",
+    "name": "顺序闪光灯立式",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "circle",
+        "brushes": {
+          "on": "brush_white",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "x": 0,
+          "y": 0,
+          "seqIndex": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "SXSGD-Q",
+    "name": "顺序闪光灯嵌入式",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on": "brush_white",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0.5,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0,
+          "seqIndex": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "TZD",
+    "name": "T字灯",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "polygon",
+        "brushes": {
+          "on": "brush_white",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "points": [
+            [
+              -3.5,
+              1.5
+            ],
+            [
+              -3.5,
+              2.5
+            ],
+            [
+              3.5,
+              2.5
+            ],
+            [
+              3.5,
+              1.5
+            ],
+            [
+              0.5,
+              1.5
+            ],
+            [
+              0.5,
+              -5.5
+            ],
+            [
+              -0.5,
+              -5.5
+            ],
+            [
+              -0.5,
+              1.5
+            ]
+          ],
+          "x": 0,
+          "y": 0,
+          "seqIndex": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "TZP",
+    "name": "停止排灯",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on": "brush_red",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0.5,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0,
+          "seqIndex": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "TZP-Q",
+    "name": "嵌入式停止排灯",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on": "brush_red",
+          "off": "brush_off",
+          "alarm": "brush_alarm",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0.5,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0,
+          "seqIndex": -1
+        }
+      }
+    ]
+  },
+  {
+    "id": "ZJDDWZD",
+    "name": "中间位置等待指示灯",
+    "description": "",
+    "ctlFaceNum": 1,
+    "profile": [
+      {
+        "ref": "semicircle",
+        "brushes": {
+          "on": "brush_yellow",
+          "off": "brush_off",
+          "alarm": "brush_yellow",
+          "selected": "brush_selected",
+          "unknown": "brush_unknown"
+        },
+        "params": {
+          "radius": 4,
+          "ArcCut": 0,
+          "LineCut": 0.5,
+          "startAngle": 90,
+          "spanAngle": 180,
+          "rotation": 0,
+          "x": 0,
+          "y": 0,
+          "seqIndex": -1
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,272 @@
+[
+    {
+        "id": "BJP-Y",
+        "name": "标记牌单向黄",
+        "profile": "sign",
+        "color": "y"
+    },
+    {
+        "id": "BJP-YY",
+        "name": "标记牌双向黄",
+        "profile": "sign",
+        "color": "yy"
+    },
+    {
+        "id": "BSYDQD",
+        "name": "太阳能不适用地区灯",
+        "profile": "circle",
+        "color": "rrr"
+    },
+    {
+        "id": "CBD",
+        "name": "侧边灯",
+        "profile": "semicircle",
+        "color": "r"
+    },
+    {
+        "id": "CBPCKZSD",
+        "name": "除冰坪出口指示灯",
+        "profile": "semicircle",
+        "color": "y"
+    },
+    {
+        "id": "FXB",
+        "name": "风向标",
+        "profile": "circle",
+        "color": "www"
+    },
+    {
+        "id": "GGD",
+        "name": "高杆灯",
+        "profile": "circle",
+        "color": "www"
+    },
+    {
+        "id": "HB",
+        "name": "立式滑行道边灯",
+        "profile": "circle",
+        "color": "bbb"
+    },
+    {
+        "id": "HB-Q",
+        "name": "嵌入式滑行道边灯",
+        "profile": "circle",
+        "color": "bbb"
+    },
+    {
+        "id": "HXDXJD",
+        "name": "滑行道相交灯",
+        "profile": "semicircle",
+        "color": "y"
+    },
+    {
+        "id": "HZ_Q_G",
+        "name": "滑行道中线灯单向绿",
+        "profile": "semicircle",
+        "color": "g"
+    },
+    {
+        "id": "HZ_Q_GG",
+        "name": "滑行道中线灯双向绿",
+        "profile": "bicircle",
+        "color": "gg"
+    },
+    {
+        "id": "HZ_Q_Y",
+        "name": "滑行道中线灯单向黄",
+        "profile": "semicircle",
+        "color": "y"
+    },
+    {
+        "id": "HZ_Q_YY",
+        "name": "滑行道中线灯双向黄",
+        "profile": "bicircle",
+        "color": "yy"
+    },
+    {
+        "id": "HZ_Q_YG",
+        "name": "滑行道中线灯半黄绿",
+        "profile": "bicircle",
+        "color": "yg"
+    },
+    {
+        "id": "JJD",
+        "name": "进近灯",
+        "profile": "semicircle",
+        "color": "w"
+    },
+    {
+        "id": "JWCZYDD",
+        "name": "机位操作引导灯",
+        "profile": "circle",
+        "color": "yyy"
+    },
+    {
+        "id": "JZJRPD",
+        "name": "禁止进入排灯",
+        "profile": "semicircle",
+        "color": "r"
+    },
+    {
+        "id": "KHRKZSD",
+        "name": "快滑入口指示灯",
+        "profile": "semicircle",
+        "color": "y"
+    },
+    {
+        "id": "MDD-Q",
+        "name": "嵌入式跑道末端灯",
+        "profile": "semicircle",
+        "color": "r"
+    },
+    {
+        "id": "PAPI-R",
+        "name": "坡度灯红色立式",
+        "profile": "semicircle",
+        "color": "r"
+    },
+    {
+        "id": "PAPI-W",
+        "name": "坡度灯白色立式",
+        "profile": "semicircle",
+        "color": "w"
+    },
+    {
+        "id": "PB-Q-WW",
+        "name": "嵌入式跑道边灯双向白",
+        "profile": "bicircle",
+        "color": "ww"
+    },
+    {
+        "id": "PB-Q-YW",
+        "name": "嵌入式跑道边灯半黄白",
+        "profile": "bicircle",
+        "color": "yw"
+    },
+    {
+        "id": "PB-WW",
+        "name": "立式跑道边灯双向白",
+        "profile": "bicircle",
+        "color": "ww"
+    },
+    {
+        "id": "PB-YW",
+        "name": "立式跑道边灯半黄白",
+        "profile": "bicircle",
+        "color": "yw"
+    },
+    {
+        "id": "PDJDD",
+        "name": "跑道接地带灯",
+        "profile": "semicircle",
+        "color": "w"
+    },
+    {
+        "id": "PDJJD-L",
+        "name": "跑道警戒灯立式",
+        "profile": "guard",
+        "color": "y"
+    },
+    {
+        "id": "PDJJD-Q",
+        "name": "跑道警戒灯嵌入式",
+        "profile": "semicircle",
+        "color": "y"
+    },
+    {
+        "id": "PDJRD",
+        "name": "跑道进入灯",
+        "profile": "semicircle",
+        "color": "r"
+    },
+    {
+        "id": "PDZTD",
+        "name": "跑道状态灯",
+        "profile": "semicircle",
+        "color": "r"
+    },
+    {
+        "id": "PZ-Q-RW",
+        "name": "嵌入式跑道中线灯半红白",
+        "profile": "bicircle",
+        "color": "rw"
+    },
+    {
+        "id": "PZ-Q-WW",
+        "name": "嵌入式跑道中线灯双向白",
+        "profile": "bicircle",
+        "color": "ww"
+    },
+    {
+        "id": "QFDDD",
+        "name": "起飞等待灯",
+        "profile": "semicircle",
+        "color": "r"
+    },
+    {
+        "id": "RK-L",
+        "name": "立式跑道入口灯",
+        "profile": "semicircle",
+        "color": "g"
+    },
+    {
+        "id": "RK-Q",
+        "name": "嵌入式跑道入口灯",
+        "profile": "semicircle",
+        "color": "g"
+    },
+    {
+        "id": "RKYP",
+        "name": "入口翼排灯",
+        "profile": "semicircle",
+        "color": "g"
+    },
+    {
+        "id": "RKYP-Q",
+        "name": "嵌入式跑道入口翼排灯",
+        "profile": "semicircle",
+        "color": "g"
+    },
+    {
+        "id": "Sensor",
+        "name": "微波传感器",
+        "profile": "semicircle",
+        "color": "w"
+    },
+    {
+        "id": "SXSGD-L",
+        "name": "顺序闪光灯立式",
+        "profile": "guard",
+        "color": "w"
+    },
+    {
+        "id": "SXSGD-Q",
+        "name": "顺序闪光灯嵌入式",
+        "profile": "semicircle",
+        "color": "w"
+    },
+    {
+        "id": "TZD",
+        "name": "T字灯",
+        "profile": "circle",
+        "color": "www"
+    },
+    {
+        "id": "TZP",
+        "name": "停止排灯",
+        "profile": "semicircle",
+        "color": "r"
+    },
+    {
+        "id": "TZP-Q",
+        "name": "嵌入式停止排灯",
+        "profile": "semicircle",
+        "color": "r"
+    },
+    {
+        "id": "ZJDDWZD",
+        "name": "中间位置等待指示灯",
+        "profile": "semicircle",
+        "color": "y"
+    }
+]

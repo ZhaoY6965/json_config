@@ -217,6 +217,20 @@ function bindConfigEvents() {
     document.getElementById('configPreviewBtn')?.addEventListener('click', configPreviewJson);
 }
 
+// 根据字段类型返回建议列宽(px)，用于固定布局 + 横向滚动
+function columnWidthFor(f) {
+    if (!f) return 110;
+    if (f.fk) return 150;                  // 外键下拉需要较宽
+    if (f.key === 'id') return 92;         // id 只读列
+    if (f.key === 'name') return 150;      // 名称列
+    if (f.type === FieldType.OBJECT || f.type === FieldType.ARRAY) return 170; // 复杂结构
+    if (f.type === FieldType.HEX) return 110;
+    if (f.options) return 84;              // 枚举下拉
+    if (f.type === FieldType.BOOL) return 72;
+    if (f.type === FieldType.INT || f.type === FieldType.FLOAT) return 74;     // 数值窄列
+    return 112;                            // 普通文本
+}
+
 function buildConfigEditor(data, schema, key) {
     editorSchema = schema;
     editorKey = key;

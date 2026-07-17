@@ -1,0 +1,252 @@
+{
+  "version": "9.6",
+  "description": "基础图形库 - 定义所有基本图形的参数结构。坐标基于数学系（原点 0,0 居中，Y 轴向上为正）。填充/描边/闪烁等外观统一由笔刷(brushes_config.json)驱动，每个 profile 项通过 brushes.{state} 或 brushes.on_N 引用笔刷，本文件不再定义 fill/stroke 等外观字段。",
+  "globalParams": {
+    "x": "水平位置偏移（相对原点 0,0，向右为正）",
+    "y": "垂直位置偏移（相对原点 0,0，向上为正）",
+    "seqIndex": "序列相位序号：-1=不参与轮巡；0,1,2…=相位序号。配合项级「启用序列轮巡」+「切换间隔」，选中 on 时同相位图形亮、其余灭，实现多灯互斥/轮巡"
+  },
+  "shapes": {
+    "semicircle": {
+      "description": "半圆 - 默认朝向左侧 (startAngle=90, spanAngle=180)",
+      "type": "semicircle",
+      "defaultParams": {
+        "radius": 4,
+        "ArcCut": 0,
+        "LineCut": 0,
+        "startAngle": 90,
+        "spanAngle": 180,
+        "rotation": 0,
+        "x": 0,
+        "y": 0,
+        "seqIndex": -1
+      },
+      "paramDescriptions": {
+        "radius": "半径",
+        "ArcCut": "弧形切割：同心环内径（0=不切割半圆盘，>0=切出半环）",
+        "LineCut": "直线切割：垂直于对称轴、距圆心距离（0=不切割，保留远端帽形）",
+        "startAngle": "起始角度（度），默认90°使中点朝左",
+        "spanAngle": "跨度角度（度），默认180°为半圆",
+        "rotation": "额外旋转角度（度）",
+        "x": "水平位置偏移（相对原点，向右为正）",
+        "y": "垂直位置偏移（相对原点，向上为正）",
+        "seqIndex": "序列相位序号（-1=不参与轮巡；0,1,2…=相位）"
+      }
+    },
+    "circle": {
+      "description": "圆形",
+      "type": "circle",
+      "defaultParams": {
+        "radius": 4,
+        "x": 0,
+        "y": 0,
+        "seqIndex": -1
+      },
+      "paramDescriptions": {
+        "radius": "半径",
+        "x": "水平位置偏移（相对原点，向右为正）",
+        "y": "垂直位置偏移（相对原点，向上为正）",
+        "seqIndex": "序列相位序号（-1=不参与轮巡；0,1,2…=相位）"
+      }
+    },
+    "ellipse": {
+      "description": "椭圆",
+      "type": "ellipse",
+      "defaultParams": {
+        "rx": 5,
+        "ry": 3,
+        "x": 0,
+        "y": 0,
+        "seqIndex": -1
+      },
+      "paramDescriptions": {
+        "rx": "X轴半径",
+        "ry": "Y轴半径",
+        "x": "水平位置偏移（相对原点，向右为正）",
+        "y": "垂直位置偏移（相对原点，向上为正）",
+        "seqIndex": "序列相位序号（-1=不参与轮巡；0,1,2…=相位）"
+      }
+    },
+    "rect": {
+      "description": "矩形（支持圆角）",
+      "type": "rect",
+      "defaultParams": {
+        "width": 8,
+        "height": 6,
+        "rx": 0,
+        "x": 0,
+        "y": 0,
+        "seqIndex": -1
+      },
+      "paramDescriptions": {
+        "width": "宽度",
+        "height": "高度",
+        "rx": "圆角半径（0=直角）",
+        "x": "水平位置偏移（相对原点，向右为正）",
+        "y": "垂直位置偏移（相对原点，向上为正）",
+        "seqIndex": "序列相位序号（-1=不参与轮巡；0,1,2…=相位）"
+      }
+    },
+    "line": {
+      "description": "线段",
+      "type": "line",
+      "defaultParams": {
+        "x1": -4,
+        "y1": 0,
+        "x2": 4,
+        "y2": 0,
+        "x": 0,
+        "y": 0,
+        "seqIndex": -1
+      },
+      "paramDescriptions": {
+        "x1": "起点X",
+        "y1": "起点Y",
+        "x2": "终点X",
+        "y2": "终点Y",
+        "x": "整体水平位置偏移（相对原点，向右为正）",
+        "y": "整体垂直位置偏移（相对原点，向上为正）",
+        "seqIndex": "序列相位序号（-1=不参与轮巡；0,1,2…=相位）"
+      }
+    },
+    "polygon": {
+      "description": "多边形",
+      "type": "polygon",
+      "defaultParams": {
+        "points": [
+          [
+            -3,
+            -3
+          ],
+          [
+            3,
+            -3
+          ],
+          [
+            4,
+            2
+          ],
+          [
+            0,
+            5
+          ],
+          [
+            -4,
+            2
+          ]
+        ],
+        "x": 0,
+        "y": 0,
+        "seqIndex": -1
+      },
+      "paramDescriptions": {
+        "points": "顶点坐标数组 [[x1,y1], [x2,y2], ...]",
+        "x": "整体水平位置偏移（相对原点，向右为正）",
+        "y": "整体垂直位置偏移（相对原点，向上为正）",
+        "seqIndex": "序列相位序号（-1=不参与轮巡；0,1,2…=相位）"
+      }
+    },
+    "arc": {
+      "description": "弧形",
+      "type": "arc",
+      "defaultParams": {
+        "radius": 4,
+        "startAngle": 0,
+        "spanAngle": 90,
+        "x": 0,
+        "y": 0,
+        "seqIndex": -1
+      },
+      "paramDescriptions": {
+        "radius": "半径",
+        "startAngle": "起始角度（度）",
+        "spanAngle": "跨度角度（度）",
+        "x": "水平位置偏移（相对原点，向右为正）",
+        "y": "垂直位置偏移（相对原点，向上为正）",
+        "seqIndex": "序列相位序号（-1=不参与轮巡；0,1,2…=相位）"
+      }
+    },
+    "star": {
+      "description": "星形",
+      "type": "star",
+      "defaultParams": {
+        "outerRadius": 5,
+        "innerRadius": 2.5,
+        "numPoints": 5,
+        "x": 0,
+        "y": 0,
+        "rotation": 0,
+        "seqIndex": -1
+      },
+      "paramDescriptions": {
+        "outerRadius": "外半径",
+        "innerRadius": "内半径",
+        "numPoints": "星尖数量",
+        "x": "水平位置偏移（相对原点，向右为正）",
+        "y": "垂直位置偏移（相对原点，向上为正）",
+        "rotation": "额外旋转角度（度）",
+        "seqIndex": "序列相位序号（-1=不参与轮巡；0,1,2…=相位）"
+      }
+    },
+    "arrow": {
+      "description": "箭头",
+      "type": "arrow",
+      "defaultParams": {
+        "x1": -5,
+        "y1": 0,
+        "x2": 5,
+        "y2": 0,
+        "headSize": 3,
+        "x": 0,
+        "y": 0,
+        "seqIndex": -1
+      },
+      "paramDescriptions": {
+        "x1": "起点X",
+        "y1": "起点Y",
+        "x2": "终点X",
+        "y2": "终点Y",
+        "headSize": "箭头大小",
+        "x": "整体水平位置偏移（相对原点，向右为正）",
+        "y": "整体垂直位置偏移（相对原点，向上为正）",
+        "seqIndex": "序列相位序号（-1=不参与轮巡；0,1,2…=相位）"
+      }
+    },
+    "cross": {
+      "description": "十字形",
+      "type": "cross",
+      "defaultParams": {
+        "size": 4,
+        "width": 1.5,
+        "x": 0,
+        "y": 0,
+        "seqIndex": -1
+      },
+      "paramDescriptions": {
+        "size": "十字臂长",
+        "width": "十字臂宽",
+        "x": "水平位置偏移（相对原点，向右为正）",
+        "y": "垂直位置偏移（相对原点，向上为正）",
+        "seqIndex": "序列相位序号（-1=不参与轮巡；0,1,2…=相位）"
+      }
+    },
+    "diamond": {
+      "description": "菱形",
+      "type": "diamond",
+      "defaultParams": {
+        "width": 6,
+        "height": 6,
+        "x": 0,
+        "y": 0,
+        "seqIndex": -1
+      },
+      "paramDescriptions": {
+        "width": "宽度",
+        "height": "高度",
+        "x": "水平位置偏移（相对原点，向右为正）",
+        "y": "垂直位置偏移（相对原点，向上为正）",
+        "seqIndex": "序列相位序号（-1=不参与轮巡；0,1,2…=相位）"
+      }
+    }
+  }
+}

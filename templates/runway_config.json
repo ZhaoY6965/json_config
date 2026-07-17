@@ -1,0 +1,18 @@
+[
+    {
+        "id": "runway_1",
+        "name": "北跑道",
+        "primary_direction": "07",
+        "secondary_direction": "25",
+        "primary_levels": "关#1档#2档#3档#4档#5档#I类#II类#",
+        "secondary_levels": "关#1档#2档#3档#4档#5档#I类#II类#"
+    },
+    {
+        "id": "runway_2",
+        "name": "南跑道",
+        "primary_direction": "06",
+        "secondary_direction": "24",
+        "primary_levels": "关#1档#2档#3档#4档#5档#I类#II类#",
+        "secondary_levels": "关#1档#2档#3档#4档#5档#I类#II类#"
+    }
+]

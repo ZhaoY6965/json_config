@@ -1,0 +1,112 @@
+[
+  {
+    "id": "brush_red",
+    "fillColor": "#ff0000",
+    "strokeColor": "#ec0e24",
+    "strokeWidth": 0.1,
+    "fillOpacity": 1,
+    "strokeOpacity": 1,
+    "blinkEnable": false,
+    "blinkIntervalMs": 700
+  },
+  {
+    "id": "brush_blue",
+    "fillColor": "#4a9bfa",
+    "strokeColor": "#2a7ad8",
+    "strokeWidth": 0.1,
+    "fillOpacity": 1,
+    "strokeOpacity": 1,
+    "blinkEnable": false,
+    "blinkIntervalMs": 700
+  },
+  {
+    "id": "brush_white",
+    "fillColor": "#ffffff",
+    "strokeColor": "#f0f0f0",
+    "strokeWidth": 0.1,
+    "fillOpacity": 1,
+    "strokeOpacity": 1,
+    "blinkEnable": false,
+    "blinkIntervalMs": 700
+  },
+  {
+    "id": "brush_yellow",
+    "fillColor": "#ffff00",
+    "strokeColor": "#d9d902",
+    "strokeWidth": 0.1,
+    "fillOpacity": 1,
+    "strokeOpacity": 1,
+    "blinkEnable": false,
+    "blinkIntervalMs": 700
+  },
+  {
+    "id": "brush_green",
+    "fillColor": "#00ff00",
+    "strokeColor": "#34b249",
+    "strokeWidth": 0.1,
+    "fillOpacity": 1,
+    "strokeOpacity": 1,
+    "blinkEnable": false,
+    "blinkIntervalMs": 700
+  },
+  {
+    "id": "brush_off",
+    "fillColor": "#8a8a8f",
+    "strokeColor": "#8a8a8f",
+    "strokeWidth": 1,
+    "fillOpacity": 1,
+    "strokeOpacity": 0.2,
+    "blinkEnable": false,
+    "blinkIntervalMs": 700
+  },
+  {
+    "id": "brush_selected",
+    "fillColor": "#ffffff",
+    "strokeColor": "#dad8d8",
+    "strokeWidth": 0.1,
+    "fillOpacity": 1,
+    "strokeOpacity": 1,
+    "blinkEnable": false,
+    "blinkIntervalMs": 700
+  },
+  {
+    "id": "brush_alarm",
+    "fillColor": "#800000",
+    "strokeColor": "#c10101",
+    "strokeWidth": 0.2,
+    "fillOpacity": 1,
+    "strokeOpacity": 1,
+    "blinkEnable": true,
+    "blinkIntervalMs": 700
+  },
+  {
+    "id": "brush_unknown",
+    "fillColor": "#000000",
+    "strokeColor": "#000000",
+    "strokeWidth": 1,
+    "fillOpacity": 1,
+    "strokeOpacity": 1,
+    "blinkEnable": false,
+    "blinkIntervalMs": 700
+  },
+  {
+    "id": "brush_black",
+    "fillColor": "#000000",
+    "strokeColor": "#000000",
+    "strokeWidth": 1,
+    "fillOpacity": 1,
+    "strokeOpacity": 0.5,
+    "blinkEnable": false,
+    "blinkIntervalMs": 700
+  },
+  {
+    "id": "brush_silver",
+    "fillColor": "#c0c0c0",
+    "strokeColor": "#b1afaf",
+    "strokeWidth": 0.1,
+    "fillOpacity": 1,
+    "strokeOpacity": 1,
+    "blinkEnable": false,
+    "blinkIntervalMs": 700
+  }
+]

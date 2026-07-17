@@ -1,6 +1,7 @@
 // projectWizard.js — 工程创建向导
-// 从0起步的机场灯光配置工程创建流程，按 Phase 0~7 共23个JSON步骤逐步生成
+// 从0起步的机场灯光配置工程创建流程，按 Phase 0~7 共25个JSON步骤逐步生成
 import { showStatus } from './core.js';
+import { TEMPLATE_FIELDS, TEMPLATE_DEFAULTS, TEMPLATE_OBJECTS } from './templateFields.js';
 
 // ============================================================
 // 步骤定义
@@ -137,12 +138,8 @@ const STEPS = [
         fileName: 'ccr_card_config.json',
         title: 'ccr_card_config.json — 调光器卡片',
         description: '定义CCR物理板卡，一站点一卡片。rows/columns 定义网格尺寸。',
-        defaultData: [
-            { id: 'ccr_card_1', site_id: 'site_1', name: '调光器卡片1', rows: 11, columns: 11 },
-            { id: 'ccr_card_2', site_id: 'site_2', name: '调光器卡片2', rows: 11, columns: 11 },
-            { id: 'ccr_card_3', site_id: 'site_3', name: '调光器卡片3', rows: 11, columns: 11 },
-            { id: 'ccr_card_4', site_id: 'site_4', name: '调光器卡片4', rows: 11, columns: 11 }
-        ]
+        defaultData: TEMPLATE_DEFAULTS['ccr_card_config'],
+        inlineTemplate: true
     },
     {
         id: 'ccr_config',
@@ -150,7 +147,8 @@ const STEPS = [
         fileName: 'ccr_config.json',
         title: 'ccr_config.json — 调光器配置',
         description: '定义每个调光器实例，这是核心工作量最大的文件之一。每个调光器关联 SOC 通道和卡片网格位置。',
-        defaultData: []
+        defaultData: TEMPLATE_DEFAULTS['ccr_config'],
+        inlineTemplate: true
     },
 
     // ===== Phase 3: 回路 =====
@@ -160,14 +158,8 @@ const STEPS = [
         fileName: 'circuit_card_config.json',
         title: 'circuit_card_config.json — 回路卡片',
         description: '定义回路分组卡片（用于回路选择面板的布局），包含虚拟网格尺寸和像素位置。',
-        defaultData: [
-            { id: 'cgd_runway1', name: '跑道1', row: 1, colum: 10, x: 280, y: 50 },
-            { id: 'cgd_runway2', name: '跑道2', row: 1, colum: 10, x: 140, y: 900 },
-            { id: 'cgd_jjd1',    name: '进近1', row: 1, colum: 1,  x: 150, y: 50 },
-            { id: 'cgd_jjd2',    name: '进近2', row: 1, colum: 1,  x: 1450,y: 50 },
-            { id: 'cgd_jjd3',    name: '进近3', row: 1, colum: 1,  x: 10,  y: 900 },
-            { id: 'cgd_jjd4',    name: '进近4', row: 1, colum: 1,  x: 1310,y: 900 }
-        ]
+        defaultData: TEMPLATE_DEFAULTS['circuit_card_config'],
+        inlineTemplate: true
     },
     {
         id: 'circuit_group_config',
@@ -175,11 +167,8 @@ const STEPS = [
         fileName: 'circuit_group_config.json',
         title: 'circuit_group_config.json — 回路分组',
         description: '按功能把回路分组，决定回路在UI面板上的排列。共24个分组。',
-        defaultData: [
-            { id: 'cg_1', name: '07进近',     card_id: 'cgd_jjd1',    card_row: 0, card_colum: 0 },
-            { id: 'cg_2', name: '北跑跑道灯',  card_id: 'cgd_runway1', card_row: 0, card_colum: 2 },
-            { id: 'cg_3', name: '07坡度灯',    card_id: 'cgd_runway1', card_row: 0, card_colum: 1 }
-        ]
+        defaultData: TEMPLATE_DEFAULTS['circuit_group_config'],
+        inlineTemplate: true
     },
     {
         id: 'circuit_config',
@@ -187,7 +176,8 @@ const STEPS = [
         fileName: 'circuit_config.json',
         title: 'circuit_config.json — 回路配置',
         description: '定义每个回路（灯串），这是条目最多的文件。关联调光器和回路分组。',
-        defaultData: []
+        defaultData: TEMPLATE_DEFAULTS['circuit_config'],
+        inlineTemplate: true
     },
 
     // ===== Phase 4: 灯具分布 =====
@@ -197,7 +187,8 @@ const STEPS = [
         fileName: 'segment_config.json',
         title: 'segment_config.json — 段配置',
         description: '定义段（从回路到灯具的中间层），每个段对应一个物理线段，包含起点终点坐标。',
-        defaultData: []
+        defaultData: TEMPLATE_DEFAULTS['segment_config'],
+        inlineTemplate: true
     },
     {
         id: 'gsegment_config',
@@ -205,7 +196,8 @@ const STEPS = [
         fileName: 'GSegment.json',
         title: 'GSegment.json — 段分组',
         description: '定义段的分组归属。',
-        defaultData: []
+        defaultData: TEMPLATE_DEFAULTS['gsegment_config'],
+        inlineTemplate: true
     },
     {
         id: 'node_config',
@@ -213,7 +205,8 @@ const STEPS = [
         fileName: 'node_config.json',
         title: 'node_config.json — 节点配置',
         description: '定义节点（灯在段上的连接点），关联段、回路、face方向。',
-        defaultData: []
+        defaultData: TEMPLATE_DEFAULTS['node_config'],
+        inlineTemplate: true
     },
     {
         id: 'single_lamp_config',
@@ -221,7 +214,8 @@ const STEPS = [
         fileName: 'single_lamp_config.json',
         title: 'single_lamp_config.json — 单灯配置',
         description: '定义单个灯具实例的位置、角度和模板引用。id 与 node_config 严格一一对应。',
-        defaultData: []
+        defaultData: TEMPLATE_DEFAULTS['single_lamp_config'],
+        inlineTemplate: true
     },
     {
         id: 'lamp_unit_config',
@@ -229,7 +223,8 @@ const STEPS = [
         fileName: 'lamp_unit_config.json',
         title: 'lamp_unit_config.json — 灯具单元',
         description: '定义灯具单元（型号绑定），关联灯型、回路、顺序。',
-        defaultData: []
+        defaultData: TEMPLATE_DEFAULTS['lamp_unit_config'],
+        inlineTemplate: true
     },
 
     // ===== Phase 5: 权限 =====
@@ -239,10 +234,8 @@ const STEPS = [
         fileName: 'ctlauth_config.json',
         title: 'ctlauth_config.json — 控制权限',
         description: '定义区域控制权限，与 zone_config 一一对应。',
-        defaultData: [
-            { id: 'ctlauth_1', name: '北跑道 公共',  zone_id: 'zone_rw1_d0' },
-            { id: 'ctlauth_2', name: '北跑道 主方向', zone_id: 'zone_rw1_d1' }
-        ]
+        defaultData: TEMPLATE_DEFAULTS['ctlauth_config'],
+        inlineTemplate: true
     },
 
     // ===== Phase 6: 网络 =====
@@ -252,19 +245,8 @@ const STEPS = [
         fileName: 'TcpServers.json',
         title: 'TcpServers.json — TCP服务器配置',
         description: '定义TCP服务器端口和服务地址。',
-        defaultData: {
-            ports: [
-                { alcms: 1235, timeout: 60 },
-                { exchange: 1236, timeout: 60 },
-                { alarm: 1246, timeout: 60 },
-                { asmgcs: 1234, timeout: 60 },
-                { database: 1257, timeout: 60 }
-            ],
-            servers: [{ name: 'ServerA', nets: [{ addr: '10.1.1.21' }] }],
-            databases: [{ name: 'DatabaseA', nets: [{ addr: '10.1.1.21' }] }],
-            startwait: 3,
-            switchover: 1
-        }
+        defaultData: TEMPLATE_OBJECTS['tcp_servers'],
+        inlineTemplate: true
     },
     {
         id: 'workstation_config',
@@ -272,9 +254,8 @@ const STEPS = [
         fileName: 'workstation_config.json',
         title: 'workstation_config.json — 工作站配置',
         description: '定义工作站列表。',
-        defaultData: [
-            { id: 'ws_11', name: '塔台1', site_id: '', priority: 1, accept_grant: true, type: 1, netaddr1: '192.168.1.11', netaddr2: '192.168.2.11', netaddr3: '*' }
-        ]
+        defaultData: TEMPLATE_DEFAULTS['workstation_config'],
+        inlineTemplate: true
     },
     {
         id: 'user_config',
@@ -282,10 +263,8 @@ const STEPS = [
         fileName: 'user_config.json',
         title: 'user_config.json — 用户配置',
         description: '定义系统用户及其权限。',
-        defaultData: [
-            { id: 1, name: '管理员', password: '8', control_auth: 0, manage_auth: 0, can_login_ids: [], islog: true },
-            { id: 13, name: '1#操作站', password: '1', control_auth: 1, manage_auth: 1, can_login_ids: [], islog: true }
-        ]
+        defaultData: TEMPLATE_DEFAULTS['user_config'],
+        inlineTemplate: true
     },
 
     // ===== Phase 7: 渲染 =====
@@ -295,12 +274,28 @@ const STEPS = [
         fileName: 'render_config.json',
         title: 'render_config.json — 渲染配置',
         description: '定义底图、灯位图、回路图、视角的参数。偏移量和缩放需要通过反复试调确定。',
-        defaultData: {
-            baseMap: { imagePath: 'qrc:/Images/XiaMen/airport_background.svg', offsetX: -2048, offsetY: -1336.5, scale: 1, flipX: false, flipY: false },
-            pointMap: { lampSizeScale: 0.4, offsetX: -4139.26, offsetY: 2562.1, scale: 0.6988, flipX: false, flipY: true },
-            circuitMap: { offsetX: -2606.3, offsetY: -1641, scale: 0.6989, svgPath: 'qrc:/Images/XiaMen/render_circuits.svg', flipX: false, flipY: false },
-            view: { offsetX: 184.15, offsetY: 115.80, zoom: 0.241, rotation: 0 }
-        }
+        defaultData: TEMPLATE_OBJECTS['render_config'],
+        inlineTemplate: true
+    },
+
+    // ===== Phase 8: 应用配置 =====
+    {
+        id: 'module_config',
+        phase: 8,
+        fileName: 'module_config.json',
+        title: 'module_config.json — 功能模块配置',
+        description: '定义 HMI 顶部功能模块（灯光/报警/调光器/网络/数据/单灯/设置/电力/PAPI/IO），每项含 id、name、icon、pageSource、enabled、description。',
+        defaultData: TEMPLATE_OBJECTS['module_config'],
+        inlineTemplate: true
+    },
+    {
+        id: 'app_config',
+        phase: 8,
+        fileName: 'app_config.json',
+        title: 'app_config.json — 应用全局配置',
+        description: '应用级配置：工作站标识、语言列表、配置加载键（ConfigLoadKey，如 XiaMen）、日志参数（LogConf）。',
+        defaultData: TEMPLATE_OBJECTS['app_config'],
+        inlineTemplate: true
     }
 ];
 
@@ -311,10 +306,61 @@ const STEPS = [
 /** 注册使用表单编辑器的步骤 */
 var FORM_EDITORS = {
     'basic_shapes': 'object',
+    // 此前已转换为卡片编辑器的 6 个配置
     'brushes_config': 'array',
     'lamp_model_config': 'array',
-    'lamp_template': 'array',
+    'site_config': 'array',
+    'runway_config': 'array',
+    'zone_config': 'array',
+    'soc_config': 'array',
+    // 由厦门真实工程配置自动提取「公共扁平字段」生成的卡片编辑器（默认仅 5 组，详见 templateFields.js）
+    'ccr_card_config': 'array',
+    'ccr_config': 'array',
+    'circuit_card_config': 'array',
+    'circuit_group_config': 'array',
+    'circuit_config': 'array',
+    'segment_config': 'array',
+    'gsegment_config': 'array',
+    'node_config': 'array',
+    'single_lamp_config': 'array',
+    'lamp_unit_config': 'array',
+    'ctlauth_config': 'array',
+    'workstation_config': 'array',
+    'user_config': 'array',
+    // lamp_template 直接关联「灯光图例」编辑器（legend_editor.html），全屏展示该页面，不再显示 JSON 预览
+    'lamp_template': 'legend',
+    // 以下四个为「对象类型」配置（顶层非数组），采用通用对象编辑器渲染，结构与数组卡片编辑器一致
+    'tcp_servers': 'object',
+    'render_config': 'object',
+    'module_config': 'object',
+    'app_config': 'object',
 };
+
+/* ============================================================
+ * 默认模板加载：真实工程配置（厦门）放在 templates/ 目录，
+ * 首次打开某步骤时按需 fetch，缓存后作为该步骤的默认数据。
+ * 这样避免把 6MB+ 的 lamp_unit_config 等大文件内联进 JS。
+ * ============================================================ */
+var TEMPLATE_DIR = 'templates/';
+var TEMPLATE_CACHE = {};    // stepId -> 已解析的模板数据（失败则回退为 step.defaultData）
+var TEMPLATE_LOADING = {};  // stepId -> true 表示正在请求，避免重复 fetch
+// 序列化后超过该字符数的模板不塞入 textarea（防止大 JSON 卡死浏览器），改用摘要卡片
+var LARGE_TEMPLATE_CHARS = 200000;
+
+/* 卡片数组编辑器的可变状态：{ data:[...], fields:[...] }，按 step.id 持久，支持新增配置组/字段后保留 */
+var wizardEditorState = {};
+function ensureWizardEditorState(stepId, baseFields, fallbackData) {
+    if (!wizardEditorState[stepId]) {
+        var parsed = fallbackData;
+        try { parsed = JSON.parse(wizardState.generatedData[stepId]); } catch (e) {}
+        if (!Array.isArray(parsed)) parsed = [];
+        wizardEditorState[stepId] = {
+            data: parsed,
+            fields: JSON.parse(JSON.stringify(baseFields))
+        };
+    }
+    return wizardEditorState[stepId];
+}
 
 /** 自动检测数组项字段类型 */
 function detectArrayFields(item) {
@@ -329,6 +375,683 @@ function detectArrayFields(item) {
         fields.push({ key: key, label: key, type: type, readonly: key === 'id' });
     }
     return fields;
+}
+
+/* brushes_config 的紧凑卡片式字段定义（颜色字段只显示 JSON 原始内容，不渲染真实颜色） */
+var BRUSH_FIELDS = [
+    { key: 'id', label: 'ID', type: 'text' },
+    { key: 'fillColor', label: '填充色', type: 'text' },
+    { key: 'strokeColor', label: '描边色', type: 'text' },
+    { key: 'strokeWidth', label: '描边宽', type: 'number' },
+    { key: 'fillOpacity', label: '填充不透明', type: 'number' },
+    { key: 'strokeOpacity', label: '描边不透明', type: 'number' },
+    { key: 'blinkEnable', label: '闪烁', type: 'boolean' },
+    { key: 'blinkIntervalMs', label: '闪烁间隔ms', type: 'number' }
+];
+
+/* lamp_model_config 的紧凑卡片字段定义：color 直接显示 JSON 原始内容（短代码） */
+var LAMP_MODEL_FIELDS = [
+    { key: 'id', label: 'ID', type: 'text' },
+    { key: 'name', label: '名称', type: 'text' },
+    { key: 'profile', label: '形状键 profile', type: 'text' },
+    { key: 'color', label: '颜色分类', type: 'text' }
+];
+
+/* site_config 站点配置字段定义 */
+var SITE_CONFIG_FIELDS = [
+    { key: 'id', label: 'ID', type: 'text' },
+    { key: 'name', label: '站点名称', type: 'text' },
+    { key: 'type', label: '类型', type: 'number' }
+];
+
+/* runway_config 跑道配置字段定义 */
+var RUNWAY_CONFIG_FIELDS = [
+    { key: 'id', label: 'ID', type: 'text' },
+    { key: 'name', label: '跑道名称', type: 'text' },
+    { key: 'primary_direction', label: '主方向编码', type: 'text' },
+    { key: 'secondary_direction', label: '次方向编码', type: 'text' },
+    { key: 'primary_levels', label: '主方向亮度等级', type: 'text' },
+    { key: 'secondary_levels', label: '次方向亮度等级', type: 'text' }
+];
+
+/* zone_config 区域配置字段定义 */
+var ZONE_CONFIG_FIELDS = [
+    { key: 'id', label: 'ID', type: 'text' },
+    { key: 'name', label: '区域名称', type: 'text' }
+];
+
+/* soc_config SOC控制器配置字段定义 */
+var SOC_CONFIG_FIELDS = [
+    { key: 'id', label: 'ID', type: 'text' },
+    { key: 'name', label: '控制器名称', type: 'text' },
+    { key: 'site_id', label: '所属站点', type: 'text' }
+];
+
+/** 共享：基于可变 state（data + fields）的紧凑卡片数组编辑器，支持「新增配置组 / 新增字段」 */
+function renderCardArrayEditor(container, state, onChange, rerender, opts) {
+    var data = state.data;
+    var fields = state.fields;
+    var html = ''
+        + '<div class="wizard-form-toolbar">'
+        + '  <button class="btn btn-primary btn-sm add-group-btn" type="button">＋ 批量新增配置组</button>'
+        + '  <button class="btn btn-danger btn-sm batch-del-btn" type="button">－ 批量删除配置组</button>'
+        + (opts.pageDesign ? '  <button class="btn btn-accent btn-sm page-design-btn" type="button">▦ 页面设计</button>' : '')
+        + '  <button class="btn btn-outline btn-sm add-field-btn" type="button">＋ 新增字段</button>'
+        + '  <button class="btn btn-outline btn-sm del-field-btn" type="button">－ 删除字段</button>'
+        + '  <span class="wizard-form-count">' + data.length + ' 个配置组</span>'
+        + '</div>'
+        + '<div class="wizard-form ' + (opts.cardsClass || 'brush-cards') + '">';
+
+    for (var i = 0; i < data.length; i++) {
+        var item = data[i];
+        html += '<div class="brush-card">';
+        html += '  <div class="brush-card-head">' + opts.headHtml(item, i)
+            + '    <button class="card-del-btn" type="button" data-del-group="' + i + '" title="删除该配置组">×</button>'
+            + '  </div>';
+        html += '  <div class="brush-card-body">';
+
+        for (var fi = 0; fi < fields.length; fi++) {
+            var f = fields[fi];
+            if (f.readonly) continue;
+            var fv = item[f.key];
+            var fvStr = fv !== undefined && fv !== null ? String(fv) : '';
+
+            if (f.type === 'boolean') {
+                html += '    <div class="form-group brush-bool-field">';
+                html += '      <label class="form-label form-label-sm">' + escapeHtml(f.label) + '</label>';
+                html += '      <input class="form-cb" type="checkbox" data-i="' + i + '" data-fk="' + escapeHtml(f.key) + '" ' + (fv ? 'checked' : '') + '>';
+                html += '    </div>';
+            } else if (f.type === 'number') {
+                html += '    <div class="form-group">';
+                html += '      <label class="form-label form-label-sm">' + escapeHtml(f.label) + '</label>';
+                html += '      <input class="form-input form-input-sm arr-num" type="number" step="any" data-i="' + i + '" data-fk="' + escapeHtml(f.key) + '" value="' + fv + '">';
+                html += '    </div>';
+            } else {
+                // 文本（含颜色字段）：只显示 JSON 原始内容，不渲染真实颜色
+                html += '    <div class="form-group">';
+                html += '      <label class="form-label form-label-sm">' + escapeHtml(f.label) + '</label>';
+                html += '      <input class="form-input form-input-sm arr-txt" type="text" data-i="' + i + '" data-fk="' + escapeHtml(f.key) + '" value="' + escapeHtml(fvStr) + '">';
+                html += '    </div>';
+            }
+        }
+
+        html += '  </div>';
+        html += '</div>';
+    }
+
+    html += '</div>';
+    container.innerHTML = html;
+
+    // 事件只绑定一次（container 在重渲染间复用，避免重复绑定导致多次触发）
+    if (!container._wzBound) {
+        container._wzBound = true;
+        function handleEdit(e) {
+            var t = e.target;
+            var isEdit = t.classList.contains('arr-num') || t.classList.contains('arr-txt') || t.classList.contains('form-cb');
+            if (!isEdit) return;
+            var updated = collectArrData(container, state.data, state.fields);
+            state.data = updated;
+            var cardIdx = +t.dataset.i;
+            var card = container.querySelectorAll('.brush-card')[cardIdx];
+            if (card) {
+                if (t.dataset.fk === 'id') { var idS = card.querySelector('.brush-id'); if (idS) idS.textContent = t.value; }
+                var nameS = card.querySelector('.lampmodel-name');
+                if (nameS && t.dataset.fk === 'name') nameS.textContent = t.value;
+            }
+            onChange(updated);
+        }
+        container.addEventListener('input', handleEdit);
+        container.addEventListener('change', handleEdit);
+        container.addEventListener('click', function(e) {
+            if (e.target.classList.contains('add-group-btn')) openAddGroupModal(state, rerender, onChange);
+            else if (e.target.classList.contains('batch-del-btn')) openBatchDeleteModal(state, rerender, onChange);
+            else if (e.target.classList.contains('add-field-btn')) openAddFieldModal(state, rerender, onChange);
+            else if (e.target.classList.contains('del-field-btn')) openDeleteFieldModal(state, rerender, onChange);
+            else if (e.target.classList.contains('page-design-btn')) openCcrPageDesignModal(state, rerender, onChange);
+            else if (e.target.classList.contains('card-del-btn')) {
+                var gi = +e.target.getAttribute('data-del-group');
+                var g = state.data[gi];
+                var gname = g ? (g.id || g.name || ('#' + (gi + 1))) : ('#' + (gi + 1));
+                if (confirm('确定删除配置组「' + gname + '」？此操作不可撤销。')) {
+                    state.data.splice(gi, 1);
+                    rerender();
+                    onChange(state.data);
+                }
+            }
+        });
+    }
+}
+
+/** 把数值格式化为字符串：整数不显示小数，去除浮点误差 */
+function fmtSerialNum(n) {
+    if (!isFinite(n)) return '0';
+    if (Math.floor(n) === n) return String(n);
+    return String(Math.round(n * 1e6) / 1e6);
+}
+
+/** 批量新增配置组：每个字段可单独选择「固定值」或「序列化」（固定内容 + 步进数字，支持「固定内容_+数字」「固定内容+数字」两种），按创建数量批量生成 */
+function openAddGroupModal(state, rerender, onChange) {
+    var fields = state.fields;
+    var editable = fields.filter(function(f) { return !f.readonly; });
+
+    var body = ''
+        + '<div class="ag-count-row">'
+        + '  <label class="form-label-sm">创建数量</label>'
+        + '  <input type="number" min="1" step="1" value="1" class="ag-count form-input form-input-sm">'
+        + '  <span class="ag-preview"></span>'
+        + '</div>'
+        + '<p class="wizard-modal-tip">为每个字段选择取值方式：<b>固定值</b>（所有组相同）或 <b>序列化</b>（固定内容 + 步进数字，支持「固定内容_+数字」与「固定内容+数字」两种）。</p>';
+
+    for (var idx = 0; idx < editable.length; idx++) {
+        var f = editable[idx];
+        var fid = 'ag' + idx;
+        body += '<div class="ag-field" id="agf-' + fid + '">';
+        body += '  <div class="ag-field-head">'
+              + '    <span class="ag-field-label">' + escapeHtml(f.label) + ' <span class="ag-field-key">(' + escapeHtml(f.key) + ')</span></span>'
+              + '    <span class="ag-modes">'
+              + '      <label><input type="radio" name="' + fid + '_mode" value="fixed" checked> 固定值</label>';
+        if (f.type !== 'boolean') {
+            body += '      <label><input type="radio" name="' + fid + '_mode" value="serial"> 序列化</label>';
+        }
+        body += '    </span>'
+              + '  </div>';
+        if (f.type === 'boolean') {
+            body += '  <div class="ag-fixed"><input type="checkbox" class="' + fid + '_fixed"></div>';
+        } else {
+            body += '  <div class="ag-fixed"><input type="text" class="' + fid + '_fixed form-input form-input-sm" placeholder="固定值"></div>';
+        }
+        if (f.type !== 'boolean') {
+            body += '  <div class="ag-serial" style="display:none;">';
+            if (f.type === 'number') {
+                body += '    <span class="ag-serial-note">数值字段仅按「起始 + 步长 × 序号」生成数字：</span>';
+            }
+            body += '    <span class="ag-serial-item"><span class="ag-serial-t">固定内容</span><input type="text" class="' + fid + '_pre form-input form-input-sm" placeholder="如 SOC"></span>';
+            body += '    <span class="ag-serial-item"><span class="ag-serial-t">分隔</span><select class="' + fid + '_sep form-input form-input-sm"><option value="">无</option><option value="_">下划线 _</option></select></span>';
+            body += '    <span class="ag-serial-item"><span class="ag-serial-t">起始</span><input type="number" step="any" class="' + fid + '_start form-input form-input-sm" value="1"></span>';
+            body += '    <span class="ag-serial-item"><span class="ag-serial-t">步长</span><input type="number" step="any" class="' + fid + '_step form-input form-input-sm" value="1"></span>';
+            body += '  </div>';
+        }
+        body += '</div>';
+    }
+
+    var overlay = showWizardModal('批量新增配置组', body, function(ov) {
+        var cntEl = ov.querySelector('.ag-count');
+        var count = parseInt(cntEl.value, 10);
+        if (isNaN(count) || count < 1) { alert('请输入有效的创建数量（≥1）'); return false; }
+
+        // 收集每个字段的取值配置
+        var cfgs = editable.map(function(f, k) {
+            var id = 'ag' + k;
+            var rb = ov.querySelector('input[name="' + id + '_mode"]:checked');
+            var mode = rb ? rb.value : 'fixed';
+            if (mode === 'serial') {
+                var prefix = (ov.querySelector('.' + id + '_pre') || {}).value || '';
+                var sep = (ov.querySelector('.' + id + '_sep') || {}).value || '';
+                var start = parseFloat((ov.querySelector('.' + id + '_start') || {}).value);
+                var step = parseFloat((ov.querySelector('.' + id + '_step') || {}).value);
+                if (isNaN(start)) start = 0;
+                if (isNaN(step)) step = 0;
+                return { f: f, mode: 'serial', prefix: prefix, sep: sep, start: start, step: step };
+            }
+            var fixedEl = ov.querySelector('.' + id + '_fixed');
+            var val;
+            if (f.type === 'boolean') val = !!fixedEl.checked;
+            else if (f.type === 'number') { var v = parseFloat(fixedEl.value); val = isNaN(v) ? 0 : v; }
+            else val = fixedEl.value;
+            return { f: f, mode: 'fixed', fixed: val };
+        });
+
+        for (var i = 0; i < count; i++) {
+            var item = {};
+            cfgs.forEach(function(cfg) {
+                var f = cfg.f;
+                if (cfg.mode === 'serial') {
+                    if (f.type === 'number') {
+                        item[f.key] = cfg.start + cfg.step * i;
+                    } else {
+                        item[f.key] = cfg.prefix + cfg.sep + fmtSerialNum(cfg.start + cfg.step * i);
+                    }
+                } else {
+                    item[f.key] = cfg.fixed;
+                }
+            });
+            // 只读字段继承首个已有配置组
+            fields.forEach(function(f) {
+                if (f.readonly) {
+                    item[f.key] = (state.data[0] && state.data[0][f.key] !== undefined)
+                        ? state.data[0][f.key]
+                        : (f.type === 'number' ? 0 : (f.type === 'boolean' ? false : ''));
+                }
+            });
+            if (!item.id || item.id === '') item.id = 'NEW_' + (state.data.length + 1);
+            state.data.push(item);
+        }
+        rerender();
+        onChange(state.data);
+    });
+
+    function refreshPreview() {
+        var cnt = parseInt(overlay.querySelector('.ag-count').value, 10) || 0;
+        var pv = overlay.querySelector('.ag-preview');
+        if (cnt < 1) { pv.textContent = ''; return; }
+        for (var k = 0; k < editable.length; k++) {
+            var id = 'ag' + k;
+            var rb = overlay.querySelector('input[name="' + id + '_mode"]:checked');
+            if (rb && rb.value === 'serial' && editable[k].type !== 'number') {
+                var prefix = overlay.querySelector('.' + id + '_pre').value || '';
+                var sep = overlay.querySelector('.' + id + '_sep').value || '';
+                var start = parseFloat(overlay.querySelector('.' + id + '_start').value) || 0;
+                var step = parseFloat(overlay.querySelector('.' + id + '_step').value) || 0;
+                var arr = [];
+                for (var i = 0; i < Math.min(cnt, 4); i++) arr.push(prefix + sep + fmtSerialNum(start + step * i));
+                pv.textContent = '示例：' + arr.join('、') + (cnt > 4 ? ' …' : '');
+                return;
+            }
+        }
+        pv.textContent = '';
+    }
+
+    overlay.querySelectorAll('input[name$="_mode"]').forEach(function(rb) {
+        rb.addEventListener('change', function() {
+            var fid = rb.name.replace('_mode', '');
+            var fld = overlay.querySelector('#agf-' + fid);
+            if (!fld) return;
+            var fixedDiv = fld.querySelector('.ag-fixed');
+            var serialDiv = fld.querySelector('.ag-serial');
+            if (rb.value === 'serial') { serialDiv.style.display = 'block'; fixedDiv.style.display = 'none'; }
+            else { serialDiv.style.display = 'none'; fixedDiv.style.display = 'block'; }
+            refreshPreview();
+        });
+    });
+    overlay.querySelector('.ag-count').addEventListener('input', refreshPreview);
+    overlay.querySelectorAll('.ag-serial input').forEach(function(inp) { inp.addEventListener('input', refreshPreview); });
+}
+
+/** 新增字段：输入字段名 + 选类型；按类型规则赋初始值到每个配置组 */
+function openAddFieldModal(state, rerender, onChange) {
+    var body = ''
+        + '<div class="form-group">'
+        + '  <label class="form-label-sm">字段名称（key）</label>'
+        + '  <input type="text" class="af-key form-input form-input-sm" placeholder="例如 customField">'
+        + '</div>'
+        + '<div class="form-group">'
+        + '  <label class="form-label-sm">字段类型</label>'
+        + '  <select class="af-type form-input form-input-sm">'
+        + '    <option value="string">字符串 String（默认空，可逐组填入）</option>'
+        + '    <option value="number">数值 Number（初始值 + 步长，逐组递增）</option>'
+        + '    <option value="boolean">布尔 Boolean（默认 false 勾选框）</option>'
+        + '  </select>'
+        + '</div>'
+        + '<div class="af-num-opts" style="display:none;">'
+        + '  <div class="form-group"><label class="form-label-sm">初始值</label><input type="number" step="any" class="af-init form-input form-input-sm"></div>'
+        + '  <div class="form-group"><label class="form-label-sm">步长（可为小数或 0）</label><input type="number" step="any" class="af-step form-input form-input-sm"></div>'
+        + '</div>';
+
+    var overlay = showWizardModal('新增字段', body, function(ov) {
+        var key = ov.querySelector('.af-key').value.trim();
+        if (!key) { alert('请输入字段名称'); return false; }
+        if (state.fields.some(function(f) { return f.key === key; })) { alert('字段名「' + key + '」已存在'); return false; }
+        var type = ov.querySelector('.af-type').value;
+        var ftype = (type === 'number') ? 'number' : (type === 'boolean' ? 'boolean' : 'text');
+        state.fields.push({ key: key, label: key, type: ftype });
+
+        state.data.forEach(function(it, i) {
+            if (type === 'string') {
+                it[key] = '';
+            } else if (type === 'boolean') {
+                it[key] = false;
+            } else {
+                var initEl = ov.querySelector('.af-init');
+                var stepEl = ov.querySelector('.af-step');
+                var init = (initEl && initEl.value !== '') ? parseFloat(initEl.value) : 0;
+                var step = (stepEl && stepEl.value !== '') ? parseFloat(stepEl.value) : 0;
+                if (isNaN(init)) init = 0;
+                if (isNaN(step)) step = 0;
+                it[key] = init + step * i;
+            }
+        });
+        rerender();
+        onChange(state.data);
+    });
+
+    var sel = overlay.querySelector('.af-type');
+    var numOpts = overlay.querySelector('.af-num-opts');
+    sel.addEventListener('change', function() {
+        numOpts.style.display = (sel.value === 'number') ? 'block' : 'none';
+    });
+}
+
+/** 删除字段：弹出窗口，列出当前全部字段，用户选择其一删除（同时从每个配置组移除该键） */
+function openDeleteFieldModal(state, rerender, onChange) {
+    if (!state.fields.length) { alert('当前没有可删除的字段'); return; }
+    var optsHtml = '';
+    state.fields.forEach(function(f, idx) {
+        optsHtml += '<option value="' + idx + '">' + escapeHtml(f.label) + ' (' + escapeHtml(f.key) + ')</option>';
+    });
+    var body = ''
+        + '<p class="wizard-modal-tip">选择要删除的字段，将同时移除每个配置组下的该字段：</p>'
+        + '<div class="form-group"><label class="form-label-sm">字段</label>'
+        + '<select class="df-key form-input form-input-sm">' + optsHtml + '</select></div>';
+    showWizardModal('删除字段', body, function(ov) {
+        var idx = parseInt(ov.querySelector('.df-key').value, 10);
+        if (isNaN(idx) || idx < 0 || idx >= state.fields.length) { alert('请选择有效字段'); return false; }
+        var fk = state.fields[idx].key;
+        state.fields.splice(idx, 1);
+        state.data.forEach(function(it) { if (it && fk in it) delete it[fk]; });
+        rerender();
+        onChange(state.data);
+    });
+}
+
+/** 批量删除配置组：勾选多个配置组，确认后一并删除 */
+function openBatchDeleteModal(state, rerender, onChange) {
+    if (!state.data.length) { alert('当前没有可删除的配置组'); return; }
+    var itemsHtml = '';
+    state.data.forEach(function(it, i) {
+        var label = it.id || it.name || ('#' + (i + 1));
+        itemsHtml += '<label class="bd-item">'
+            + '<input type="checkbox" class="bd-chk" data-i="' + i + '">'
+            + '<span class="bd-index">' + (i + 1) + '</span>'
+            + '<span class="bd-label">' + escapeHtml(String(label)) + '</span>'
+            + '</label>';
+    });
+    var body = ''
+        + '<p class="wizard-modal-tip">勾选要删除的配置组，确认后将一并移除（不可撤销）。<b>提示：在列表中按住鼠标拖动可批量勾选 / 取消</b>。</p>'
+        + '<div class="bd-actions"><label class="bd-all-wrap"><input type="checkbox" class="bd-all"> 全选 / 全不选</label></div>'
+        + '<div class="bd-list">' + itemsHtml + '</div>';
+
+    var overlay = showWizardModal('批量删除配置组', body, function(ov) {
+        var chks = Array.prototype.slice.call(ov.querySelectorAll('.bd-chk:checked'));
+        if (!chks.length) { alert('请至少勾选一个配置组'); return false; }
+        var idxs = chks.map(function(c) { return parseInt(c.dataset.i, 10); });
+        idxs.sort(function(a, b) { return b - a; }); // 从后往前删，避免索引偏移
+        idxs.forEach(function(i) { state.data.splice(i, 1); });
+        rerender();
+        onChange(state.data);
+    });
+
+    var allChk = overlay.querySelector('.bd-all');
+    if (allChk) {
+        allChk.addEventListener('change', function() {
+            overlay.querySelectorAll('.bd-chk').forEach(function(c) { c.checked = allChk.checked; });
+        });
+    }
+
+    // 滑动勾选：按住鼠标在列表上拖动，经过的配置组统一设为「按下首项的反状态」
+    var list = overlay.querySelector('.bd-list');
+    if (list) {
+        var isDown = false, paintState = false, suppressClick = false;
+        function syncAll() {
+            if (!allChk) return;
+            var chks = list.querySelectorAll('.bd-chk');
+            var checked = list.querySelectorAll('.bd-chk:checked');
+            allChk.checked = chks.length > 0 && chks.length === checked.length;
+        }
+        list.addEventListener('mousedown', function(e) {
+            var item = e.target.closest('.bd-item');
+            if (!item) return;
+            var chk = item.querySelector('.bd-chk');
+            e.preventDefault(); // 阻止原生切换与文本选中
+            isDown = true;
+            suppressClick = true;
+            paintState = !chk.checked;
+            chk.checked = paintState;
+            syncAll();
+        });
+        list.addEventListener('mouseover', function(e) {
+            if (!isDown) return;
+            var item = e.target.closest('.bd-item');
+            if (!item) return;
+            var chk = item.querySelector('.bd-chk');
+            if (chk) chk.checked = paintState;
+        });
+        list.addEventListener('click', function(e) {
+            if (suppressClick) { e.preventDefault(); e.stopPropagation(); suppressClick = false; }
+        });
+        function onDocMouseUp() {
+            isDown = false;
+            syncAll();
+            if (!document.body.contains(overlay)) {
+                document.removeEventListener('mouseup', onDocMouseUp);
+            }
+        }
+        document.addEventListener('mouseup', onDocMouseUp);
+    }
+}
+
+/**
+ * 页面设计（ccr_config）：把某站点的调光器拖拽布置到「行(row) × 列(column)」网格中。
+ * - 读取 ccr_config 中所有 site_xx，每个站点形成一页（顶部下拉切换）。
+ * - 网格尺寸默认取该站点在 ccr_card_config 中定义的 rows/columns（参考 ccr_card 页面设计逻辑）。
+ * - 右侧列出该站点全部 ccr；已有 row/colum 的自动预落位；拖拽落点写回这两个值；× 清除位置。
+ */
+function openCcrPageDesignModal(state, rerender, onChange) {
+    var all = state.data; // 当前 ccr_config 实时数据
+    var siteSet = {};
+    all.forEach(function(it) { if (it && it.site_id) siteSet[it.site_id] = true; });
+    var sites = Object.keys(siteSet).sort();
+    if (!sites.length) { alert('当前 ccr_config 中没有任何 site_id，无法进入页面设计。请先在配置组中填写 site_id。'); return; }
+
+    // 工作副本：所有改动落在 work 上，保存时才写回 state.data
+    var work = JSON.parse(JSON.stringify(all));
+
+    // 取某站点在 ccr_card_config 中的网格尺寸作为默认行列
+    function cardSizeFor(site) {
+        var cd = null;
+        try { if (wizardState.generatedData && wizardState.generatedData['ccr_card_config']) cd = JSON.parse(wizardState.generatedData['ccr_card_config']); } catch (e) {}
+        if (!cd || !cd.length) cd = TEMPLATE_DEFAULTS['ccr_card_config'] || [];
+        var card = null;
+        for (var k = 0; k < cd.length; k++) { if (cd[k] && cd[k].site_id === site) { card = cd[k]; break; } }
+        if (card && card.rows && card.columns) return { rows: +card.rows, cols: +card.columns };
+        var mr = 0, mc = 0;
+        work.forEach(function(it) {
+            if (it.site_id === site) {
+                if (typeof it.row === 'number' && it.row > mr) mr = it.row;
+                if (typeof it.colum === 'number' && it.colum > mc) mc = it.colum;
+            }
+        });
+        return { rows: Math.max(1, mr + 1), cols: Math.max(1, mc + 1) };
+    }
+
+    var overlay = document.createElement('div');
+    overlay.className = 'wizard-modal-overlay pd-overlay';
+    overlay.innerHTML = ''
+        + '<div class="wizard-modal pd-modal">'
+        + '  <div class="wizard-modal-head"><span>页面设计 — 调光器配置 (ccr_config)</span><button type="button" class="wizard-modal-close" title="关闭">×</button></div>'
+        + '  <div class="wizard-modal-body pd-body">'
+        + '    <div class="pd-controls">'
+        + '      <span class="pd-ctl"><label>站点</label><select class="pd-site form-input form-input-sm">' + sites.map(function(s) { return '<option value="' + escapeHtml(s) + '">' + escapeHtml(s) + '</option>'; }).join('') + '</select></span>'
+        + '      <span class="pd-ctl"><label>行(row)</label><input type="number" min="1" class="pd-rows form-input form-input-sm" value="11"></span>'
+        + '      <span class="pd-ctl"><label>列(column)</label><input type="number" min="1" class="pd-cols form-input form-input-sm" value="11"></span>'
+        + '      <button type="button" class="btn btn-primary btn-sm pd-apply">应用尺寸</button>'
+        + '      <span class="pd-hint">拖拽右侧调光器到左侧网格即可落位；已有 row/colum 的会自动落位。点击芯片 × 或拖回右侧列表可清除位置。</span>'
+        + '    </div>'
+        + '    <div class="pd-workspace">'
+        + '      <div class="pd-grid-wrap"><div class="pd-grid"></div></div>'
+        + '      <div class="pd-list-wrap"><div class="pd-list-title">本站点调光器</div><div class="pd-list"></div>'
+        + '    </div>'
+        + '  </div>'
+        + '  <div class="wizard-modal-foot">'
+        + '    <button type="button" class="btn btn-outline btn-sm pd-cancel">取消</button>'
+        + '    <button type="button" class="btn btn-primary btn-sm pd-save">保存并返回</button>'
+        + '  </div>'
+        + '</div>';
+
+    document.body.appendChild(overlay);
+    function close() { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }
+    overlay.querySelector('.wizard-modal-close').addEventListener('click', close);
+    overlay.querySelector('.pd-cancel').addEventListener('click', close);
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) close(); });
+
+    var siteSel = overlay.querySelector('.pd-site');
+    var rowsInp = overlay.querySelector('.pd-rows');
+    var colsInp = overlay.querySelector('.pd-cols');
+    var gridEl = overlay.querySelector('.pd-grid');
+    var listEl = overlay.querySelector('.pd-list');
+
+    function curSite() { return siteSel.value; }
+
+    function placedMap() {
+        var m = {};
+        work.forEach(function(it, idx) {
+            if (it.site_id === curSite() && typeof it.row === 'number' && typeof it.colum === 'number') {
+                var key = it.row + '_' + it.colum;
+                (m[key] = m[key] || []).push(idx);
+            }
+        });
+        return m;
+    }
+
+    function renderGrid() {
+        var rows = Math.max(1, parseInt(rowsInp.value, 10) || 1);
+        var cols = Math.max(1, parseInt(colsInp.value, 10) || 1);
+        var pm = placedMap();
+        var html = '';
+        for (var r = 0; r < rows; r++) {
+            for (var c = 0; c < cols; c++) {
+                var idxs = pm[r + '_' + c] || [];
+                var chips = '';
+                idxs.forEach(function(idx) {
+                    var it = work[idx];
+                    chips += '<div class="pd-chip" draggable="true" data-idx="' + idx + '">'
+                        + '<span class="pd-chip-id">' + escapeHtml(it.id != null ? String(it.id) : '-') + '</span>'
+                        + (it.name ? '<span class="pd-chip-name">' + escapeHtml(it.name) + '</span>' : '')
+                        + '<button type="button" class="pd-chip-x" data-idx="' + idx + '" title="清除位置">×</button>'
+                        + '</div>';
+                });
+                html += '<div class="pd-cell" data-r="' + r + '" data-c="' + c + '">'
+                    + '<span class="pd-cell-coord">' + r + ',' + c + '</span>'
+                    + chips
+                    + '</div>';
+            }
+        }
+        gridEl.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+        gridEl.innerHTML = html;
+    }
+
+    function renderList() {
+        var site = curSite();
+        var html = '';
+        work.forEach(function(it, idx) {
+            if (it.site_id !== site) return;
+            var placed = (typeof it.row === 'number' && typeof it.colum === 'number');
+            var badge = placed
+                ? '<span class="pd-badge">已放置 ' + it.row + ',' + it.colum + '</span>'
+                : '<span class="pd-badge pd-badge-none">未放置</span>';
+            html += '<div class="pd-item" draggable="true" data-idx="' + idx + '">'
+                + '<span class="pd-item-id">' + escapeHtml(it.id != null ? String(it.id) : '-') + '</span>'
+                + (it.name ? '<span class="pd-item-name">' + escapeHtml(it.name) + '</span>' : '')
+                + badge
+                + '</div>';
+        });
+        listEl.innerHTML = html || '<div class="pd-empty">该站点暂无调光器</div>';
+    }
+
+    function clearPos(idx) { delete work[idx].row; delete work[idx].colum; }
+
+    // 拖拽开始（事件委托到 overlay，innerHTML 刷新后仍有效）
+    overlay.addEventListener('dragstart', function(e) {
+        var el = e.target.closest('.pd-item, .pd-chip');
+        if (!el) return;
+        e.dataTransfer.setData('text/plain', el.getAttribute('data-idx'));
+        e.dataTransfer.effectAllowed = 'move';
+    });
+
+    // 芯片 × 清除
+    overlay.addEventListener('click', function(e) {
+        var x = e.target.closest('.pd-chip-x');
+        if (x) { clearPos(+x.getAttribute('data-idx')); renderGrid(); renderList(); }
+    });
+
+    // 网格落点
+    gridEl.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        var cell = e.target.closest('.pd-cell');
+        if (cell) cell.classList.add('pd-cell-over');
+    });
+    gridEl.addEventListener('dragleave', function(e) {
+        var cell = e.target.closest('.pd-cell');
+        if (cell) cell.classList.remove('pd-cell-over');
+    });
+    gridEl.addEventListener('drop', function(e) {
+        e.preventDefault();
+        var cell = e.target.closest('.pd-cell');
+        if (!cell) return;
+        cell.classList.remove('pd-cell-over');
+        var idx = parseInt(e.dataTransfer.getData('text/plain'), 10);
+        if (isNaN(idx)) return;
+        work[idx].row = +cell.getAttribute('data-r');
+        work[idx].colum = +cell.getAttribute('data-c');
+        renderGrid();
+        renderList();
+    });
+
+    // 右侧列表：拖回即清除位置
+    listEl.addEventListener('dragover', function(e) { e.preventDefault(); });
+    listEl.addEventListener('drop', function(e) {
+        e.preventDefault();
+        var idx = parseInt(e.dataTransfer.getData('text/plain'), 10);
+        if (isNaN(idx)) return;
+        clearPos(idx);
+        renderGrid();
+        renderList();
+    });
+
+    // 站点切换：套用该站点在 ccr_card_config 的网格尺寸并刷新
+    siteSel.addEventListener('change', function() { selectSite(curSite()); });
+    overlay.querySelector('.pd-apply').addEventListener('click', function() { renderGrid(); });
+
+    function selectSite(site) {
+        var sz = cardSizeFor(site);
+        rowsInp.value = sz.rows;
+        colsInp.value = sz.cols;
+        renderGrid();
+        renderList();
+    }
+
+    // 保存：把 work 的坐标写回 state.data（work 与 state.data 一一对应）
+    overlay.querySelector('.pd-save').addEventListener('click', function() {
+        work.forEach(function(it, i) {
+            if (i >= state.data.length) return;
+            if (typeof it.row === 'number' && typeof it.colum === 'number') {
+                state.data[i].row = it.row;
+                state.data[i].colum = it.colum;
+            } else {
+                delete state.data[i].row;
+                delete state.data[i].colum;
+            }
+        });
+        rerender();
+        onChange(state.data);
+        close();
+    });
+
+    selectSite(sites[0]);
+}
+
+/** 通用模态弹窗：标题 + 主体 + 确定/取消；onConfirm 返回 false 则保持打开（用于校验失败） */
+function showWizardModal(title, bodyHtml, onConfirm) {
+    var overlay = document.createElement('div');
+    overlay.className = 'wizard-modal-overlay';
+    overlay.innerHTML = ''
+        + '<div class="wizard-modal">'
+        + '  <div class="wizard-modal-head"><span>' + escapeHtml(title) + '</span><button type="button" class="wizard-modal-close" title="关闭">×</button></div>'
+        + '  <div class="wizard-modal-body">' + bodyHtml + '</div>'
+        + '  <div class="wizard-modal-foot">'
+        + '    <button type="button" class="btn btn-outline btn-sm wizard-modal-cancel">取消</button>'
+        + '    <button type="button" class="btn btn-primary btn-sm wizard-modal-ok">确定</button>'
+        + '  </div>'
+        + '</div>';
+    document.body.appendChild(overlay);
+    function close() { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); }
+    overlay.querySelector('.wizard-modal-close').addEventListener('click', close);
+    overlay.querySelector('.wizard-modal-cancel').addEventListener('click', close);
+    overlay.addEventListener('click', function(e) { if (e.target === overlay) close(); });
+    overlay.querySelector('.wizard-modal-ok').addEventListener('click', function() {
+        var res = onConfirm(overlay);
+        if (res !== false) close();
+    });
+    return overlay;
 }
 
 /** 通用数组表单编辑器（左表单 + 右预览） */
@@ -662,6 +1385,280 @@ function renderBasicShapesForm(container, data, onChange) {
     onChange(collectData());
 }
 
+/* ============================================================
+ * 通用对象编辑器：渲染任意「顶层为对象」的 JSON 配置
+ *  - 标量(string/number/boolean) → 输入框 / 数字框 / 勾选框
+ *  - 对象数组 → 卡片（提取公共标量字段编辑，支持增删项）
+ *  - 标量数组 → 列表（逐项文本输入，支持增删项）
+ *  - 嵌套对象 → 可展开子表单
+ *  - 顶层支持「新增字段 / 删除字段」
+ * 所有改动实时同步右侧 JSON 预览（通过 onChange）。
+ * ============================================================ */
+function renderGenericObjectEditor(container, obj, onChange) {
+    var rootObj = obj;
+
+    function emit() { if (onChange) onChange(rootObj); }
+
+    // 是否为「对象数组」（数组元素为普通对象）
+    function isObjectArray(arr) {
+        return arr.length > 0 && arr[0] && typeof arr[0] === 'object' && !Array.isArray(arr[0]);
+    }
+
+    // 提取对象数组中各元素共有的标量字段
+    function commonScalarFields(arr) {
+        var common = null;
+        for (var i = 0; i < arr.length; i++) {
+            var rec = arr[i];
+            if (!rec || typeof rec !== 'object') continue;
+            var flat = Object.keys(rec).filter(function(k) {
+                var v = rec[k];
+                return v === null || typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean';
+            });
+            if (common === null) common = {};
+            else {
+                var cur = {};
+                for (var j = 0; j < flat.length; j++) cur[flat[j]] = true;
+                for (var ck in common) if (!cur[ck]) delete common[ck];
+            }
+            for (var f = 0; f < flat.length; f++) if (!(flat[f] in common)) common[flat[f]] = true;
+        }
+        return common ? Object.keys(common) : [];
+    }
+
+    function defaultValueForType(t) {
+        if (t === 'number') return 0;
+        if (t === 'boolean') return false;
+        if (t === 'object') return {};
+        if (t === 'array') return [];
+        return '';
+    }
+
+    // 标量输入
+    function buildScalar(val, onSet) {
+        if (typeof val === 'boolean') {
+            var cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.className = 'form-cb obj-scalar';
+            cb.checked = !!val;
+            cb.addEventListener('change', function() { onSet(cb.checked); emit(); });
+            return cb;
+        }
+        var inp = document.createElement('input');
+        inp.className = 'form-input form-input-sm obj-scalar';
+        if (typeof val === 'number') {
+            inp.type = 'number'; inp.step = 'any';
+            inp.value = (val === null || val === undefined) ? '' : val;
+            inp.addEventListener('input', function() {
+                onSet(inp.value === '' ? null : parseFloat(inp.value)); emit();
+            });
+        } else {
+            inp.type = 'text';
+            inp.value = (val === null || val === undefined) ? '' : String(val);
+            inp.addEventListener('input', function() { onSet(inp.value); emit(); });
+        }
+        return inp;
+    }
+
+    // 对象数组 → 卡片列表
+    function buildObjectArray(container, arr) {
+        var fields = commonScalarFields(arr);
+        var wrap = document.createElement('div');
+        wrap.className = 'obj-array obj-array-cards';
+
+        var bar = document.createElement('div');
+        bar.className = 'obj-array-bar';
+        bar.innerHTML = '<span class="obj-array-count">' + arr.length + ' 项</span>';
+        var addBtn = document.createElement('button');
+        addBtn.type = 'button'; addBtn.className = 'btn btn-primary btn-sm'; addBtn.textContent = '＋ 新增项';
+        addBtn.addEventListener('click', function() {
+            var item = {};
+            for (var i = 0; i < fields.length; i++) {
+                var t = typeof (arr.length ? arr[0][fields[i]] : '');
+                item[fields[i]] = defaultValueForType(t === 'object' ? 'string' : t);
+            }
+            arr.push(item);
+            rebuildAll();
+        });
+        bar.appendChild(addBtn);
+        wrap.appendChild(bar);
+
+        for (var i = 0; i < arr.length; i++) {
+            (function(idx) {
+                var card = document.createElement('div');
+                card.className = 'obj-card';
+                var head = document.createElement('div');
+                head.className = 'obj-card-head';
+                var headId = arr[idx].id != null ? String(arr[idx].id)
+                    : (arr[idx].name != null ? String(arr[idx].name) : ('#' + (idx + 1)));
+                head.innerHTML = '<span class="brush-id">' + escapeHtml(headId) + '</span>';
+                var del = document.createElement('button');
+                del.type = 'button'; del.className = 'card-del-btn'; del.textContent = '×';
+                del.title = '删除该项';
+                del.addEventListener('click', function() {
+                    if (confirm('确认删除该项「' + headId + '」？')) { arr.splice(idx, 1); rebuildAll(); }
+                });
+                head.appendChild(del);
+                card.appendChild(head);
+
+                var body = document.createElement('div');
+                body.className = 'obj-card-body';
+                for (var fi = 0; fi < fields.length; fi++) {
+                    (function(fk) {
+                        var fg = document.createElement('div');
+                        fg.className = 'form-group';
+                        var lb = document.createElement('label');
+                        lb.className = 'form-label form-label-sm'; lb.textContent = fk;
+                        fg.appendChild(lb);
+                        fg.appendChild(buildScalar(arr[idx][fk], function(nv) { arr[idx][fk] = nv; }));
+                        body.appendChild(fg);
+                    })(fields[fi]);
+                }
+                if (fields.length === 0) {
+                    var empty = document.createElement('div');
+                    empty.className = 'obj-card-empty';
+                    empty.textContent = '（无标量字段，仅含嵌套结构）';
+                    body.appendChild(empty);
+                }
+                card.appendChild(body);
+                wrap.appendChild(card);
+            })(i);
+        }
+        container.appendChild(wrap);
+    }
+
+    // 标量数组 → 列表
+    function buildScalarArray(container, arr) {
+        var wrap = document.createElement('div');
+        wrap.className = 'obj-array obj-array-list';
+        var bar = document.createElement('div');
+        bar.className = 'obj-array-bar';
+        bar.innerHTML = '<span class="obj-array-count">' + arr.length + ' 项</span>';
+        var addBtn = document.createElement('button');
+        addBtn.type = 'button'; addBtn.className = 'btn btn-primary btn-sm'; addBtn.textContent = '＋ 新增项';
+        addBtn.addEventListener('click', function() { arr.push(''); rebuildAll(); });
+        bar.appendChild(addBtn);
+        wrap.appendChild(bar);
+
+        for (var i = 0; i < arr.length; i++) {
+            (function(idx) {
+                var item = document.createElement('div');
+                item.className = 'obj-list-item';
+                var inp = document.createElement('input');
+                inp.type = 'text'; inp.className = 'form-input form-input-sm';
+                inp.value = (arr[idx] === null || arr[idx] === undefined) ? '' : String(arr[idx]);
+                inp.addEventListener('input', function() { arr[idx] = inp.value; emit(); });
+                item.appendChild(inp);
+                var del = document.createElement('button');
+                del.type = 'button'; del.className = 'card-del-btn'; del.textContent = '×';
+                del.title = '删除该项';
+                del.addEventListener('click', function() { arr.splice(idx, 1); rebuildAll(); });
+                item.appendChild(del);
+                wrap.appendChild(item);
+            })(i);
+        }
+        if (arr.length === 0) {
+            var empty = document.createElement('div');
+            empty.className = 'obj-card-empty';
+            empty.textContent = '（空数组）';
+            wrap.appendChild(empty);
+        }
+        container.appendChild(wrap);
+    }
+
+    // 字段构造：根据值类型返回控件（对象/数组会就地递归挂载到 parentRow）
+    function buildField(parentRow, val, onSet) {
+        if (val && typeof val === 'object') {
+            if (Array.isArray(val)) {
+                if (isObjectArray(val)) buildObjectArray(parentRow, val);
+                else buildScalarArray(parentRow, val);
+            } else {
+                var det = document.createElement('details');
+                det.className = 'obj-nested';
+                det.open = true;
+                var sum = document.createElement('summary');
+                sum.className = 'obj-nested-sum';
+                sum.textContent = '对象（' + Object.keys(val).length + ' 个键）';
+                det.appendChild(sum);
+                var inner = document.createElement('div');
+                inner.className = 'obj-nested-body';
+                buildObjectForm(inner, val);
+                det.appendChild(inner);
+                parentRow.appendChild(det);
+            }
+        } else {
+            parentRow.appendChild(buildScalar(val, onSet));
+        }
+    }
+
+    // 构建对象表单（递归）
+    function buildObjectForm(parentEl, targetObj) {
+        var keys = Object.keys(targetObj);
+        for (var ki = 0; ki < keys.length; ki++) {
+            (function(key) {
+                var val = targetObj[key];
+                var row = document.createElement('div');
+                row.className = 'obj-row';
+                var labelWrap = document.createElement('div');
+                labelWrap.className = 'obj-label-wrap';
+                var label = document.createElement('label');
+                label.className = 'obj-label'; label.textContent = key;
+                labelWrap.appendChild(label);
+                var del = document.createElement('button');
+                del.type = 'button'; del.className = 'obj-row-del'; del.textContent = '×';
+                del.title = '删除该字段';
+                del.addEventListener('click', function() {
+                    if (confirm('确认删除字段「' + key + '」？')) { delete targetObj[key]; rebuildAll(); }
+                });
+                labelWrap.appendChild(del);
+                row.appendChild(labelWrap);
+
+                var fieldCell = document.createElement('div');
+                fieldCell.className = 'obj-field-cell';
+                row.appendChild(fieldCell);
+                buildField(fieldCell, val, function(nv) { targetObj[key] = nv; });
+
+                parentEl.appendChild(row);
+            })(keys[ki]);
+        }
+    }
+
+    function rebuildAll() {
+        container.innerHTML = '';
+        buildToolbar();
+        buildObjectForm(container, rootObj);
+        emit();
+    }
+
+    function buildToolbar() {
+        var bar = document.createElement('div');
+        bar.className = 'wizard-form-toolbar obj-top-toolbar';
+        var keyInp = document.createElement('input');
+        keyInp.type = 'text'; keyInp.className = 'form-input form-input-sm obj-addkey';
+        keyInp.placeholder = '新字段名';
+        var typeSel = document.createElement('select');
+        typeSel.className = 'form-input form-input-sm obj-addtype';
+        [['string', '文本'], ['number', '数字'], ['boolean', '布尔'], ['object', '对象'], ['array', '数组']].forEach(function(t) {
+            var o = document.createElement('option'); o.value = t[0]; o.textContent = t[1]; typeSel.appendChild(o);
+        });
+        var addBtn = document.createElement('button');
+        addBtn.type = 'button'; addBtn.className = 'btn btn-outline btn-sm'; addBtn.textContent = '＋ 新增字段';
+        addBtn.addEventListener('click', function() {
+            var k = keyInp.value.trim();
+            if (!k) { alert('请输入字段名'); return; }
+            if (k in rootObj) { alert('字段「' + k + '」已存在'); return; }
+            rootObj[k] = defaultValueForType(typeSel.value);
+            keyInp.value = '';
+            rebuildAll();
+        });
+        bar.appendChild(keyInp);
+        bar.appendChild(typeSel);
+        bar.appendChild(addBtn);
+        container.appendChild(bar);
+    }
+
+    rebuildAll();
+}
+
 /** 根据图形数据生成 SVG 预览 HTML */
 function renderShapePreviewSVG(shape) {
     if (!shape) return '';
@@ -862,7 +1859,14 @@ function handleGenerate() {
 
 function collectStepData(step) {
     var textarea = document.getElementById('stepJsonEditor');
-    if (!textarea) return step.defaultData;
+    if (!textarea) {
+        // 无 textarea（大文件摘要视图 / 尚未渲染）→ 用已生成数据 > 模板缓存 > 内置兜底
+        if (wizardState.generatedData[step.id]) {
+            try { return JSON.parse(wizardState.generatedData[step.id]); } catch (e) {}
+        }
+        if (TEMPLATE_CACHE[step.id] != null) return TEMPLATE_CACHE[step.id];
+        return step.defaultData;
+    }
 
     try {
         return JSON.parse(textarea.value);
@@ -933,10 +1937,8 @@ function renderSidebar() {
     var html = '';
     for (var i = 0; i < STEPS.length; i++) {
         var step = STEPS[i];
-        var isGen = !!wizardState.generatedData[step.id];
         var isActive = wizardState.currentStep === i;
         html += '<div class="ws-item' + (isActive ? ' active' : '') + '" data-idx="' + i + '">';
-        html += '  <span class="ws-status ' + (isGen ? 'gen' : 'pending') + '">' + (isGen ? '✔' : '○') + '</span>';
         html += '  <span class="ws-name">' + escapeHtml(step.fileName) + '</span>';
         html += '</div>';
     }
@@ -985,17 +1987,81 @@ function renderStepEditor(step) {
     if (!body) return;
 
     var existingData = wizardState.generatedData[step.id];
-    var data = existingData ? JSON.parse(existingData) : (step.defaultData && typeof step.defaultData === 'object' ? JSON.parse(JSON.stringify(step.defaultData)) : step.defaultData);
+
+    // inlineTemplate 步骤：默认数据已内联在 step.defaultData（仅提炼公共字段 + 5 组真实数据），
+    // 无需再 fetch 大文件，直接种子化缓存即可。
+    if (step.inlineTemplate && !(step.id in TEMPLATE_CACHE)) {
+        TEMPLATE_CACHE[step.id] = (step.defaultData !== undefined ? step.defaultData : null);
+    }
+
+    // 尚未生成、且默认模板未加载 → 异步从 templates/ 拉取真实工程配置作为默认值
+    if (!existingData && !(step.id in TEMPLATE_CACHE)) {
+        if (!TEMPLATE_LOADING[step.id]) {
+            TEMPLATE_LOADING[step.id] = true;
+            fetch(TEMPLATE_DIR + step.fileName)
+                .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+                .then(function(json) {
+                    TEMPLATE_CACHE[step.id] = json;
+                    delete TEMPLATE_LOADING[step.id];
+                    if (STEPS[wizardState.currentStep] === step) renderStepEditor(step);
+                })
+                .catch(function(err) {
+                    // 加载失败（未通过 http 服务打开 / 文件缺失）→ 回退到内置兜底默认值
+                    console.warn('模板加载失败 ' + step.fileName + '：', err);
+                    TEMPLATE_CACHE[step.id] = (step.defaultData !== undefined ? step.defaultData : null);
+                    delete TEMPLATE_LOADING[step.id];
+                    if (STEPS[wizardState.currentStep] === step) renderStepEditor(step);
+                });
+        }
+        body.innerHTML = '<div class="wizard-tpl-loading">正在加载默认模板 <strong>' + escapeHtml(step.fileName) + '</strong> …</div>';
+        return;
+    }
+
+    // 计算当前步骤数据：已生成 > 模板缓存 > 内置兜底
+    var data;
+    if (existingData) {
+        data = JSON.parse(existingData);
+    } else {
+        var tpl = TEMPLATE_CACHE[step.id];
+        data = (tpl && typeof tpl === 'object') ? JSON.parse(JSON.stringify(tpl)) : tpl;
+    }
     var isGenerated = !!existingData;
     var editorType = FORM_EDITORS[step.id];
 
+    // lamp_template：直接关联「灯光图例」编辑器，全屏嵌入 legend_editor.html，
+    // 充分展示该网页内容，不显示 JSON 预览区。
+    if (editorType === 'legend') {
+        // 进入该步骤时，若尚未生成过数据，则用默认数据初始化，保证图例编辑器载入即有内容。
+        if (!wizardState.generatedData[step.id]) {
+            wizardState.generatedData[step.id] = JSON.stringify(data, null, 4);
+        }
+        // 用 DOM 方式创建 iframe 并挂载，确保其获得确定高度、可靠渲染（避免 innerHTML 中 iframe 高度坍塌）
+        body.innerHTML = '<div class="wizard-editor-split" id="wizardLegendWrap"></div>';
+        var wrap = document.getElementById('wizardLegendWrap');
+        if (wrap) {
+            var frame = document.createElement('iframe');
+            frame.className = 'wizard-legend-frame';
+            frame.src = 'legend_editor.html';
+            frame.setAttribute('title', '灯光图例编辑器');
+            wrap.appendChild(frame);
+        }
+        return;
+    }
+
     // 表单编辑器（中栏 + 右JSON预览）
     if (editorType) {
+        // 图形预览区域仅 basic_shapes（object 编辑器）需要；
+        // brushes_config / lamp_model_config（array 编辑器）不显示，
+        // 让属性配置区域自动撑满至与 JSON 预览区底部平齐。
+        var previewPaneHtml = (editorType === 'object')
+            ? '        <div class="wizard-editor-preview" id="wizardEditorPreview"></div>'
+            : '';
+
         var html = ''
             + '<div class="wizard-editor-split">'
             + '    <div class="wizard-editor-center">'
             + '        <div class="wizard-editor-form" id="wizardEditorLeft"></div>'
-            + '        <div class="wizard-editor-preview" id="wizardEditorPreview"></div>'
+            + previewPaneHtml
             + '    </div>'
             + '    <div class="wizard-editor-right">'
             + '        <div class="wizard-preview-header">JSON 预览 <span style="font-weight:400;font-size:11px;color:var(--text-secondary);">（编辑表单自动更新）</span></div>'
@@ -1020,15 +2086,87 @@ function renderStepEditor(step) {
             };
 
             if (editorType === 'object') {
-                renderBasicShapesForm(leftContainer, data, onChange);
+                if (step.id === 'basic_shapes') {
+                    renderBasicShapesForm(leftContainer, data, onChange);
+                } else {
+                    renderGenericObjectEditor(leftContainer, data, onChange);
+                }
             } else if (editorType === 'array') {
-                renderArrayFormEditor(leftContainer, data, onChange);
+                var cardOpts = (function() {
+                    if (step.id === 'brushes_config') return { fields: BRUSH_FIELDS, cardsClass: 'brush-cards', headFn: function(item, i) { return '<span class="brush-id">' + escapeHtml(item.id || ('#' + (i + 1))) + '</span>'; } };
+                    if (step.id === 'lamp_model_config') return { fields: LAMP_MODEL_FIELDS, cardsClass: 'lampmodel-cards', headFn: function(item, i) { return '<span class="brush-id">' + escapeHtml(item.id || ('#' + (i + 1))) + '</span>' + '<span class="lampmodel-name">' + escapeHtml(item.name || '') + '</span>'; } };
+                    if (step.id === 'site_config') return { fields: SITE_CONFIG_FIELDS, cardsClass: 'site-cards', headFn: function(item, i) { return '<span class="brush-id">' + escapeHtml(item.id || ('#' + (i + 1))) + '</span>' + '<span class="lampmodel-name">' + escapeHtml(item.name || '') + '</span>'; } };
+                    if (step.id === 'runway_config') return { fields: RUNWAY_CONFIG_FIELDS, cardsClass: 'runway-cards', headFn: function(item, i) { return '<span class="brush-id">' + escapeHtml(item.id || ('#' + (i + 1))) + '</span>' + '<span class="lampmodel-name">' + escapeHtml(item.name || '') + '</span>'; } };
+                    if (step.id === 'zone_config') return { fields: ZONE_CONFIG_FIELDS, cardsClass: 'zone-cards', headFn: function(item, i) { return '<span class="brush-id">' + escapeHtml(item.id || ('#' + (i + 1))) + '</span>' + '<span class="lampmodel-name">' + escapeHtml(item.name || '') + '</span>'; } };
+                    if (step.id === 'soc_config') return { fields: SOC_CONFIG_FIELDS, cardsClass: 'soc-cards', headFn: function(item, i) { return '<span class="brush-id">' + escapeHtml(item.id || ('#' + (i + 1))) + '</span>' + '<span class="lampmodel-name">' + escapeHtml(item.name || '') + '</span>'; } };
+                    if (step.id === 'ccr_config') return {
+                        fields: TEMPLATE_FIELDS['ccr_config'],
+                        cardsClass: 'ccr-cards',
+                        pageDesign: true,
+                        headFn: function(item, i) {
+                            return '<span class="brush-id">' + escapeHtml(item.id != null ? item.id : ('#' + (i + 1))) + '</span>'
+                                + (item.name != null && item.name !== '' ? '<span class="lampmodel-name">' + escapeHtml(item.name) + '</span>' : '');
+                        }
+                    };
+                    // 自动提取字段的数组配置（厦门真实工程）：用公共字段生成卡片，卡片头显示 id（+name）
+                    if (TEMPLATE_FIELDS[step.id]) return {
+                        fields: TEMPLATE_FIELDS[step.id],
+                        cardsClass: step.id + '-cards',
+                        headFn: function(item, i) {
+                            var h = '<span class="brush-id">' + escapeHtml(item.id != null ? item.id : ('#' + (i + 1))) + '</span>';
+                            if (item.name != null && item.name !== '') h += '<span class="lampmodel-name">' + escapeHtml(item.name) + '</span>';
+                            return h;
+                        }
+                    };
+                    return null;
+                })();
+
+                if (cardOpts) {
+                    var st = ensureWizardEditorState(step.id, cardOpts.fields, data);
+                    var doRender = function() {
+                        renderCardArrayEditor(leftContainer, st, onChange, doRender, {
+                            cardsClass: cardOpts.cardsClass,
+                            headHtml: cardOpts.headFn
+                        });
+                    };
+                    doRender();
+                } else {
+                    renderArrayFormEditor(leftContainer, data, onChange);
+                }
             }
         }
         return;
     }
 
     // 其他步骤保持 textarea 编辑器
+    var jsonStr = JSON.stringify(data, null, 4) || '';
+    var countLabel = Array.isArray(data)
+        ? (data.length + ' 条记录')
+        : (data && typeof data === 'object' ? (Object.keys(data).length + ' 个顶级键') : '—');
+
+    // 大文件保护：序列化后过大（如 6MB+ 的 lamp_unit_config）不塞入 textarea，
+    // 否则会卡死浏览器。改用只读摘要卡片，并直接预存为已生成数据以便保存/下一步。
+    if (jsonStr.length > LARGE_TEMPLATE_CHARS) {
+        if (!existingData) {
+            wizardState.generatedData[step.id] = jsonStr;
+            isGenerated = true;
+        }
+        var sizeMB = (jsonStr.length / 1048576).toFixed(2);
+        body.innerHTML = ''
+            + '<div class="step-editor">'
+            + '  <div class="wizard-bigfile">'
+            + '    <div class="wizard-bigfile-icon">📦</div>'
+            + '    <div class="wizard-bigfile-title">' + escapeHtml(step.fileName) + ' 已按默认模板载入</div>'
+            + '    <div class="wizard-bigfile-meta">' + countLabel + ' · 约 ' + sizeMB + ' MB · <span style="color:var(--msg-success-text);">✔ 已生成</span></div>'
+            + '    <div class="wizard-bigfile-tip">该文件体积较大，为保证界面流畅未在此内联编辑。内容已加载为默认模板，保存时将原样输出。如需修改，请用外部编辑器调整后放回工程目录。</div>'
+            + '  </div>'
+            + '</div>';
+        wizardState.currentFormData = null;
+        renderSidebar();
+        updateNavButtons();
+        return;
+    }
+
     var html = ''
         + '<div class="step-editor">'
         + '    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:6px;">'
@@ -1039,11 +2177,11 @@ function renderStepEditor(step) {
         + '            </span>'
         + '        </div>'
         + '        <div style="font-size:11px; color:var(--text-secondary);">'
-        + (Array.isArray(data) ? data.length + ' 条记录' : Object.keys(data).length + ' 个顶级键')
+        + countLabel
         + '        </div>'
         + '    </div>'
         + '    <textarea id="stepJsonEditor" class="step-json-editor" spellcheck="false">'
-        + escapeHtml(JSON.stringify(data, null, 4))
+        + escapeHtml(jsonStr)
         + '</textarea>'
         + '    <pre id="stepPreview" class="step-preview" style="display:' + (isGenerated ? 'block' : 'none') + ';">'
         + (isGenerated ? escapeHtml(existingData) : '')
